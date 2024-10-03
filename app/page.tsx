@@ -17,6 +17,8 @@ export default function Dashboard() {
   const { projects, projectsLoading } = useFetchProjects();
   const { clients, clientLoading } = useFetchClients();
 
+  const router = useRouter();
+
   return (
     <div className="max-w-screen-2xl space-y-8">
       <div className="flex items-center justify-between">
@@ -29,12 +31,14 @@ export default function Dashboard() {
           icon={SquareUser}
           content={clients.length.toString()}
           horizontal={true}
+          onClick={() => router.push("/clients")}
         />
         <DashboardSimpleCard
           title="Projects"
           icon={PanelsTopLeft}
           content={projects.length.toString()}
           horizontal={true}
+          onClick={() => router.push("/projects")}
         />
       </div>
       <div>

@@ -1,5 +1,4 @@
 import { supabase } from "@/lib/supabase";
-import { Client } from "@/models/client";
 import { TableName } from "@/models/enums/table-name";
 import { Project } from "@/models/project";
 import { PostgrestError } from "@supabase/supabase-js";
@@ -21,7 +20,6 @@ export const useFetchProjects = () => {
       return;
     }
 
-    console.log(data);
     setProjects(data);
     setLoading(false);
   };

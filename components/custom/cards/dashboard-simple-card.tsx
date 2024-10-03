@@ -7,17 +7,22 @@ interface DashboardSimpleCard {
   content: string;
   icon: LucideIcon;
   horizontal?: boolean;
+  onClick?: () => void;
 }
 
 const DashboardSimpleCard = ({
   title,
   content,
   horizontal,
+  onClick,
   ...props
 }: DashboardSimpleCard) => {
   if (horizontal) {
     return (
-      <div className="flex w-[200px] cursor-pointer items-center justify-between rounded-lg border p-6 hover:bg-gray-50">
+      <div
+        className="flex w-[200px] cursor-pointer items-center justify-between rounded-lg border p-6 hover:bg-gray-50"
+        onClick={onClick}
+      >
         <div className="flex items-center space-x-2">
           {<props.icon />}
           <p>{title}</p>
@@ -29,7 +34,10 @@ const DashboardSimpleCard = ({
     );
   }
   return (
-    <Card className="w-[200px] cursor-pointer hover:bg-gray-50">
+    <Card
+      className="w-[200px] cursor-pointer hover:bg-gray-50"
+      onClick={onClick}
+    >
       <CardHeader>
         <div className="flex items-center justify-between">
           <p>{title}</p>

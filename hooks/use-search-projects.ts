@@ -15,12 +15,9 @@ export const useSearchProjects = (searchValue: string) => {
     let { data, error } = await supabase
       .from(TableName.Project)
       .select("*, client(*)")
-      .or(
-        `title.ilike.%${searchValue}%,clientId.in.(select id from client where name ilike '%${searchValue}%')`,
-      );
+      .or(`title.ilike.%${searchValue}%`);
 
     if (error) {
-      console.log(error);
       setLoading(false);
       return;
     }

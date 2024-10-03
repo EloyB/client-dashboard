@@ -1,21 +1,22 @@
 "use client";
 
+import CreateProjectDialog from "@/components/custom/dialogs/create-project-dialog";
 import Loader from "@/components/custom/loaders/loader";
 import ProjectsTable from "@/components/custom/tables/projects-table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import useDebouncedInput from "@/hooks/use-debounce-input";
 import { useFetchProjects } from "@/hooks/use-fetch-projects";
-import { useSearchClient } from "@/hooks/use-search-clients";
 import { useSearchProjects } from "@/hooks/use-search-projects";
-import { Search } from "lucide-react";
+import { PlusIcon, Search } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
 const Projects = () => {
   const searchParams = useSearchParams();
 
-  const { projects, projectsLoading } = useFetchProjects();
+  const { projects, projectsLoading, error, refetch } = useFetchProjects();
   const searchInput = useDebouncedInput("", 500);
   const { filteredProjects, searchLoading } = useSearchProjects(
     searchParams.get("searchValue")
@@ -41,12 +42,12 @@ const Projects = () => {
           <h1 className="text-4xl font-bold">Projects</h1>
           <Badge variant={"gray"}>{projects.length}</Badge>
         </div>
-        {/* <CreateClientDialog onClose={() => refetch()}>
+        <CreateProjectDialog onClose={() => refetch()}>
           <Button className="space-x-2">
             <PlusIcon />
-            <span>Create new client</span>
+            <span>Create new project</span>
           </Button>
-        </CreateClientDialog> */}
+        </CreateProjectDialog>
       </div>
       <div className="space-y-4">
         <div className="flex items-center space-x-2">
