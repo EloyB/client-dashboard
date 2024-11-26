@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 
 interface DashboardSimpleCard {
   title: string;
-  content: string;
+  content?: string;
   icon: LucideIcon;
   horizontal?: boolean;
   onClick?: () => void;
@@ -20,16 +20,18 @@ const DashboardSimpleCard = ({
   if (horizontal) {
     return (
       <div
-        className="flex w-[200px] cursor-pointer items-center justify-between rounded-lg border p-6 hover:bg-gray-50"
+        className="flex w-max cursor-pointer items-center justify-between space-x-4 rounded-lg border p-6 hover:bg-gray-50"
         onClick={onClick}
       >
         <div className="flex items-center space-x-2">
           {<props.icon />}
           <p>{title}</p>
         </div>
-        <Badge variant={"gray"} className="font-semibold">
-          {content}
-        </Badge>
+        {content && (
+          <Badge variant={"gray"} className="font-semibold">
+            {content}
+          </Badge>
+        )}
       </div>
     );
   }

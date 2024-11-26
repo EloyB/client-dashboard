@@ -147,7 +147,7 @@ const CreateProjectDialog = ({
                 <Button variant={"ghost"} onClick={() => setOpen(false)}>
                   Cancel
                 </Button>
-                <Button type="submit">Create client</Button>
+                <Button type="submit">Create project</Button>
               </div>
             </form>
           </Form>

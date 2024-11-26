@@ -13,7 +13,7 @@ export interface Client extends BaseType {
   language?: string;
   balance?: number;
 
-  projects?: Project[];
+  project?: Project[];
 }
 
 export const ClientKeys = {

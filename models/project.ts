@@ -2,6 +2,7 @@ import { BaseType } from "./base-type";
 import { Client } from "./client";
 import { DefaultTableKeys } from "./enums/default-table-keys";
 import { ProjectStatus } from "./enums/project-status";
+import { TimelineItem } from "./timeline-item";
 
 export interface Project extends BaseType {
   id: string;
@@ -15,6 +16,7 @@ export interface Project extends BaseType {
   status: ProjectStatus;
   repositoryUri: string;
   client: Client;
+  timelineItems: TimelineItem[];
 }
 
 export const ProjectKeys = {

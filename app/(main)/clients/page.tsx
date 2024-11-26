@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import useDebouncedInput from "@/hooks/use-debounce-input";
 import { useFetchClients } from "@/hooks/use-fetch-clients";
 import { useSearchClient } from "@/hooks/use-search-clients";
-import { PlusIcon, Search } from "lucide-react";
+import { PlusIcon, Search, TriangleAlert } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 
@@ -35,6 +35,12 @@ const Clients = () => {
         <Loader />
       </div>
     );
+  }
+
+  if (error) {
+    <div className="flex h-full w-full items-center justify-center p-8">
+      <TriangleAlert />
+    </div>;
   }
 
   return (

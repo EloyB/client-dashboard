@@ -6,16 +6,23 @@ import ProjectStatusBadge from "../badges/project-status-badge";
 import DefaultTableCell from "./default-table-cell";
 import DynamicTable from "./dynamic-table";
 import moment from "moment";
+import { useRouter } from "next/navigation";
 
 interface ProjectsTableProps {
   projects: Project[];
 }
 
 const ProjectsTable = ({ projects }: ProjectsTableProps) => {
+  const router = useRouter();
+
   return (
     <DynamicTable headers={[...projectsTabelHeaders, { key: "", label: "" }]}>
       {projects.map((project, index) => (
-        <TableRow key={index} className="group cursor-pointer">
+        <TableRow
+          key={index}
+          className="group cursor-pointer"
+          onClick={() => router.push(`/projects/${project.id}`)}
+        >
           {projectsTabelHeaders.map(({ key }, index) => {
             switch (key) {
               case ProjectKeys.Title:

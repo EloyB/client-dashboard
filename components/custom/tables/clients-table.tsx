@@ -1,11 +1,11 @@
-import { clientsMockingData, clientsTableHeaders } from "@/lib/constants";
+import { clientsTableHeaders } from "@/lib/constants";
 import { Client, ClientKeys } from "@/models/client";
 import { ChevronRight } from "lucide-react";
+import moment from "moment";
+import { useRouter } from "next/navigation";
 import { TableCell, TableRow } from "../../ui/table";
 import DefaultTableCell from "./default-table-cell";
 import DynamicTable from "./dynamic-table";
-import moment from "moment";
-import { useRouter } from "next/navigation";
 
 interface ClientsTableProps {
   clients: Client[];
