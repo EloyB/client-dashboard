@@ -1,5 +1,5 @@
-@import "tailwindcss";
-@import "tw-animate-css";
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -10,63 +10,63 @@
 
 :root {
   /* Basis */
-  --background: 60 14% 96%;            /* #F2F2EE */
-  --foreground: 0 0% 7%;               /* #121212 */
+  --background: 60 14% 96%; /* #F2F2EE */
+  --foreground: 0 0% 7%; /* #121212 */
 
-  --card: 0 0% 100%;                   /* #FFFFFF */
+  --card: 0 0% 100%; /* #FFFFFF */
   --card-foreground: 0 0% 7%;
   --popover: 0 0% 100%;
   --popover-foreground: 0 0% 7%;
 
   /* Accent (primair) */
-  --primary: 168 64% 14%;              /* #0D3B33 */
-  --primary-hover: 168 64% 11%;        /* #0A2C26 */
+  --primary: 168 64% 14%; /* #0D3B33 */
+  --primary-hover: 168 64% 11%; /* #0A2C26 */
   --primary-foreground: 0 0% 100%;
 
-  --secondary: 60 14% 96%;             /* #F2F2EE */
-  --secondary-foreground: 60 4% 32%;   /* #55554F */
+  --secondary: 60 14% 96%; /* #F2F2EE */
+  --secondary-foreground: 60 4% 32%; /* #55554F */
   --muted: 60 14% 96%;
-  --muted-foreground: 60 4% 53%;       /* #87877E */
-  --accent: 165 24% 92%;               /* #E6EFEC */
+  --muted-foreground: 60 4% 53%; /* #87877E */
+  --accent: 165 24% 92%; /* #E6EFEC */
   --accent-foreground: 168 64% 14%;
 
   /* Semantisch */
-  --destructive: 0 74% 42%;            /* #B91C1C */
+  --destructive: 0 74% 42%; /* #B91C1C */
   --destructive-foreground: 0 0% 100%;
-  --destructive-muted: 0 71% 96%;      /* #FDECEC */
-  --destructive-border: 0 45% 88%;     /* #F0CFCF */
+  --destructive-muted: 0 71% 96%; /* #FDECEC */
+  --destructive-border: 0 45% 88%; /* #F0CFCF */
 
-  --success: 129 41% 30%;              /* #2C6B34 */
+  --success: 129 41% 30%; /* #2C6B34 */
   --success-foreground: 0 0% 100%;
-  --success-muted: 120 24% 93%;        /* #E8F1E8 */
+  --success-muted: 120 24% 93%; /* #E8F1E8 */
 
-  --warning: 30 89% 29%;               /* #8A4008 */
-  --warning-solid: 30 91% 37%;         /* #B45309 */
+  --warning: 30 89% 29%; /* #8A4008 */
+  --warning-solid: 30 91% 37%; /* #B45309 */
   --warning-foreground: 0 0% 100%;
-  --warning-muted: 38 67% 94%;         /* #FBF0E2 */
-  --warning-border: 36 52% 83%;        /* #ECD9BD */
+  --warning-muted: 38 67% 94%; /* #FBF0E2 */
+  --warning-border: 36 52% 83%; /* #ECD9BD */
 
-  --info: 203 64% 33%;                 /* #1E5F8A */
+  --info: 203 64% 33%; /* #1E5F8A */
   --info-foreground: 0 0% 100%;
-  --info-muted: 203 50% 93%;           /* #E6F0F6 */
+  --info-muted: 203 50% 93%; /* #E6F0F6 */
 
   /* Lijnen en velden */
-  --border: 60 5% 89%;                 /* #E3E3E0 */
-  --border-strong: 60 6% 84%;          /* #DCDCD6 */
-  --border-subtle: 60 17% 95%;         /* #F0F0EC */
+  --border: 60 5% 89%; /* #E3E3E0 */
+  --border-strong: 60 6% 84%; /* #DCDCD6 */
+  --border-subtle: 60 17% 95%; /* #F0F0EC */
   --input: 60 5% 89%;
   --ring: 168 64% 14%;
 
   /* Neutrale schaal (voor uitzonderingen buiten de rollen hierboven) */
-  --neutral-50: 60 20% 98%;            /* #FAFAF8 */
-  --neutral-100: 60 14% 96%;           /* #F2F2EE */
-  --neutral-200: 60 5% 89%;            /* #E3E3E0 */
-  --neutral-300: 60 5% 80%;            /* #CFCFC9 */
-  --neutral-400: 60 4% 59%;            /* #9A9A92 */
-  --neutral-500: 60 4% 42%;            /* #6E6E66 */
-  --neutral-600: 60 4% 32%;            /* #55554F */
-  --neutral-800: 60 4% 17%;            /* #2E2E2B */
-  --neutral-900: 0 0% 7%;              /* #121212 */
+  --neutral-50: 60 20% 98%; /* #FAFAF8 */
+  --neutral-100: 60 14% 96%; /* #F2F2EE */
+  --neutral-200: 60 5% 89%; /* #E3E3E0 */
+  --neutral-300: 60 5% 80%; /* #CFCFC9 */
+  --neutral-400: 60 4% 59%; /* #9A9A92 */
+  --neutral-500: 60 4% 42%; /* #6E6E66 */
+  --neutral-600: 60 4% 32%; /* #55554F */
+  --neutral-800: 60 4% 17%; /* #2E2E2B */
+  --neutral-900: 0 0% 7%; /* #121212 */
 
   /* Grafieken */
   --chart-1: 168 64% 14%;
@@ -86,7 +86,7 @@
   --sidebar-ring: 168 64% 14%;
 
   /* Vorm */
-  --radius: 0.625rem;                  /* 10px — lg */
+  --radius: 0.625rem; /* 10px — lg */
 }
 
 .dark {
@@ -230,31 +230,31 @@
   --font-mono: var(--font-jetbrains-mono), ui-monospace, monospace;
 
   /* Typeschaal */
-  --text-overline: 0.6875rem;          /* 11px */
+  --text-overline: 0.6875rem; /* 11px */
   --text-overline--line-height: 1rem;
   --text-overline--letter-spacing: 0.08em;
   --text-overline--font-weight: 600;
-  --text-small: 0.8125rem;             /* 13px */
+  --text-small: 0.8125rem; /* 13px */
   --text-small--line-height: 1.25rem;
-  --text-body: 0.875rem;               /* 14px */
+  --text-body: 0.875rem; /* 14px */
   --text-body--line-height: 1.375rem;
-  --text-h3: 0.9375rem;                /* 15px */
+  --text-h3: 0.9375rem; /* 15px */
   --text-h3--line-height: 1.375rem;
-  --text-h2: 1.125rem;                 /* 18px */
+  --text-h2: 1.125rem; /* 18px */
   --text-h2--line-height: 1.5rem;
   --text-h2--letter-spacing: -0.01em;
-  --text-h1: 1.5rem;                   /* 24px */
+  --text-h1: 1.5rem; /* 24px */
   --text-h1--line-height: 1.875rem;
   --text-h1--letter-spacing: -0.02em;
-  --text-display: 2rem;                /* 32px */
+  --text-display: 2rem; /* 32px */
   --text-display--line-height: 2.3125rem;
   --text-display--letter-spacing: -0.03em;
 
   /* Radius */
-  --radius-sm: calc(var(--radius) - 4px);   /* 6px */
-  --radius-md: calc(var(--radius) - 2px);   /* 8px */
-  --radius-lg: var(--radius);               /* 10px */
-  --radius-xl: calc(var(--radius) + 4px);   /* 14px */
+  --radius-sm: calc(var(--radius) - 4px); /* 6px */
+  --radius-md: calc(var(--radius) - 2px); /* 8px */
+  --radius-lg: var(--radius); /* 10px */
+  --radius-xl: calc(var(--radius) + 4px); /* 14px */
 
   /* Eén schaduwniveau; verder alleen randen */
   --shadow-card: 0 1px 2px rgb(18 18 18 / 0.05);
@@ -274,17 +274,19 @@
     -webkit-font-smoothing: antialiased;
   }
 
-  h1, h2, h3 {
+  h1,
+  h2,
+  h3 {
     font-family: var(--font-display);
     font-weight: 600;
   }
 
   /* Raakvlakken minimaal 44px onder md (mobile-first, PWA) */
   @media (max-width: 767px) {
-    button:not([data-slot="badge"]),
-    [role="button"],
+    button:not([data-slot='badge']),
+    [role='button'],
     select,
-    input:not([type="checkbox"]):not([type="radio"]),
+    input:not([type='checkbox']):not([type='radio']),
     a[data-nav-item] {
       min-height: 2.75rem;
     }
