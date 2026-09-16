@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#e8e8e3; }
+  a { color:#0d3b33; } a:hover { color:#0a2c26; }
+  * { box-sizing:border-box; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb { background:#d5d5cf; border-radius:4px; }
+</style>
+</helmet>
+
+<div style="font-family:'Instrument Sans',system-ui,sans-serif; color:#121212; padding:40px; display:flex; flex-direction:column; gap:36px;">
+
+  <div style="display:flex; flex-direction:column; gap:6px; max-width:84ch;">
+    <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#87877e; font-weight:600;">Beheer · klanten</div>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; letter-spacing:-.03em;">Klantenoverzicht, detail en formulieren</div>
+    <div style="font-size:14px; color:#6e6e66; line-height:1.55;">Opgebouwd met het lijst-, detail- en formulierpatroon. Zoeken filtert echt, de uitnodigingsdialoog en het klantformulier zijn klikbaar.</div>
+  </div>
+
+  <!-- ============================ 1 · OVERZICHT ============================ -->
+  <div style="display:flex; flex-direction:column; gap:12px;">
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600; letter-spacing:-.02em;">1 · Klantenoverzicht</div>
+    <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">Desktop 1040 · typ in het zoekveld</span>
+        <div style="width:1040px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column;">
+          <header style="background:#fff; border-bottom:1px solid #e3e3e0; padding:18px 24px; display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap;">
+            <div style="display:flex; flex-direction:column; gap:3px;">
+              <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">Klanten</h1>
+              <span style="font-size:13px; color:#87877e;">{{ countLabel }}</span>
+            </div>
+            <button style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font:inherit; font-size:14px; font-weight:600; cursor:pointer;" style-hover="background:#0a2c26;">Nieuwe klant</button>
+          </header>
+
+          <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:14px 24px; display:flex; flex-wrap:wrap; gap:12px; align-items:center; justify-content:space-between;">
+            <div style="height:36px; min-width:300px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; display:flex; align-items:center; gap:8px;">
+              <span style="color:#9a9a92; font-size:13px;">⌕</span>
+              <input type="text" value="{{ query }}" onChange="{{ onQuery }}" placeholder="Zoek op naam of e-mailadres" style="border:none; outline:none; font-family:'Instrument Sans',sans-serif; font-size:14px; background:transparent; width:100%; color:#121212;">
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; font-size:13px;">
+              <span style="color:#87877e;">Sorteren</span>
+              <select style="height:36px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer;">
+                <option>Naam A → Z</option><option>Meest open tickets</option><option>Recent toegevoegd</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="background:#fff;">
+            <div style="display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1.5fr) minmax(130px,.7fr) minmax(130px,.7fr) 92px; gap:12px; padding:10px 24px; background:#fafaf8; border-bottom:1px solid #f0f0ec; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#6e6e66; font-weight:600;">
+              <span>Klant</span><span>Contact</span><span>Projecten</span><span>Open tickets</span><span></span>
+            </div>
+            <sc-if value="{{ hasClients }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <sc-for list="{{ clients }}" as="c" hint-placeholder-count="5">
+                  <div style="display:grid; grid-template-columns:minmax(0,1.5fr) minmax(0,1.5fr) minmax(130px,.7fr) minmax(130px,.7fr) 92px; gap:12px; padding:13px 24px; border-bottom:1px solid #f0f0ec; font-size:13px; align-items:center; cursor:pointer;" style-hover="background:#fafaf8;">
+                    <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                      <div style="width:32px; height:32px; border-radius:8px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:12px; font-weight:700; flex-shrink:0;">{{ c.initials }}</div>
+                      <div style="display:flex; flex-direction:column; gap:1px; min-width:0;">
+                        <span style="font-size:14px; font-weight:600;">{{ c.name }}</span>
+                        <span style="font-size:12px; color:#9a9a92;">{{ c.city }}</span>
+                      </div>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:1px; min-width:0;">
+                      <span style="color:#2e2e2b;">{{ c.contact }}</span>
+                      <span style="font-size:12px; color:#9a9a92;">{{ c.email }}</span>
+                    </div>
+                    <span style="{{ c.projectStyle }}">{{ c.projects }}</span>
+                    <span style="{{ c.ticketStyle }}">{{ c.tickets }}</span>
+                    <span style="text-align:right; color:#0d3b33; font-weight:600; font-size:13px;">Openen</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noClients }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:40px 24px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">Geen klanten gevonden</span>
+                <span style="font-size:14px; color:#87877e; max-width:44ch; line-height:1.5;">Geen enkele klant komt overeen met “{{ query }}”.</span>
+                <button onClick="{{ clearQuery }}" style="margin-top:6px; padding:9px 16px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font:inherit; font-size:14px; font-weight:600; cursor:pointer;" style-hover="background:#fafaf8;">Zoekterm wissen</button>
+              </div>
+            </sc-if>
+            <div style="padding:14px 24px; display:flex; align-items:center; justify-content:space-between; gap:12px; border-top:1px solid #f0f0ec; font-size:13px; color:#87877e;">
+              <span>{{ pageLabel }}</span>
+              <div style="display:flex; gap:4px; font-weight:600; color:#121212;">
+                <span style="min-width:32px; height:32px; border-radius:8px; border:1px solid #dcdcd6; display:flex; align-items:center; justify-content:center; color:#cfcfc9;">‹</span>
+                <span style="min-width:32px; height:32px; border-radius:8px; background:#121212; color:#fff; display:flex; align-items:center; justify-content:center;">1</span>
+                <span style="min-width:32px; height:32px; border-radius:8px; border:1px solid #dcdcd6; display:flex; align-items:center; justify-content:center; color:#cfcfc9;">›</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">Mobiel 375</span>
+        <div style="width:375px; height:812px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column;">
+          <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:12px 14px; display:flex; flex-direction:column; gap:10px; flex-shrink:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600;">Klanten</span>
+              <span style="width:40px; height:40px; border-radius:10px; border:1px solid #dcdcd6; display:flex; align-items:center; justify-content:center; font-size:17px; color:#2e2e2b;">+</span>
+            </div>
+            <div style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; display:flex; align-items:center; gap:8px;">
+              <span style="color:#9a9a92; font-size:14px;">⌕</span>
+              <input type="text" value="{{ query }}" onChange="{{ onQuery }}" placeholder="Zoeken" style="border:none; outline:none; font-family:'Instrument Sans',sans-serif; font-size:15px; background:transparent; width:100%;">
+            </div>
+          </div>
+          <div style="flex:1; min-height:0; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:8px;">
+            <sc-for list="{{ clients }}" as="c" hint-placeholder-count="4">
+              <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:12px; display:flex; align-items:center; gap:12px; flex-shrink:0;">
+                <div style="width:38px; height:38px; border-radius:9px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700; flex-shrink:0;">{{ c.initials }}</div>
+                <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                  <span style="font-size:15px; font-weight:600;">{{ c.name }}</span>
+                  <span style="font-size:12px; color:#87877e; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ c.email }}</span>
+                  <span style="font-size:12px; color:#6e6e66;">{{ c.mobileMeta }}</span>
+                </div>
+                <span style="color:#cfcfc9; font-size:15px; flex-shrink:0;">›</span>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noClients }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px dashed #cfcfc9; border-radius:14px; background:#fff; padding:32px 16px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; flex-shrink:0;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Geen klanten gevonden</span>
+                <button onClick="{{ clearQuery }}" style="margin-top:4px; height:44px; padding:0 16px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Zoekterm wissen</button>
+              </div>
+            </sc-if>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ 2 · DETAIL ============================ -->
+  <div style="display:flex; flex-direction:column; gap:12px;">
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600; letter-spacing:-.02em;">2 · Klantdetail</div>
+    <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">Desktop 1040 · klik “Gebruiker uitnodigen”</span>
+        <div style="width:1040px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; position:relative;">
+          <header style="background:#fff; border-bottom:1px solid #e3e3e0; padding:18px 24px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:#87877e;">
+              <span style="cursor:pointer;" style-hover="color:#0d3b33;">Klanten</span><span style="color:#cfcfc9;">/</span><span style="color:#121212; font-weight:600;">Verlinden &amp; Zn</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap;">
+              <div style="display:flex; align-items:flex-start; gap:14px;">
+                <div style="width:44px; height:44px; border-radius:10px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:700;">VZ</div>
+                <div style="display:flex; flex-direction:column; gap:5px;">
+                  <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">Verlinden &amp; Zn</h1>
+                  <div style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600;">
+                    <span style="padding:4px 10px; border-radius:999px; background:#e6efec; color:#0d3b33;">Actieve klant</span>
+                    <span style="font-weight:400; color:#87877e;">Meubelmakerij · Brugge · klant sinds maart 2024</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; position:relative;">
+                <button style="padding:9px 16px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font:inherit;" style-hover="background:#fafaf8;">Bewerken</button>
+                <button style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Nieuw project</button>
+                <span onClick="{{ toggleMore }}" style="width:40px; height:40px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer;" style-hover="background:#fafaf8;">⋯</span>
+                <sc-if value="{{ moreOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; top:48px; right:0; width:210px; z-index:6; background:#fff; border:1px solid #e3e3e0; border-radius:12px; box-shadow:0 8px 24px rgba(18,18,18,.10); padding:6px; display:flex; flex-direction:column; font-weight:400;">
+                    <div style="padding:9px 10px; border-radius:8px; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;">Notitie toevoegen</div>
+                    <div style="padding:9px 10px; border-radius:8px; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;">Gegevens exporteren</div>
+                    <div style="height:1px; background:#f0f0ec; margin:4px 0;"></div>
+                    <div style="padding:9px 10px; border-radius:8px; font-size:14px; color:#b91c1c; font-weight:600; cursor:pointer;" style-hover="background:#fdecec;">Klant archiveren</div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </header>
+
+          <div style="padding:20px 24px 24px; display:grid; grid-template-columns:minmax(0,1.6fr) minmax(0,1fr); gap:18px; align-items:start;">
+            <div style="display:flex; flex-direction:column; gap:18px; min-width:0;">
+
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #f0f0ec;">
+                  <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Projecten</span>
+                  <span style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer;">Alle projecten</span>
+                </div>
+                <div style="display:grid; grid-template-columns:minmax(0,1.6fr) minmax(120px,.6fr) minmax(140px,.7fr) minmax(110px,.5fr); gap:12px; padding:10px 18px; background:#fafaf8; border-bottom:1px solid #f0f0ec; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#6e6e66; font-weight:600;">
+                  <span>Project</span><span>Status</span><span>Deadline</span><span>Tickets</span>
+                </div>
+                <div style="display:grid; grid-template-columns:minmax(0,1.6fr) minmax(120px,.6fr) minmax(140px,.7fr) minmax(110px,.5fr); gap:12px; padding:13px 18px; border-bottom:1px solid #f0f0ec; font-size:13px; align-items:center; cursor:pointer;" style-hover="background:#fafaf8;">
+                  <span style="font-size:14px; font-weight:600;">Herbouw website</span>
+                  <span><span style="padding:4px 10px; border-radius:999px; background:#e6efec; color:#0d3b33; font-size:12px; font-weight:600; white-space:nowrap;">Actief</span></span>
+                  <span style="color:#2e2e2b;">21 okt 2026</span>
+                  <span style="color:#2e2e2b; font-weight:600;">3 open</span>
+                </div>
+                <div style="display:grid; grid-template-columns:minmax(0,1.6fr) minmax(120px,.6fr) minmax(140px,.7fr) minmax(110px,.5fr); gap:12px; padding:13px 18px; font-size:13px; align-items:center; cursor:pointer;" style-hover="background:#fafaf8;">
+                  <span style="font-size:14px; font-weight:600;">Onderhoud oude site</span>
+                  <span><span style="padding:4px 10px; border-radius:999px; background:#e8f1e8; color:#2c6b34; font-size:12px; font-weight:600; white-space:nowrap;">Afgerond</span></span>
+                  <span style="color:#87877e;">juli 2026</span>
+                  <span style="color:#9a9a92;">geen</span>
+                </div>
+              </div>
+
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #f0f0ec; gap:12px; flex-wrap:wrap;">
+                  <div style="display:flex; flex-direction:column; gap:2px;">
+                    <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Gebruikers</span>
+                    <span style="font-size:12px; color:#87877e;">Wie van deze klant toegang heeft tot het portaal.</span>
+                  </div>
+                  <button onClick="{{ openInvite }}" style="padding:8px 14px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font:inherit; font-size:13px; font-weight:600; cursor:pointer;" style-hover="background:#0a2c26;">Gebruiker uitnodigen</button>
+                </div>
+                <sc-for list="{{ users }}" as="u" hint-placeholder-count="3">
+                  <div style="{{ u.rowStyle }}">
+                    <div style="width:32px; height:32px; border-radius:999px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#55554f; flex-shrink:0;">{{ u.initials }}</div>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:1px;">
+                      <span style="font-size:14px; font-weight:600;">{{ u.name }}</span>
+                      <span style="font-size:12px; color:#87877e;">{{ u.email }} · {{ u.meta }}</span>
+                    </div>
+                    <span style="{{ u.statusStyle }}">{{ u.statusLabel }}</span>
+                    <div style="display:flex; align-items:center; gap:6px; flex-shrink:0; font-size:12px; font-weight:600;">
+                      <span style="{{ u.resendStyle }}">Opnieuw uitnodigen</span>
+                      <span style="padding:6px 10px; border-radius:8px; color:#b91c1c; cursor:pointer;" style-hover="background:#fdecec;">Toegang intrekken</span>
+                    </div>
+                  </div>
+                </sc-for>
+                <div style="padding:12px 18px; border-top:1px solid #f0f0ec; font-size:12px; color:#87877e; line-height:1.5;">Gebruikers zien enkel de projecten, tickets, agenda-items en gedeelde documenten van deze klant. Interne taken blijven verborgen.</div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:18px; min-width:0;">
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Bedrijfsgegevens</span>
+                <div style="display:flex; flex-direction:column;">
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Naam</span><span style="font-weight:500; text-align:right;">Verlinden &amp; Zn bvba</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Btw-nummer</span><span style="font-weight:500; text-align:right; font-family:'JetBrains Mono',monospace;">BE 0652.874.109</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">E-mail</span><span style="font-weight:500; text-align:right;">info@verlinden.be</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Telefoon</span><span style="font-weight:500; text-align:right;">050 33 71 24</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; font-size:13px;"><span style="color:#87877e;">Adres</span><span style="font-weight:500; text-align:right; line-height:1.5;">Koning Albertlaan 42<br>8000 Brugge</span></div>
+                </div>
+              </div>
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:18px; display:flex; flex-direction:column; gap:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                  <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Notities</span>
+                  <span style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer;">Bewerken</span>
+                </div>
+                <p style="margin:0; font-size:14px; line-height:1.6; color:#2e2e2b;">Katrien beslist, Bart volgt de techniek op. Facturatie per schijf van 50%. Bouwverlof: eerste twee weken van juli onbereikbaar.</p>
+                <span style="font-size:12px; color:#9a9a92;">Alleen intern zichtbaar.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- uitnodigingspaneel -->
+          <sc-if value="{{ inviteOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; inset:0; z-index:8; background:rgba(18,18,18,.28); display:flex; justify-content:flex-end;">
+              <div style="width:440px; background:#fff; border-left:1px solid #e3e3e0; display:flex; flex-direction:column; box-shadow:-8px 0 24px rgba(18,18,18,.10);">
+                <div style="padding:16px 18px; border-bottom:1px solid #f0f0ec; display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-shrink:0;">
+                  <div style="display:flex; flex-direction:column; gap:2px;">
+                    <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">{{ inviteTitle }}</span>
+                    <span style="font-size:12px; color:#87877e;">Verlinden &amp; Zn</span>
+                  </div>
+                  <span onClick="{{ closeInvite }}" style="width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#9a9a92; font-size:14px; cursor:pointer; flex-shrink:0;" style-hover="background:#f2f2ee;">✕</span>
+                </div>
+
+                <sc-if value="{{ inviteForm }}" hint-placeholder-val="{{ true }}">
+                  <div style="flex:1; min-height:0; display:flex; flex-direction:column;">
+                    <div style="flex:1; min-height:0; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:16px;">
+                      <span style="font-size:14px; color:#2e2e2b; line-height:1.55; flex-shrink:0;">De gebruiker krijgt een e-mail met een uitnodiging. Een wachtwoord is niet nodig: aanmelden gebeurt met een link.</span>
+                      <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                        <label style="font-size:13px; font-weight:600;">Naam <span style="color:#b91c1c;">*</span></label>
+                        <input type="text" value="Sofie Maertens" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                        <label style="font-size:13px; font-weight:600;">E-mailadres <span style="color:#b91c1c;">*</span></label>
+                        <input type="text" value="sofie@verlinden.be" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                        <span style="font-size:12px; color:#87877e;">Gebruik bij voorkeur een adres op het domein van de klant.</span>
+                      </div>
+                      <label style="display:flex; align-items:flex-start; gap:10px; font-size:14px; cursor:pointer; flex-shrink:0;">
+                        <span style="width:18px; height:18px; border-radius:5px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; margin-top:1px;">✓</span>
+                        <span style="display:flex; flex-direction:column; gap:1px;"><span>Meteen een uitnodiging versturen</span><span style="font-size:12px; color:#87877e;">Uit laten betekent: aanmaken zonder e-mail, u nodigt later uit.</span></span>
+                      </label>
+                    </div>
+                    <div style="padding:14px 18px; border-top:1px solid #f0f0ec; display:flex; justify-content:flex-end; gap:8px; font-size:14px; font-weight:600; flex-shrink:0;">
+                      <button onClick="{{ closeInvite }}" style="padding:9px 16px; border-radius:10px; border:1px solid transparent; background:transparent; color:#6e6e66; cursor:pointer; font:inherit;" style-hover="background:#f2f2ee;">Annuleren</button>
+                      <button onClick="{{ sendInvite }}" style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Uitnodiging versturen</button>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ inviteDone }}" hint-placeholder-val="{{ false }}">
+                  <div style="flex:1; min-height:0; display:flex; flex-direction:column;">
+                    <div style="flex:1; min-height:0; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:16px;">
+                      <div style="display:flex; align-items:flex-start; gap:12px; border:1px solid #e3e3e0; border-radius:12px; background:#fafaf8; padding:14px; flex-shrink:0;">
+                        <span style="width:28px; height:28px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0;">✓</span>
+                        <div style="display:flex; flex-direction:column; gap:3px;">
+                          <span style="font-size:14px; font-weight:600;">Uitnodiging verstuurd</span>
+                          <span style="font-size:13px; color:#55554f; line-height:1.55;">Sofie Maertens krijgt een e-mail op sofie@verlinden.be. De uitnodiging blijft 7 dagen geldig.</span>
+                        </div>
+                      </div>
+                      <div style="border:1px solid #e3e3e0; border-radius:12px; padding:14px; display:flex; align-items:center; gap:12px; flex-shrink:0;">
+                        <div style="width:32px; height:32px; border-radius:999px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#55554f;">SM</div>
+                        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:1px;">
+                          <span style="font-size:14px; font-weight:600;">Sofie Maertens</span>
+                          <span style="font-size:12px; color:#87877e;">sofie@verlinden.be</span>
+                        </div>
+                        <span style="padding:4px 10px; border-radius:999px; background:#fbf0e2; color:#8a4008; font-size:12px; font-weight:600;">Uitgenodigd</span>
+                      </div>
+                      <span style="font-size:13px; color:#87877e; line-height:1.55; flex-shrink:0;">Zolang de uitnodiging niet aanvaard is, staat de gebruiker op “Uitgenodigd”. U kunt ze opnieuw versturen of de toegang weer intrekken.</span>
+                    </div>
+                    <div style="padding:14px 18px; border-top:1px solid #f0f0ec; display:flex; justify-content:flex-end; gap:8px; font-size:14px; font-weight:600; flex-shrink:0;">
+                      <button onClick="{{ againInvite }}" style="padding:9px 16px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font:inherit;" style-hover="background:#fafaf8;">Nog iemand uitnodigen</button>
+                      <button onClick="{{ closeInvite }}" style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Sluiten</button>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">Mobiel 375 · zelfde orde</span>
+        <div style="width:375px; height:812px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; position:relative;">
+          <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:10px 8px; display:flex; align-items:center; gap:4px; flex-shrink:0;">
+            <span style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; color:#2e2e2b; flex-shrink:0;">‹</span>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+              <span style="font-size:11px; color:#87877e;">Klanten</span>
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Verlinden &amp; Zn</span>
+            </div>
+            <span style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; color:#2e2e2b; flex-shrink:0;">⋯</span>
+          </div>
+          <div style="flex:1; min-height:0; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px;">
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:10px; flex-shrink:0;">
+              <div style="display:flex; align-items:center; gap:12px;">
+                <div style="width:40px; height:40px; border-radius:10px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:700;">VZ</div>
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                  <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">Verlinden &amp; Zn</span>
+                  <span style="font-size:12px; color:#87877e;">Meubelmakerij · Brugge</span>
+                </div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button style="flex:1; height:44px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Nieuw project</button>
+                <button style="flex:1; height:44px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Bewerken</button>
+              </div>
+            </div>
+
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden; flex-shrink:0;">
+              <div style="padding:13px 14px; border-bottom:1px solid #f0f0ec; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Projecten</div>
+              <div style="padding:12px 14px; display:flex; flex-direction:column; gap:8px;">
+                <div style="border:1px solid #e3e3e0; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:6px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <span style="font-size:14px; font-weight:600;">Herbouw website</span>
+                    <span style="padding:3px 9px; border-radius:999px; background:#e6efec; color:#0d3b33; font-size:11px; font-weight:600;">Actief</span>
+                  </div>
+                  <span style="font-size:12px; color:#87877e;">21 okt 2026 · 3 open tickets</span>
+                </div>
+                <div style="border:1px solid #e3e3e0; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:6px;">
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                    <span style="font-size:14px; font-weight:600;">Onderhoud oude site</span>
+                    <span style="padding:3px 9px; border-radius:999px; background:#e8f1e8; color:#2c6b34; font-size:11px; font-weight:600;">Afgerond</span>
+                  </div>
+                  <span style="font-size:12px; color:#87877e;">juli 2026</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden; flex-shrink:0;">
+              <div style="padding:13px 14px; border-bottom:1px solid #f0f0ec; display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Gebruikers</span>
+                <span onClick="{{ openInviteM }}" style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer;">Uitnodigen</span>
+              </div>
+              <div style="padding:12px 14px; display:flex; flex-direction:column; gap:8px;">
+                <sc-for list="{{ usersMobile }}" as="u" hint-placeholder-count="3">
+                  <div style="border:1px solid #e3e3e0; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                      <div style="width:34px; height:34px; border-radius:999px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#55554f; flex-shrink:0;">{{ u.initials }}</div>
+                      <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:1px;">
+                        <span style="font-size:14px; font-weight:600;">{{ u.name }}</span>
+                        <span style="font-size:12px; color:#87877e; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ u.email }}</span>
+                      </div>
+                      <span style="{{ u.statusStyle }}">{{ u.statusLabel }}</span>
+                    </div>
+                    <div style="display:flex; gap:8px; padding-top:8px; border-top:1px solid #f0f0ec;">
+                      <span style="{{ u.resendStyleM }}">Opnieuw uitnodigen</span>
+                      <span style="flex:1; min-height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px; border:1px solid #f0cfcf; color:#b91c1c; font-size:13px; font-weight:600; cursor:pointer;">Intrekken</span>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:10px; flex-shrink:0;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Bedrijfsgegevens</span>
+              <div style="display:flex; flex-direction:column;">
+                <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Btw-nummer</span><span style="font-weight:500; font-family:'JetBrains Mono',monospace;">BE 0652.874.109</span></div>
+                <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">E-mail</span><span style="font-weight:500;">info@verlinden.be</span></div>
+                <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Telefoon</span><span style="font-weight:500;">050 33 71 24</span></div>
+                <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; font-size:13px;"><span style="color:#87877e;">Adres</span><span style="font-weight:500; text-align:right; line-height:1.5;">Koning Albertlaan 42<br>8000 Brugge</span></div>
+              </div>
+            </div>
+          </div>
+
+          <sc-if value="{{ inviteOpenM }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; inset:0; z-index:8; background:rgba(18,18,18,.3); display:flex; align-items:flex-end;">
+              <div style="width:100%; max-height:88%; background:#fff; border-radius:16px 16px 0 0; display:flex; flex-direction:column;">
+                <div style="padding:10px 14px 12px; border-bottom:1px solid #f0f0ec; display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+                  <div style="width:40px; height:4px; border-radius:2px; background:#e3e3e0; margin:0 auto;"></div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                    <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">{{ inviteTitleM }}</span>
+                    <span onClick="{{ closeInviteM }}" style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#9a9a92; font-size:15px; cursor:pointer;">✕</span>
+                  </div>
+                </div>
+                <sc-if value="{{ inviteFormM }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex; flex-direction:column;">
+                    <div style="padding:14px; display:flex; flex-direction:column; gap:14px;">
+                      <span style="font-size:14px; color:#2e2e2b; line-height:1.55;">De gebruiker krijgt een e-mail met een uitnodiging. Aanmelden gebeurt met een link, zonder wachtwoord.</span>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:13px; font-weight:600;">Naam <span style="color:#b91c1c;">*</span></label>
+                        <input type="text" value="Sofie Maertens" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:13px; font-weight:600;">E-mailadres <span style="color:#b91c1c;">*</span></label>
+                        <input type="text" value="sofie@verlinden.be" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+                      </div>
+                    </div>
+                    <div style="padding:12px 14px 16px; border-top:1px solid #f0f0ec; display:flex; flex-direction:column; gap:8px;">
+                      <button onClick="{{ sendInviteM }}" style="height:48px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;">Uitnodiging versturen</button>
+                      <button onClick="{{ closeInviteM }}" style="height:44px; border-radius:10px; border:1px solid transparent; background:transparent; color:#6e6e66; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Annuleren</button>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ inviteDoneM }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; flex-direction:column;">
+                    <div style="padding:14px; display:flex; flex-direction:column; gap:14px;">
+                      <div style="display:flex; align-items:flex-start; gap:12px; border:1px solid #e3e3e0; border-radius:12px; background:#fafaf8; padding:14px;">
+                        <span style="width:28px; height:28px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0;">✓</span>
+                        <div style="display:flex; flex-direction:column; gap:3px;">
+                          <span style="font-size:14px; font-weight:600;">Uitnodiging verstuurd</span>
+                          <span style="font-size:13px; color:#55554f; line-height:1.55;">Sofie Maertens krijgt een e-mail op sofie@verlinden.be. De uitnodiging blijft 7 dagen geldig.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="padding:12px 14px 16px; border-top:1px solid #f0f0ec; display:flex; flex-direction:column; gap:8px;">
+                      <button onClick="{{ closeInviteM }}" style="height:48px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;">Sluiten</button>
+                      <button onClick="{{ againInviteM }}" style="height:44px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Nog iemand uitnodigen</button>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ 4 · KLANTFORMULIER ============================ -->
+  <div style="display:flex; flex-direction:column; gap:12px;">
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600; letter-spacing:-.02em;">3 · Klant aanmaken of bewerken</div>
+    <div style="font-size:14px; color:#6e6e66; line-height:1.55; max-width:84ch;">Volle pagina, want het zijn meer dan acht velden verdeeld over twee secties. Bij bewerken staat in de kop “Klant bewerken” en verschijnt “Archiveren” in het overloopmenu.</div>
+
+    <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">Desktop 1040 × 800</span>
+        <div style="width:1040px; height:800px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column;">
+          <header style="background:#fff; border-bottom:1px solid #e3e3e0; padding:18px 24px; display:flex; flex-direction:column; gap:12px; flex-shrink:0;">
+            <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:#87877e;">
+              <span style="cursor:pointer;" style-hover="color:#0d3b33;">Klanten</span><span style="color:#cfcfc9;">/</span><span style="color:#121212; font-weight:600;">Nieuwe klant</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap;">
+              <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">Nieuwe klant</h1>
+              <div style="display:flex; gap:8px; font-size:14px; font-weight:600;">
+                <button style="padding:9px 16px; border-radius:10px; border:1px solid transparent; background:transparent; color:#6e6e66; cursor:pointer; font:inherit;" style-hover="background:#f2f2ee;">Annuleren</button>
+                <button style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Klant opslaan</button>
+              </div>
+            </div>
+          </header>
+          <div style="flex:1; min-height:0; overflow-y:auto; padding:20px 24px 28px; display:flex; flex-direction:column; gap:16px;">
+
+            <div style="flex-shrink:0; max-width:720px; border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:20px; display:flex; flex-direction:column; gap:18px;">
+              <div style="display:flex; flex-direction:column; gap:2px; padding-bottom:4px; border-bottom:1px solid #f0f0ec;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Bedrijf</span>
+                <span style="font-size:12px; color:#87877e;">Velden met <span style="color:#b91c1c;">*</span> zijn verplicht.</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">Bedrijfsnaam <span style="color:#b91c1c;">*</span></label>
+                <input type="text" value="Verlinden &amp; Zn bvba" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Btw-nummer</label>
+                  <input type="text" value="BE 0652.874" style="height:40px; padding:0 12px; border:1px solid #b91c1c; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:14px; background:#fff; width:100%;">
+                  <span style="font-size:12px; color:#b91c1c; font-weight:500;">Een Belgisch btw-nummer heeft tien cijfers, bijvoorbeeld BE 0652.874.109.</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Sector</label>
+                  <select style="height:40px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:14px; cursor:pointer;">
+                    <option>Meubelmakerij</option><option>Voeding</option><option>Zorg</option><option>Bouw</option><option>Andere</option>
+                  </select>
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Algemeen e-mailadres <span style="color:#b91c1c;">*</span></label>
+                  <input type="text" value="info@verlinden.be" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Telefoon</label>
+                  <input type="text" value="050 33 71 24" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">Straat en nummer</label>
+                <input type="text" value="Koning Albertlaan 42" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+              </div>
+              <div style="display:grid; grid-template-columns:140px 1fr 200px; gap:14px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Postcode</label>
+                  <input type="text" value="8000" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:14px; background:#fff; width:100%;">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Gemeente</label>
+                  <input type="text" value="Brugge" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Land</label>
+                  <select style="height:40px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:14px; cursor:pointer;"><option>België</option><option>Nederland</option><option>Frankrijk</option></select>
+                </div>
+              </div>
+            </div>
+
+            <div style="flex-shrink:0; max-width:720px; border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:20px; display:flex; flex-direction:column; gap:18px;">
+              <div style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; padding-bottom:4px; border-bottom:1px solid #f0f0ec;">Contact en notities</div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Contactpersoon</label>
+                  <input type="text" value="Katrien Verlinden" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">E-mailadres contactpersoon</label>
+                  <input type="text" value="katrien@verlinden.be" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                  <span style="font-size:12px; color:#87877e;">Deze persoon kunt u na het opslaan uitnodigen voor het portaal.</span>
+                </div>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">Interne notities</label>
+                <textarea rows="4" style="padding:10px 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%; resize:vertical; line-height:1.5;">Katrien beslist, Bart volgt de techniek op. Facturatie per schijf van 50%.</textarea>
+                <span style="font-size:12px; color:#87877e;">Nooit zichtbaar voor de klant.</span>
+              </div>
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding-top:12px; border-top:1px solid #f0f0ec; font-size:14px;">
+                <span style="display:flex; flex-direction:column; gap:1px;"><span>Contactpersoon meteen uitnodigen</span><span style="font-size:12px; color:#87877e;">Stuurt een uitnodiging zodra de klant is opgeslagen.</span></span>
+                <span style="width:38px; height:22px; border-radius:999px; background:#cfcfc9; padding:3px; display:flex; cursor:pointer; flex-shrink:0;"><span style="width:16px; height:16px; border-radius:999px; background:#fff;"></span></span>
+              </div>
+            </div>
+
+            <div style="flex-shrink:0; max-width:720px; display:flex; justify-content:flex-end; gap:8px; font-size:14px; font-weight:600;">
+              <button style="padding:9px 16px; border-radius:10px; border:1px solid transparent; background:transparent; color:#6e6e66; cursor:pointer; font:inherit;" style-hover="background:#e8e8e3;">Annuleren</button>
+              <button style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Klant opslaan</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">Mobiel 375 · zelfde velden, één kolom</span>
+        <div style="width:375px; height:812px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column;">
+          <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:10px 8px; display:flex; align-items:center; gap:4px; flex-shrink:0;">
+            <span style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; color:#2e2e2b; flex-shrink:0;">‹</span>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+              <span style="font-size:11px; color:#87877e;">Klanten</span>
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Nieuwe klant</span>
+            </div>
+          </div>
+          <div style="flex:1; min-height:0; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px;">
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:14px; flex-shrink:0;">
+              <div style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; padding-bottom:4px; border-bottom:1px solid #f0f0ec;">Bedrijf</div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">Bedrijfsnaam <span style="color:#b91c1c;">*</span></label>
+                <input type="text" value="Verlinden &amp; Zn bvba" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">Btw-nummer</label>
+                <input type="text" value="BE 0652.874" style="height:44px; padding:0 12px; border:1px solid #b91c1c; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:14px; background:#fff; width:100%;">
+                <span style="font-size:12px; color:#b91c1c; font-weight:500;">Een Belgisch btw-nummer heeft tien cijfers.</span>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">Algemeen e-mailadres <span style="color:#b91c1c;">*</span></label>
+                <input type="text" value="info@verlinden.be" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">Telefoon</label>
+                <input type="text" value="050 33 71 24" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">Straat en nummer</label>
+                <input type="text" value="Koning Albertlaan 42" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+              </div>
+              <div style="display:grid; grid-template-columns:110px 1fr; gap:10px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Postcode</label>
+                  <input type="text" value="8000" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:15px; background:#fff; width:100%;">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Gemeente</label>
+                  <input type="text" value="Brugge" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+                </div>
+              </div>
+            </div>
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:14px; flex-shrink:0;">
+              <div style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600; padding-bottom:4px; border-bottom:1px solid #f0f0ec;">Contact en notities</div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">Contactpersoon</label>
+                <input type="text" value="Katrien Verlinden" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">E-mailadres contactpersoon</label>
+                <input type="text" value="katrien@verlinden.be" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+              </div>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">Interne notities</label>
+                <textarea rows="4" style="padding:12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%; resize:none; line-height:1.5;">Katrien beslist, Bart volgt de techniek op.</textarea>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+              <button style="height:48px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;">Klant opslaan</button>
+              <button style="height:44px; border-radius:10px; border:1px solid transparent; background:transparent; color:#6e6e66; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Annuleren</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const CLIENTS = [
+  { name: 'Verlinden & Zn',       city: 'Brugge',       contact: 'Katrien Verlinden', email: 'katrien@verlinden.be',  projects: 1, tickets: 3 },
+  { name: 'De Groene Kruidenier', city: 'Leuven',       contact: 'Tom Peeters',       email: 'tom@degroenekruidenier.be', projects: 1, tickets: 2 },
+  { name: 'Bakkerij Vermeulen',   city: 'Sint-Niklaas', contact: 'Ann Vermeulen',     email: 'ann@bakkerijvermeulen.be',  projects: 1, tickets: 1 },
+  { name: 'Praktijk Dewulf',      city: 'Gent',         contact: 'Lien Dewulf',       email: 'lien@praktijkdewulf.be',    projects: 1, tickets: 0 },
+  { name: 'Garage Standaert',     city: 'Deinze',       contact: 'Wim Standaert',     email: 'wim@garagestandaert.be',    projects: 0, tickets: 0 }
+];
+const USERS = [
+  { name: 'Katrien Verlinden', email: 'katrien@verlinden.be', status: 'actief',      meta: 'laatst aangemeld vandaag' },
+  { name: 'Bart Verlinden',    email: 'bart@verlinden.be',    status: 'actief',      meta: 'laatst aangemeld 11 sep' },
+  { name: 'Sofie Maertens',    email: 'sofie@verlinden.be',   status: 'uitgenodigd', meta: 'uitgenodigd op 15 sep' }
+];
+const USTATUS = {
+  actief:      { label: 'Actief',      bg: '#e8f1e8', color: '#2c6b34' },
+  uitgenodigd: { label: 'Uitgenodigd', bg: '#fbf0e2', color: '#8a4008' }
+};
+
+class Component extends DCLogic {
+  state = { query: '', moreOpen: false, invite: null, inviteM: null };
+
+  initials(name) {
+    return name.split(' ').filter(w => w.length > 2 || /^[A-Z]/.test(w)).slice(0, 2).map(w => w[0]).join('').toUpperCase();
+  }
+
+  matched() {
+    const q = this.state.query.trim().toLowerCase();
+    if (!q) return CLIENTS;
+    return CLIENTS.filter(c => (c.name + ' ' + c.email + ' ' + c.contact + ' ' + c.city).toLowerCase().indexOf(q) >= 0);
+  }
+
+  userRows(mobile) {
+    return USERS.map((u, i) => {
+      const s = USTATUS[u.status];
+      const invited = u.status === 'uitgenodigd';
+      return Object.assign({}, u, {
+        initials: this.initials(u.name),
+        statusLabel: s.label,
+        statusStyle: 'padding:4px 10px; border-radius:999px; background:' + s.bg + '; color:' + s.color + '; font-size:' + (mobile ? '11' : '12') + 'px; font-weight:600; white-space:nowrap; flex-shrink:0;',
+        rowStyle: 'display:flex; align-items:center; gap:12px; padding:12px 18px;' + (i === USERS.length - 1 ? '' : ' border-bottom:1px solid #f0f0ec;'),
+        resendStyle: invited
+          ? 'padding:6px 10px; border-radius:8px; color:#0d3b33; cursor:pointer; white-space:nowrap;'
+          : 'display:none;',
+        resendStyleM: invited
+          ? 'flex:1; min-height:40px; display:flex; align-items:center; justify-content:center; border-radius:10px; border:1px solid #dcdcd6; color:#121212; font-size:13px; font-weight:600; cursor:pointer;'
+          : 'display:none;'
+      });
+    });
+  }
+
+  renderVals() {
+    const list = this.matched();
+    const inv = this.state.invite;
+    const invM = this.state.inviteM;
+    return {
+      query: this.state.query,
+      onQuery: e => this.setState({ query: e.target.value }),
+      clearQuery: () => this.setState({ query: '' }),
+      clients: list.map(c => Object.assign({}, c, {
+        initials: this.initials(c.name),
+        projects: c.projects === 0 ? 'geen' : c.projects === 1 ? '1 actief' : c.projects + ' actief',
+        tickets: c.tickets === 0 ? 'geen' : c.tickets === 1 ? '1 open' : c.tickets + ' open',
+        projectStyle: 'font-size:13px; color:' + (c.projects ? '#2e2e2b' : '#9a9a92') + ';',
+        ticketStyle: 'font-size:13px; color:' + (c.tickets > 1 ? '#2e2e2b' : c.tickets ? '#2e2e2b' : '#9a9a92') + '; font-weight:' + (c.tickets > 1 ? '600' : '400') + ';',
+        mobileMeta: (c.projects ? c.projects + ' project' + (c.projects > 1 ? 'en' : '') : 'geen projecten') + ' · ' + (c.tickets ? c.tickets + ' open ticket' + (c.tickets > 1 ? 's' : '') : 'geen tickets')
+      })),
+      hasClients: list.length > 0,
+      noClients: list.length === 0,
+      countLabel: list.length === 1 ? '1 klant' : list.length + ' klanten',
+      pageLabel: list.length ? '1–' + list.length + ' van ' + list.length : 'geen resultaten',
+
+      users: this.userRows(false),
+      usersMobile: this.userRows(true),
+
+      moreOpen: this.state.moreOpen,
+      toggleMore: () => this.setState(s => ({ moreOpen: !s.moreOpen })),
+
+      inviteOpen: inv !== null,
+      inviteForm: inv === 'form',
+      inviteDone: inv === 'done',
+      inviteTitle: inv === 'done' ? 'Uitnodiging verstuurd' : 'Gebruiker uitnodigen',
+      openInvite: () => this.setState({ invite: 'form', moreOpen: false }),
+      closeInvite: () => this.setState({ invite: null }),
+      sendInvite: () => this.setState({ invite: 'done' }),
+      againInvite: () => this.setState({ invite: 'form' }),
+
+      inviteOpenM: invM !== null,
+      inviteFormM: invM === 'form',
+      inviteDoneM: invM === 'done',
+      inviteTitleM: invM === 'done' ? 'Uitnodiging verstuurd' : 'Gebruiker uitnodigen',
+      openInviteM: () => this.setState({ inviteM: 'form' }),
+      closeInviteM: () => this.setState({ inviteM: null }),
+      sendInviteM: () => this.setState({ inviteM: 'done' }),
+      againInviteM: () => this.setState({ inviteM: 'form' })
+    };
+  }
+}
+</script>
+</body>
+</html>

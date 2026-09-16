@@ -13,7 +13,7 @@ const envSchema = z.object({
   SCALEWAY_ENDPOINT: z.url(),
 
   RESEND_API_KEY: z.string().min(1),
-  EMAIL_FROM: z.email(),
+  EMAIL_FROM: z.string().min(1),
   ADMIN_NOTIFICATION_EMAIL: z.email(),
 });
 

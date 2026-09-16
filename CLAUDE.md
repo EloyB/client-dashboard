@@ -8,7 +8,7 @@ Personal web app for Studio Swyft to manage client projects: tasks, bug reports,
 - **Styling/UI:** Tailwind CSS, shadcn/ui
 - **Database:** PostgreSQL (Scaleway Managed Database in production, Docker locally)
 - **ORM:** Drizzle ORM + drizzle-kit
-- **Auth:** Better Auth (email + magic link for client invites)
+- **Auth:** Better Auth (admin: email + password; client users: magic link invites)
 - **Validation:** Zod
 - **File storage:** Scaleway Object Storage (S3-compatible, via `@aws-sdk/client-s3`)
 - **Email:** transactional provider for client invites and admin notifications on new tickets
@@ -22,7 +22,7 @@ Do not introduce new dependencies without asking first.
 
 ```
 docs/
-  design/              Claude Design output: globals.css, COMPONENTS.md (read-only reference)
+  design/              Claude Design output (read-only reference): globals.css, COMPONENTS.md, INDEX.md, handoff/
 src/
   app/
     (auth)/            login, invite acceptance
@@ -161,6 +161,8 @@ The visual design was created in Claude Design. These files are the source of tr
 
 - `docs/design/globals.css` — original design tokens (colors, typography, radius) as shadcn/ui-compatible CSS variables.
 - `docs/design/COMPONENTS.md` — components, their variants, and where they are used.
+- `docs/design/handoff/` — the handoff bundle exported from Claude Design: design files, screenshots of screens and states, the design chat, and its README.
+- `docs/design/INDEX.md` — maps each slice in "MVP scope and build order" to the relevant files and screenshots in the handoff bundle.
 
 Rules:
 
@@ -168,7 +170,12 @@ Rules:
 - Use only tokens via Tailwind classes (`bg-primary`, `text-muted-foreground`, …). No hardcoded hex colors, arbitrary values, or custom font sizes outside the scale.
 - Build components as described in `COMPONENTS.md`: same names, variants, and usage. Check it before creating any UI.
 - Do not make independent styling choices. If a screen needs something not covered by the design system, propose an addition and wait for approval.
-- Keep `docs/design/` unchanged; it is the reference, not working code.
+- Keep `docs/design/` unchanged; it is the reference, not working code. Only `INDEX.md` may be updated, and only when asked.
+- CLAUDE.md always takes precedence over the handoff bundle's README for stack, structure, and conventions. Report conflicts instead of following the bundle.
+- Before building a slice's UI, look up the slice in `docs/design/INDEX.md` and study only the referenced designs, for both desktop and mobile, including empty, loading, error, and confirmation states.
+- HTML/CSS/JS from the handoff bundle is a visual reference only. Never copy it into the codebase; rebuild it with the project's shadcn/ui and shared components, tokens, and Server/Client Component conventions.
+- If the design and the data model or MVP scope conflict, stop and ask instead of choosing one.
+- After implementing a screen, take Playwright screenshots at desktop and 375px and compare them with the designs. List any visible differences.
 
 ## UI
 
@@ -196,17 +203,64 @@ Rules:
 - Email failures are logged but never fail or roll back the ticket creation.
 - Locally, emails are not sent to real addresses; use the provider's test mode or log them to the console.
 
-## MVP scope
+## MVP scope and build order
 
-1. Auth with roles, client user invites via magic link
-2. Clients CRUD
-3. Projects CRUD and project overview page
-4. Kanban task board per project + "all my tasks" overview
-5. Ticket reporting from the portal with screenshot upload; convert ticket to task; email notification to admin and confirmation to the reporting client on new ticket
-6. Agenda per project + global calendar
-7. Document uploads per project
+Build in vertical slices: one slice = one branch = one session, delivering data layer, access checks, UI, and tests together. Build strictly in this order and only the current slice. Track progress in the checklist below and tick a slice only after it is reviewed and merged.
 
-Build order: 1 → 2 → 3 → 5 → 7 → 4 → 6.
+**0. App shell**
+
+- [ ] 0a. Admin and portal layouts with navigation (desktop sidebar, mobile menu)
+- [ ] 0b. Shared base components from `COMPONENTS.md`: StatusBadge, EmptyState, DataTable with mobile card layout, form pattern
+
+**1. Auth**
+
+- [ ] 1a. Admin login with email + password, logout, route protection
+- [ ] 1b. Email module + client user invite via magic link
+
+**2. Clients**
+
+- [ ] 2a. Clients overview and detail
+- [ ] 2b. Create/edit clients, manage and invite client users from the client page
+
+**3. Projects**
+
+- [ ] 3a. Projects overview and create/edit
+- [ ] 3b. Project detail page skeleton with empty sections for tickets, agenda, documents, and tasks
+
+**4. Object storage**
+
+- [ ] 4. Upload helper, presigned URLs, access-checked downloads
+
+**5. Tickets**
+
+- [ ] 5a. Portal: report a bug with screenshot upload and confirmation state
+- [ ] 5b. Emails: new ticket notification to admin and confirmation to the reporting client user
+- [ ] 5c. Portal: ticket overview and detail with status
+- [ ] 5d. Admin: ticket overview, status changes, tickets section on project detail
+
+**6. Documents**
+
+- [ ] 6a. Admin: upload documents per project with `visibleToClient`
+- [ ] 6b. Portal: view and download documents
+
+**7. Tasks**
+
+- [ ] 7a. Task list per project with create/edit (no board yet)
+- [ ] 7b. Kanban board on desktop with drag-and-drop and fractional indexing
+- [ ] 7c. Mobile kanban: one column at a time with status select
+- [ ] 7d. Convert ticket to task
+- [ ] 7e. "All my tasks" overview across projects
+
+**8. Agenda**
+
+- [ ] 8a. Create/edit events per project, agenda section on project detail
+- [ ] 8b. Global calendar on desktop, list view on mobile
+- [ ] 8c. Client-visible events in the portal
+
+**9. Home pages**
+
+- [ ] 9a. Admin home page: new tickets, today and upcoming agenda, my tasks, active projects
+- [ ] 9b. Client portal home page: report bug action, projects, recent tickets, upcoming events, recent documents
 
 ## Out of scope — do not build
 
@@ -216,7 +270,7 @@ If a request touches these, flag it instead of implementing it.
 
 ## Working agreements
 
-- Work in small, reviewable steps; one feature per branch.
+- Work in small, reviewable steps; one slice per branch (see MVP scope and build order).
 - Before implementing a feature, briefly outline the plan (schema changes, actions, components) and wait for approval.
 - Run `pnpm format:check`, `pnpm typecheck`, `pnpm lint`, and `pnpm test` before declaring a task done.
 - Environment variables are validated at startup with Zod and documented in `.env.example`. Never commit secrets.

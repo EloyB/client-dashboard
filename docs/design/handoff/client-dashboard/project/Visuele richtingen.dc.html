@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Sans:wght@400;500;600&family=Public+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#f4f4f2; }
+  a { color:#1f3a5f; } a:hover { color:#132741; }
+</style>
+</helmet>
+
+<section style="display:flex; flex-direction:column; gap:28px; padding:48px; font-family:'Public Sans',system-ui,sans-serif;">
+  <div style="display:flex; flex-direction:column; gap:6px; max-width:760px;">
+    <div style="font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:#8a8a84; font-weight:600;">Iteratie 1 — visuele richting</div>
+    <div style="font-size:30px; font-weight:700; color:#17171a; letter-spacing:-.02em;">Drie richtingen voor het projectplatform</div>
+    <div style="font-size:15px; color:#5c5c58; line-height:1.55;">Elke richting toont palet, lettercombinatie, één projectkaart, statusbadges en knoppen. Verwijs in chat naar <a href="#1a">1a</a>, <a href="#1b">1b</a> of <a href="#1c">1c</a>.</div>
+  </div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start;">
+
+    <!-- ============ 1a — Dossier ============ -->
+    <div id="1a" style="width:420px; background:#fffdf9; border:1px solid #e4ded2; border-radius:8px; overflow:hidden;">
+      <div style="display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid #e4ded2; background:#faf6ef;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:22px; padding:0 8px; border-radius:4px; background:#1f3a5f; color:#fff; font-size:12px; font-weight:700; font-family:'IBM Plex Sans',sans-serif;">1a</span>
+        <span style="font-family:'Source Serif 4',serif; font-size:19px; font-weight:600; color:#1a1814;">Dossier</span>
+      </div>
+
+      <div style="padding:18px; display:flex; flex-direction:column; gap:20px;">
+        <div style="font-family:'Source Serif 4',serif; font-size:15px; line-height:1.5; color:#4a463e;">Rustig en redactioneel: warm papier, een serif voor titels en een diep inktblauw accent, alsof je in een net geordend klantendossier bladert.</div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#8b8578; font-weight:600; font-family:'IBM Plex Sans',sans-serif;">Palet</div>
+          <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;">
+            <div style="height:44px; border-radius:4px; background:#fffdf9; border:1px solid #e4ded2;"></div>
+            <div style="height:44px; border-radius:4px; background:#efe9dd;"></div>
+            <div style="height:44px; border-radius:4px; background:#1a1814;"></div>
+            <div style="height:44px; border-radius:4px; background:#1f3a5f;"></div>
+            <div style="height:44px; border-radius:4px; background:#2f6f4e;"></div>
+            <div style="height:44px; border-radius:4px; background:#9a3412;"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px; font-size:9px; color:#8b8578; font-family:'JetBrains Mono',monospace;">
+            <span>FFFDF9</span><span>EFE9DD</span><span>1A1814</span><span>1F3A5F</span><span>2F6F4E</span><span>9A3412</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#8b8578; font-weight:600; font-family:'IBM Plex Sans',sans-serif;">Typografie</div>
+          <div style="font-family:'Source Serif 4',serif; font-size:26px; font-weight:600; color:#1a1814; line-height:1.15;">Source Serif 4</div>
+          <div style="font-family:'IBM Plex Sans',sans-serif; font-size:14px; color:#4a463e;">IBM Plex Sans · lopende tekst, labels en cijfers</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#8b8578; font-weight:600; font-family:'IBM Plex Sans',sans-serif;">Projectkaart</div>
+          <div style="border:1px solid #e4ded2; border-radius:6px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+              <div style="display:flex; flex-direction:column; gap:3px;">
+                <div style="font-family:'Source Serif 4',serif; font-size:17px; font-weight:600; color:#1a1814;">Website Bakkerij Vermeulen</div>
+                <div style="font-family:'IBM Plex Sans',sans-serif; font-size:13px; color:#8b8578;">Vermeulen bvba · Sint-Niklaas</div>
+              </div>
+              <span style="font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600; padding:3px 8px; border-radius:4px; background:#e8eef6; color:#1f3a5f; white-space:nowrap;">In uitvoering</span>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:6px;">
+              <div style="display:flex; justify-content:space-between; font-family:'IBM Plex Sans',sans-serif; font-size:12px; color:#6b6558;"><span>Fase 3 van 5 · Ontwerp</span><span style="font-family:'JetBrains Mono',monospace;">62%</span></div>
+              <div style="height:5px; border-radius:3px; background:#efe9dd; overflow:hidden;"><div style="width:62%; height:100%; background:#1f3a5f;"></div></div>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding-top:10px; border-top:1px solid #f0ece3; font-family:'IBM Plex Sans',sans-serif; font-size:12px; color:#6b6558;">
+              <span>Deadline 14 okt 2026</span>
+              <span style="color:#9a3412; font-weight:600;">2 openstaande bugs</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#8b8578; font-weight:600; font-family:'IBM Plex Sans',sans-serif;">Statusbadges</div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px; font-family:'IBM Plex Sans',sans-serif; font-size:11px; font-weight:600;">
+            <span style="padding:3px 8px; border-radius:4px; background:#efe9dd; color:#5c564a;">Te doen</span>
+            <span style="padding:3px 8px; border-radius:4px; background:#e8eef6; color:#1f3a5f;">In uitvoering</span>
+            <span style="padding:3px 8px; border-radius:4px; background:#e6f0ea; color:#245c40;">Afgerond</span>
+            <span style="padding:3px 8px; border-radius:4px; background:#fbeadf; color:#9a3412;">Hoge prioriteit</span>
+            <span style="padding:3px 8px; border-radius:4px; background:#fff; border:1px solid #e4ded2; color:#8b8578;">Wacht op klant</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#8b8578; font-weight:600; font-family:'IBM Plex Sans',sans-serif;">Knoppen</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; font-family:'IBM Plex Sans',sans-serif; font-size:13px; font-weight:600;">
+            <button style="padding:8px 14px; border-radius:5px; border:1px solid #1f3a5f; background:#1f3a5f; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#162944; border-color:#162944;">Nieuw project</button>
+            <button style="padding:8px 14px; border-radius:5px; border:1px solid #d9d2c4; background:#fff; color:#1a1814; cursor:pointer; font:inherit;" style-hover="background:#faf6ef;">Bewerken</button>
+            <button style="padding:8px 14px; border-radius:5px; border:1px solid transparent; background:transparent; color:#6b6558; cursor:pointer; font:inherit;" style-hover="background:#efe9dd;">Annuleren</button>
+            <button style="padding:8px 14px; border-radius:5px; border:1px solid #f0d6c8; background:#fff; color:#9a3412; cursor:pointer; font:inherit;" style-hover="background:#fbeadf;">Verwijderen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 1b — Console ============ -->
+    <div id="1b" style="width:420px; background:#ffffff; border:1px solid #dfe3e8; border-radius:6px; overflow:hidden;">
+      <div style="display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid #dfe3e8; background:#f7f8fa;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:22px; padding:0 8px; border-radius:3px; background:#0f172a; color:#fff; font-size:12px; font-weight:700; font-family:'JetBrains Mono',monospace;">1b</span>
+        <span style="font-family:'Public Sans',sans-serif; font-size:19px; font-weight:700; color:#0f172a; letter-spacing:-.01em;">Console</span>
+      </div>
+
+      <div style="padding:18px; display:flex; flex-direction:column; gap:20px;">
+        <div style="font-family:'Public Sans',sans-serif; font-size:15px; line-height:1.5; color:#475569;">Strak en technisch: koele grijstinten, mono voor codes en cijfers, een signaalrood accent dat alleen opduikt waar actie nodig is.</div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#94a3b8; font-weight:600; font-family:'JetBrains Mono',monospace;">Palet</div>
+          <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;">
+            <div style="height:44px; border-radius:3px; background:#ffffff; border:1px solid #dfe3e8;"></div>
+            <div style="height:44px; border-radius:3px; background:#eef1f5;"></div>
+            <div style="height:44px; border-radius:3px; background:#0f172a;"></div>
+            <div style="height:44px; border-radius:3px; background:#d4381f;"></div>
+            <div style="height:44px; border-radius:3px; background:#0e7490;"></div>
+            <div style="height:44px; border-radius:3px; background:#15803d;"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px; font-size:9px; color:#94a3b8; font-family:'JetBrains Mono',monospace;">
+            <span>FFFFFF</span><span>EEF1F5</span><span>0F172A</span><span>D4381F</span><span>0E7490</span><span>15803D</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#94a3b8; font-weight:600; font-family:'JetBrains Mono',monospace;">Typografie</div>
+          <div style="font-family:'Public Sans',sans-serif; font-size:26px; font-weight:700; color:#0f172a; letter-spacing:-.02em; line-height:1.15;">Public Sans</div>
+          <div style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#475569;">JetBrains Mono · ID's, datums, statuslabels</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#94a3b8; font-weight:600; font-family:'JetBrains Mono',monospace;">Projectkaart</div>
+          <div style="border:1px solid #dfe3e8; border-radius:4px; background:#fff; display:flex; flex-direction:column;">
+            <div style="padding:12px 14px; display:flex; flex-direction:column; gap:8px;">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#94a3b8;">PRJ-0142</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; padding:2px 7px; border-radius:3px; background:#0f172a; color:#fff; text-transform:uppercase; letter-spacing:.06em;">Actief</span>
+              </div>
+              <div style="font-family:'Public Sans',sans-serif; font-size:16px; font-weight:600; color:#0f172a;">Webshop De Groene Kruidenier</div>
+              <div style="font-family:'Public Sans',sans-serif; font-size:13px; color:#64748b;">De Groene Kruidenier cvba · Leuven</div>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(3,1fr); border-top:1px solid #eef1f5;">
+              <div style="padding:10px 14px; border-right:1px solid #eef1f5; display:flex; flex-direction:column; gap:2px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:600; color:#0f172a;">12</span>
+                <span style="font-family:'Public Sans',sans-serif; font-size:11px; color:#94a3b8;">Taken open</span>
+              </div>
+              <div style="padding:10px 14px; border-right:1px solid #eef1f5; display:flex; flex-direction:column; gap:2px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:600; color:#d4381f;">3</span>
+                <span style="font-family:'Public Sans',sans-serif; font-size:11px; color:#94a3b8;">Bugs</span>
+              </div>
+              <div style="padding:10px 14px; display:flex; flex-direction:column; gap:2px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:16px; font-weight:600; color:#0f172a;">21.10</span>
+                <span style="font-family:'Public Sans',sans-serif; font-size:11px; color:#94a3b8;">Oplevering</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#94a3b8; font-weight:600; font-family:'JetBrains Mono',monospace;">Statusbadges</div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px; font-family:'JetBrains Mono',monospace; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.06em;">
+            <span style="padding:3px 7px; border-radius:3px; background:#eef1f5; color:#475569;">Backlog</span>
+            <span style="padding:3px 7px; border-radius:3px; background:#e0f2f7; color:#0e7490;">Bezig</span>
+            <span style="padding:3px 7px; border-radius:3px; background:#e7f5ec; color:#15803d;">Klaar</span>
+            <span style="padding:3px 7px; border-radius:3px; background:#fbe6e2; color:#b02e17;">Kritiek</span>
+            <span style="padding:3px 7px; border-radius:3px; background:#fff; border:1px solid #dfe3e8; color:#94a3b8;">Review</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:#94a3b8; font-weight:600; font-family:'JetBrains Mono',monospace;">Knoppen</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; font-family:'Public Sans',sans-serif; font-size:13px; font-weight:600;">
+            <button style="padding:8px 14px; border-radius:4px; border:1px solid #0f172a; background:#0f172a; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#1e293b;">Nieuw project</button>
+            <button style="padding:8px 14px; border-radius:4px; border:1px solid #cbd5e1; background:#fff; color:#0f172a; cursor:pointer; font:inherit;" style-hover="background:#f7f8fa;">Bewerken</button>
+            <button style="padding:8px 14px; border-radius:4px; border:1px solid transparent; background:transparent; color:#64748b; cursor:pointer; font:inherit;" style-hover="background:#eef1f5;">Annuleren</button>
+            <button style="padding:8px 14px; border-radius:4px; border:1px solid #d4381f; background:#d4381f; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#b02e17;">Bug melden</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============ 1c — Atelier ============ -->
+    <div id="1c" style="width:420px; background:#ffffff; border:1px solid #e3e3e0; border-radius:14px; overflow:hidden;">
+      <div style="display:flex; align-items:center; gap:10px; padding:14px 18px; border-bottom:1px solid #e3e3e0; background:#fafaf8;">
+        <span style="display:inline-flex; align-items:center; justify-content:center; min-width:30px; height:22px; padding:0 8px; border-radius:6px; background:#0d3b33; color:#fff; font-size:12px; font-weight:700; font-family:'Instrument Sans',sans-serif;">1c</span>
+        <span style="font-family:'Space Grotesk',sans-serif; font-size:19px; font-weight:700; color:#121212; letter-spacing:-.02em;">Atelier</span>
+      </div>
+
+      <div style="padding:18px; display:flex; flex-direction:column; gap:20px;">
+        <div style="font-family:'Instrument Sans',sans-serif; font-size:15px; line-height:1.5; color:#55554f;">Modern en zelfverzekerd: bijna-zwarte typografie met karakter, veel wit en één diepgroen accent dat het geheel studio-achtig maakt.</div>
+
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600; font-family:'Instrument Sans',sans-serif;">Palet</div>
+          <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px;">
+            <div style="height:44px; border-radius:8px; background:#ffffff; border:1px solid #e3e3e0;"></div>
+            <div style="height:44px; border-radius:8px; background:#f2f2ee;"></div>
+            <div style="height:44px; border-radius:8px; background:#121212;"></div>
+            <div style="height:44px; border-radius:8px; background:#0d3b33;"></div>
+            <div style="height:44px; border-radius:8px; background:#b45309;"></div>
+            <div style="height:44px; border-radius:8px; background:#b91c1c;"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(6,1fr); gap:6px; font-size:9px; color:#9a9a92; font-family:'Instrument Sans',sans-serif;">
+            <span>FFFFFF</span><span>F2F2EE</span><span>121212</span><span>0D3B33</span><span>B45309</span><span>B91C1C</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600; font-family:'Instrument Sans',sans-serif;">Typografie</div>
+          <div style="font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; color:#121212; letter-spacing:-.03em; line-height:1.15;">Space Grotesk</div>
+          <div style="font-family:'Instrument Sans',sans-serif; font-size:14px; color:#55554f;">Instrument Sans · lopende tekst en interface</div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600; font-family:'Instrument Sans',sans-serif;">Projectkaart</div>
+          <div style="border:1px solid #e3e3e0; border-radius:10px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:14px;">
+            <div style="display:flex; align-items:flex-start; gap:12px;">
+              <div style="width:38px; height:38px; border-radius:8px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:700;">MV</div>
+              <div style="display:flex; flex-direction:column; gap:2px; flex:1; min-width:0;">
+                <div style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; color:#121212; letter-spacing:-.01em;">Herbouw site Meubelmakerij Verlinden</div>
+                <div style="font-family:'Instrument Sans',sans-serif; font-size:13px; color:#87877e;">Verlinden & Zn · Brugge</div>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; font-family:'Instrument Sans',sans-serif; font-size:12px;">
+              <span style="padding:4px 10px; border-radius:999px; background:#e6efec; color:#0d3b33; font-weight:600;">Ontwikkeling</span>
+              <span style="padding:4px 10px; border-radius:999px; background:#f2f2ee; color:#55554f;">4 taken vandaag</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding-top:12px; border-top:1px solid #f0f0ec; font-family:'Instrument Sans',sans-serif; font-size:12px; color:#87877e;">
+              <span>Laatste update: gisteren</span>
+              <span style="color:#b45309; font-weight:600;">Wacht op feedback</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600; font-family:'Instrument Sans',sans-serif;">Statusbadges</div>
+          <div style="display:flex; flex-wrap:wrap; gap:6px; font-family:'Instrument Sans',sans-serif; font-size:12px; font-weight:600;">
+            <span style="padding:4px 10px; border-radius:999px; background:#f2f2ee; color:#55554f;">Gepland</span>
+            <span style="padding:4px 10px; border-radius:999px; background:#e6efec; color:#0d3b33;">Ontwikkeling</span>
+            <span style="padding:4px 10px; border-radius:999px; background:#e8f1e8; color:#2c6b34;">Opgeleverd</span>
+            <span style="padding:4px 10px; border-radius:999px; background:#fdecec; color:#b91c1c;">Geblokkeerd</span>
+            <span style="padding:4px 10px; border-radius:999px; background:#fbf0e2; color:#8a4008;">Feedback</span>
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:10px;">
+          <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600; font-family:'Instrument Sans',sans-serif;">Knoppen</div>
+          <div style="display:flex; flex-wrap:wrap; gap:8px; font-family:'Instrument Sans',sans-serif; font-size:13px; font-weight:600;">
+            <button style="padding:9px 16px; border-radius:8px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Nieuw project</button>
+            <button style="padding:9px 16px; border-radius:8px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font:inherit;" style-hover="background:#fafaf8;">Bewerken</button>
+            <button style="padding:9px 16px; border-radius:8px; border:1px solid transparent; background:transparent; color:#87877e; cursor:pointer; font:inherit;" style-hover="background:#f2f2ee;">Annuleren</button>
+            <button style="padding:9px 16px; border-radius:8px; border:1px solid #f0d9d9; background:#fff; color:#b91c1c; cursor:pointer; font:inherit;" style-hover="background:#fdecec;">Verwijderen</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</x-dc>
+</body>
+</html>

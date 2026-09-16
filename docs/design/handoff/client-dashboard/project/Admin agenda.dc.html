@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#e8e8e3; }
+  a { color:#0d3b33; } a:hover { color:#0a2c26; }
+  * { box-sizing:border-box; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb { background:#d5d5cf; border-radius:4px; }
+</style>
+</helmet>
+
+<div style="font-family:'Instrument Sans',system-ui,sans-serif; color:#121212; padding:40px; display:flex; flex-direction:column; gap:36px;">
+
+  <div style="display:flex; flex-direction:column; gap:6px; max-width:84ch;">
+    <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#87877e; font-weight:600;">Beheer · agenda</div>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; letter-spacing:-.03em;">Kalender, agendalijst en agenda-item</div>
+    <div style="font-size:14px; color:#6e6e66; line-height:1.55;">Type bepaalt de markering: deadlines krijgen een balkje links, overleg een gevulde stip, mijlpalen een ruit. Achterstallige deadlines staan in rood met een streep. Klik een item voor de popover; maand/week, de filters en het formulier werken.</div>
+  </div>
+
+  <!-- ============================ 1 · KALENDER (DESKTOP) ============================ -->
+  <div style="display:flex; flex-direction:column; gap:12px;">
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600; letter-spacing:-.02em;">1 · Kalender · maand en week</div>
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <span style="font-size:12px; color:#6e6e66; font-weight:600;">Desktop 1240 · schakel tussen Maand en Week, klik een item</span>
+      <div style="width:1240px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; position:relative;">
+
+        <header style="background:#fff; border-bottom:1px solid #e3e3e0; padding:18px 24px; display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap;">
+            <div style="display:flex; align-items:center; gap:14px;">
+              <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">September 2026</h1>
+              <div style="display:flex; gap:4px;">
+                <span style="width:32px; height:32px; border-radius:8px; border:1px solid #dcdcd6; display:flex; align-items:center; justify-content:center; font-size:13px; color:#55554f; cursor:pointer;" style-hover="background:#fafaf8;">‹</span>
+                <span style="height:32px; padding:0 12px; border-radius:8px; border:1px solid #dcdcd6; display:flex; align-items:center; font-size:13px; font-weight:600; cursor:pointer;" style-hover="background:#fafaf8;">Vandaag</span>
+                <span style="width:32px; height:32px; border-radius:8px; border:1px solid #dcdcd6; display:flex; align-items:center; justify-content:center; font-size:13px; color:#55554f; cursor:pointer;" style-hover="background:#fafaf8;">›</span>
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <div style="display:flex; padding:3px; border-radius:10px; background:#f2f2ee; gap:2px;">
+                <span onClick="{{ showMonth }}" style="{{ monthTabStyle }}">Maand</span>
+                <span onClick="{{ showWeek }}" style="{{ weekTabStyle }}">Week</span>
+              </div>
+              <button onClick="{{ openNew }}" style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font:inherit; font-size:14px; font-weight:600; cursor:pointer;" style-hover="background:#0a2c26;">Agenda-item</button>
+            </div>
+          </div>
+          <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <sc-for list="{{ typeFilters }}" as="f" hint-placeholder-count="5">
+                <span onClick="{{ f.onClick }}" style="{{ f.style }}"><span style="{{ f.mark }}"></span>{{ f.label }} <span style="{{ f.countStyle }}">{{ f.count }}</span></span>
+              </sc-for>
+            </div>
+            <select value="{{ project }}" onChange="{{ onProject }}" style="height:34px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer;">
+              <option value="all">Alle projecten</option>
+              <option value="Herbouw website">Herbouw website · Verlinden &amp; Zn</option>
+              <option value="Webshop">Webshop · De Groene Kruidenier</option>
+              <option value="Onderhoud site">Onderhoud site · Bakkerij Vermeulen</option>
+            </select>
+          </div>
+        </header>
+
+        <!-- maandweergave -->
+        <sc-if value="{{ isMonth }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff; padding:0 0 4px;">
+            <div style="display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); border-bottom:1px solid #e3e3e0;">
+              <sc-for list="{{ dayNames }}" as="d" hint-placeholder-count="7">
+                <div style="padding:9px 12px; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#6e6e66; font-weight:600; border-right:1px solid #f0f0ec;">{{ d }}</div>
+              </sc-for>
+            </div>
+            <div style="display:grid; grid-template-columns:repeat(7,minmax(0,1fr));">
+              <sc-for list="{{ monthCells }}" as="c" hint-placeholder-count="35">
+                <div style="{{ c.cellStyle }}">
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:6px;">
+                    <span style="{{ c.dayStyle }}">{{ c.day }}</span>
+                    <span style="{{ c.moreStyle }}">{{ c.more }}</span>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:4px;">
+                    <sc-for list="{{ c.events }}" as="e" hint-placeholder-count="1">
+                      <div onClick="{{ e.onClick }}" style="{{ e.chipStyle }}" title="{{ e.title }}">
+                        <span style="{{ e.mark }}"></span>
+                        <span style="{{ e.chipTextStyle }}">{{ e.title }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- weekweergave -->
+        <sc-if value="{{ isWeek }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff;">
+            <div style="display:grid; grid-template-columns:60px repeat(5,1fr); border-bottom:1px solid #e3e3e0;">
+              <div style="border-right:1px solid #f0f0ec;"></div>
+              <sc-for list="{{ weekHeads }}" as="h" hint-placeholder-count="5">
+                <div style="{{ h.style }}">
+                  <span style="font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#6e6e66; font-weight:600;">{{ h.name }}</span>
+                  <span style="{{ h.dayStyle }}">{{ h.day }}</span>
+                </div>
+              </sc-for>
+            </div>
+            <div style="display:grid; grid-template-columns:60px repeat(5,1fr);">
+              <div style="border-right:1px solid #f0f0ec; display:flex; flex-direction:column;">
+                <sc-for list="{{ hours }}" as="h" hint-placeholder-count="10">
+                  <div style="height:54px; padding:4px 8px; border-bottom:1px solid #f5f5f1; font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9a92; text-align:right;">{{ h }}</div>
+                </sc-for>
+              </div>
+              <sc-for list="{{ weekColumns }}" as="col" hint-placeholder-count="5">
+                <div style="{{ col.style }}">
+                  <sc-for list="{{ col.hours }}" as="h" hint-placeholder-count="10">
+                    <div style="height:54px; border-bottom:1px solid #f5f5f1;"></div>
+                  </sc-for>
+                  <sc-for list="{{ col.events }}" as="e" hint-placeholder-count="1">
+                    <div onClick="{{ e.onClick }}" style="{{ e.blockStyle }}">
+                      <span style="{{ e.blockTitleStyle }}">{{ e.title }}</span>
+                      <span style="{{ e.blockMetaStyle }}">{{ e.timeLabel }}</span>
+                      <span style="{{ e.blockMetaStyle }}">{{ e.project }}</span>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="background:#fff; border-top:1px solid #e3e3e0; padding:12px 24px; display:flex; flex-wrap:wrap; gap:16px; align-items:center; font-size:12px; color:#6e6e66;">
+          <span style="display:inline-flex; align-items:center; gap:7px;"><span style="width:4px; height:14px; border-radius:2px; background:#b45309; display:inline-block;"></span>Deadline</span>
+          <span style="display:inline-flex; align-items:center; gap:7px;"><span style="width:8px; height:8px; border-radius:50%; background:#0d3b33; display:inline-block;"></span>Overleg</span>
+          <span style="display:inline-flex; align-items:center; gap:7px;"><span style="width:8px; height:8px; background:#1e5f8a; display:inline-block; transform:rotate(45deg);"></span>Mijlpaal</span>
+          <span style="display:inline-flex; align-items:center; gap:7px;"><span style="width:8px; height:8px; border-radius:2px; background:#9a9a92; display:inline-block;"></span>Andere</span>
+          <span style="display:inline-flex; align-items:center; gap:7px; color:#b91c1c; font-weight:600;"><span style="width:4px; height:14px; border-radius:2px; background:#b91c1c; display:inline-block;"></span>Deadline voorbij</span>
+          <span style="margin-left:auto;">{{ visibleHint }}</span>
+        </div>
+
+        <!-- popover -->
+        <sc-if value="{{ popoverOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ closePopover }}" style="position:absolute; inset:0; z-index:8; background:rgba(18,18,18,.12); display:flex; align-items:center; justify-content:center;">
+            <div style="width:400px; background:#fff; border:1px solid #e3e3e0; border-radius:14px; box-shadow:0 12px 32px rgba(18,18,18,.16); display:flex; flex-direction:column; overflow:hidden;">
+              <div style="padding:16px 18px; border-bottom:1px solid #f0f0ec; display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+                <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                  <span style="{{ popType }}"><span style="{{ popTypeMark }}"></span>{{ popTypeLabel }}</span>
+                  <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; line-height:1.3;">{{ popTitle }}</span>
+                </div>
+                <span onClick="{{ closePopover }}" style="width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#9a9a92; font-size:14px; cursor:pointer; flex-shrink:0;" style-hover="background:#f2f2ee;">✕</span>
+              </div>
+              <div style="padding:16px 18px; display:flex; flex-direction:column; gap:12px;">
+                <div style="display:flex; flex-direction:column;">
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Wanneer</span><span style="{{ popWhenStyle }}">{{ popWhen }}</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Project</span><span style="font-weight:500; text-align:right;">{{ popProject }}</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Klant</span><span style="font-weight:500; text-align:right;">{{ popClient }}</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:8px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Locatie</span><span style="font-weight:500; text-align:right;">{{ popLocation }}</span></div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; padding:8px 0; font-size:13px;"><span style="color:#87877e;">Zichtbaarheid</span><span style="{{ popVisStyle }}">{{ popVisLabel }}</span></div>
+                </div>
+                <p style="margin:0; font-size:14px; line-height:1.6; color:#2e2e2b;">{{ popDesc }}</p>
+              </div>
+              <div style="padding:12px 18px; border-top:1px solid #f0f0ec; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <span style="font-size:13px; color:#b91c1c; font-weight:600; cursor:pointer;">Verwijderen</span>
+                <div style="display:flex; gap:8px; font-size:13px; font-weight:600;">
+                  <button onClick="{{ closePopover }}" style="padding:8px 14px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font:inherit;" style-hover="background:#fafaf8;">Naar project</button>
+                  <button onClick="{{ openEdit }}" style="padding:8px 14px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Bewerken</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <!-- formulierpaneel -->
+        <sc-if value="{{ sheetOpen }}" hint-placeholder-val="{{ false }}">
+          <div style="position:absolute; inset:0; z-index:9; background:rgba(18,18,18,.28); display:flex; justify-content:flex-end;">
+            <div style="width:470px; background:#fff; border-left:1px solid #e3e3e0; display:flex; flex-direction:column; box-shadow:-8px 0 24px rgba(18,18,18,.10);">
+              <div style="padding:16px 18px; border-bottom:1px solid #f0f0ec; display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-shrink:0;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">{{ sheetTitle }}</span>
+                <span onClick="{{ closeSheet }}" style="width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#9a9a92; font-size:14px; cursor:pointer; flex-shrink:0;" style-hover="background:#f2f2ee;">✕</span>
+              </div>
+              <div style="flex:1; min-height:0; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:16px;">
+                <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                  <label style="font-size:13px; font-weight:600;">Project <span style="color:#b91c1c;">*</span></label>
+                  <select style="height:40px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:14px; cursor:pointer;">
+                    <option>Herbouw website · Verlinden &amp; Zn</option>
+                    <option>Webshop · De Groene Kruidenier</option>
+                    <option>Onderhoud site · Bakkerij Vermeulen</option>
+                    <option>Geen project (intern)</option>
+                  </select>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                  <label style="font-size:13px; font-weight:600;">Titel <span style="color:#b91c1c;">*</span></label>
+                  <input type="text" value="{{ formTitle }}" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                  <label style="font-size:13px; font-weight:600;">Omschrijving</label>
+                  <textarea rows="3" style="padding:10px 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%; resize:vertical; line-height:1.5;" value="{{ formDesc }}"></textarea>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+                  <label style="font-size:13px; font-weight:600;">Type</label>
+                  <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <sc-for list="{{ typeOptions }}" as="t" hint-placeholder-count="4">
+                      <div onClick="{{ t.onClick }}" style="{{ t.style }}"><span style="{{ t.mark }}"></span>{{ t.label }}</div>
+                    </sc-for>
+                  </div>
+                  <span style="font-size:12px; color:#87877e;">{{ typeHint }}</span>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-top:1px solid #f0f0ec; border-bottom:1px solid #f0f0ec; font-size:14px; flex-shrink:0;">
+                  <span style="display:flex; flex-direction:column; gap:1px;"><span>Hele dag</span><span style="font-size:12px; color:#87877e;">{{ allDayHint }}</span></span>
+                  <span onClick="{{ toggleAllDay }}" style="{{ allDaySwitch }}"><span style="width:16px; height:16px; border-radius:999px; background:#fff;"></span></span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:10px; flex-shrink:0;">
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="font-size:13px; font-weight:600;">Start <span style="color:#b91c1c;">*</span></label>
+                    <div style="{{ startGridStyle }}">
+                      <div style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; display:flex; align-items:center; justify-content:space-between; font-size:14px; cursor:pointer;"><span>18 september 2026</span><span style="color:#9a9a92; font-size:13px;">▦</span></div>
+                      <div style="{{ timeFieldStyle }}"><span>10:00</span><span style="color:#9a9a92; font-size:11px;">▼</span></div>
+                    </div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="font-size:13px; font-weight:600;">Einde</label>
+                    <div style="{{ startGridStyle }}">
+                      <div style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; display:flex; align-items:center; justify-content:space-between; font-size:14px; cursor:pointer;"><span>18 september 2026</span><span style="color:#9a9a92; font-size:13px;">▦</span></div>
+                      <div style="{{ timeFieldStyle }}"><span>11:00</span><span style="color:#9a9a92; font-size:11px;">▼</span></div>
+                    </div>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                  <label style="font-size:13px; font-weight:600;">Locatie</label>
+                  <input type="text" value="Videocall (Teams)" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                  <span style="font-size:12px; color:#87877e;">Een adres of een link naar het gesprek.</span>
+                </div>
+                <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding-top:12px; border-top:1px solid #f0f0ec; font-size:14px; flex-shrink:0;">
+                  <span style="display:flex; flex-direction:column; gap:1px;"><span>Zichtbaar voor de klant</span><span style="font-size:12px; color:#87877e;">{{ visHint }}</span></span>
+                  <span onClick="{{ toggleVisible }}" style="{{ visSwitch }}"><span style="width:16px; height:16px; border-radius:999px; background:#fff;"></span></span>
+                </div>
+              </div>
+              <div style="padding:14px 18px; border-top:1px solid #f0f0ec; display:flex; justify-content:flex-end; gap:8px; font-size:14px; font-weight:600; flex-shrink:0;">
+                <button onClick="{{ closeSheet }}" style="padding:9px 16px; border-radius:10px; border:1px solid transparent; background:transparent; color:#6e6e66; cursor:pointer; font:inherit;" style-hover="background:#f2f2ee;">Annuleren</button>
+                <button onClick="{{ closeSheet }}" style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Opslaan</button>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ 2 · MOBIEL ============================ -->
+  <div style="display:flex; flex-direction:column; gap:12px;">
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600; letter-spacing:-.02em;">2 · Mobiel · agendalijst per dag</div>
+    <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">375 · lijst, met datumstrook om te springen</span>
+        <div style="width:375px; height:812px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; position:relative;">
+          <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:12px 14px 10px; display:flex; flex-direction:column; gap:12px; flex-shrink:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+              <div style="display:flex; flex-direction:column;">
+                <span style="font-size:11px; color:#87877e;">September 2026</span>
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">Agenda</span>
+              </div>
+              <div style="display:flex; gap:6px;">
+                <span onClick="{{ openJump }}" style="width:40px; height:40px; border-radius:10px; border:1px solid #dcdcd6; display:flex; align-items:center; justify-content:center; font-size:15px; color:#2e2e2b; cursor:pointer;">▦</span>
+                <span onClick="{{ openNewM }}" style="width:40px; height:40px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; display:flex; align-items:center; justify-content:center; font-size:17px; color:#fff; cursor:pointer;">+</span>
+              </div>
+            </div>
+            <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:2px;">
+              <sc-for list="{{ dateStrip }}" as="d" hint-placeholder-count="7">
+                <div onClick="{{ d.onClick }}" style="{{ d.style }}">
+                  <span style="{{ d.nameStyle }}">{{ d.name }}</span>
+                  <span style="{{ d.numStyle }}">{{ d.num }}</span>
+                  <span style="{{ d.dotStyle }}"></span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+          <div style="flex:1; min-height:0; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:16px;">
+            <sc-for list="{{ dayGroups }}" as="g" hint-placeholder-count="4">
+              <div style="display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+                <div style="display:flex; align-items:baseline; gap:8px; padding:0 2px;">
+                  <span style="{{ g.labelStyle }}">{{ g.label }}</span>
+                  <span style="font-size:12px; color:#9a9a92;">{{ g.date }}</span>
+                </div>
+                <sc-for list="{{ g.events }}" as="e" hint-placeholder-count="2">
+                  <div onClick="{{ e.onClickM }}" style="{{ e.mobileCardStyle }}">
+                    <div style="display:flex; align-items:flex-start; gap:10px;">
+                      <div style="width:52px; flex-shrink:0; display:flex; flex-direction:column; gap:1px;">
+                        <span style="{{ e.timeStyle }}">{{ e.timeShort }}</span>
+                        <span style="font-size:11px; color:#9a9a92;">{{ e.timeEnd }}</span>
+                      </div>
+                      <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;">
+                        <span style="font-size:15px; font-weight:600; line-height:1.35;">{{ e.title }}</span>
+                        <span style="font-size:12px; color:#87877e;">{{ e.project }} · {{ e.client }}</span>
+                        <span style="{{ e.typePill }}"><span style="{{ e.mark }}"></span>{{ e.typeLabel }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-for>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(5,1fr); background:#fff; border-top:1px solid #e3e3e0; padding:6px 4px 10px; flex-shrink:0;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">◧</span><span style="font-size:10px;">Start</span></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">▤</span><span style="font-size:10px;">Projecten</span></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">◫</span><span style="font-size:10px;">Taken</span></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">◎</span><span style="font-size:10px;">Tickets</span></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#0d3b33;"><span style="font-size:17px;">▦</span><span style="font-size:10px; font-weight:600;">Agenda</span></div>
+          </div>
+
+          <!-- datumkiezer -->
+          <sc-if value="{{ jumpOpen }}" hint-placeholder-val="{{ false }}">
+            <div onClick="{{ closeJump }}" style="position:absolute; inset:0; z-index:8; background:rgba(18,18,18,.3); display:flex; align-items:flex-end;">
+              <div style="width:100%; background:#fff; border-radius:16px 16px 0 0; padding:10px 14px 18px; display:flex; flex-direction:column; gap:12px;">
+                <div style="width:40px; height:4px; border-radius:2px; background:#e3e3e0; margin:2px auto 4px;"></div>
+                <div style="display:flex; justify-content:space-between; align-items:center; font-size:14px; font-weight:600;"><span style="color:#9a9a92; cursor:pointer;">‹</span>september 2026<span style="color:#9a9a92; cursor:pointer;">›</span></div>
+                <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:2px; font-size:10px; color:#9a9a92; text-align:center; font-weight:600;">
+                  <span>ma</span><span>di</span><span>wo</span><span>do</span><span>vr</span><span>za</span><span>zo</span>
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(7,1fr); gap:4px; font-size:14px; text-align:center;">
+                  <sc-for list="{{ jumpDays }}" as="d" hint-placeholder-count="30">
+                    <span onClick="{{ d.onClick }}" style="{{ d.style }}">{{ d.num }}</span>
+                  </sc-for>
+                </div>
+                <button onClick="{{ closeJump }}" style="height:44px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; margin-top:4px;">Naar vandaag</button>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- detailsheet -->
+          <sc-if value="{{ detailOpenM }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; inset:0; z-index:9; background:rgba(18,18,18,.3); display:flex; align-items:flex-end;">
+              <div style="width:100%; max-height:88%; background:#fff; border-radius:16px 16px 0 0; display:flex; flex-direction:column;">
+                <div style="padding:10px 14px 12px; border-bottom:1px solid #f0f0ec; display:flex; flex-direction:column; gap:10px; flex-shrink:0;">
+                  <div style="width:40px; height:4px; border-radius:2px; background:#e3e3e0; margin:0 auto;"></div>
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                    <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                      <span style="{{ popType }}"><span style="{{ popTypeMark }}"></span>{{ popTypeLabel }}</span>
+                      <span style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600; line-height:1.3;">{{ popTitle }}</span>
+                    </div>
+                    <span onClick="{{ closeDetailM }}" style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#9a9a92; font-size:15px; cursor:pointer; flex-shrink:0;">✕</span>
+                  </div>
+                </div>
+                <div style="padding:14px; display:flex; flex-direction:column; gap:12px;">
+                  <div style="display:flex; flex-direction:column;">
+                    <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Wanneer</span><span style="{{ popWhenStyle }}">{{ popWhen }}</span></div>
+                    <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Project</span><span style="font-weight:500; text-align:right;">{{ popProject }}</span></div>
+                    <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Locatie</span><span style="font-weight:500; text-align:right;">{{ popLocation }}</span></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; padding:9px 0; font-size:13px;"><span style="color:#87877e;">Zichtbaarheid</span><span style="{{ popVisStyle }}">{{ popVisLabel }}</span></div>
+                  </div>
+                  <p style="margin:0; font-size:14px; line-height:1.6; color:#2e2e2b;">{{ popDesc }}</p>
+                </div>
+                <div style="padding:12px 14px 16px; border-top:1px solid #f0f0ec; display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+                  <button onClick="{{ openNewM }}" style="height:48px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;">Bewerken</button>
+                  <button onClick="{{ closeDetailM }}" style="height:44px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Naar project</button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+
+          <!-- formulier mobiel -->
+          <sc-if value="{{ sheetOpenM }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; inset:0; z-index:10; background:rgba(18,18,18,.3); display:flex; align-items:flex-end;">
+              <div style="width:100%; max-height:94%; background:#fff; border-radius:16px 16px 0 0; display:flex; flex-direction:column;">
+                <div style="padding:10px 14px 12px; border-bottom:1px solid #f0f0ec; display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+                  <div style="width:40px; height:4px; border-radius:2px; background:#e3e3e0; margin:0 auto;"></div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                    <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">Agenda-item</span>
+                    <span onClick="{{ closeSheetM }}" style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#9a9a92; font-size:15px; cursor:pointer;">✕</span>
+                  </div>
+                </div>
+                <div style="flex:1; min-height:0; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:14px;">
+                  <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                    <label style="font-size:13px; font-weight:600;">Project <span style="color:#b91c1c;">*</span></label>
+                    <select style="height:44px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:15px; cursor:pointer;">
+                      <option>Herbouw website</option><option>Webshop</option><option>Onderhoud site</option><option>Geen project</option>
+                    </select>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                    <label style="font-size:13px; font-weight:600;">Titel <span style="color:#b91c1c;">*</span></label>
+                    <input type="text" value="{{ formTitle }}" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                    <label style="font-size:13px; font-weight:600;">Type</label>
+                    <select style="height:44px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:15px; cursor:pointer;">
+                      <option>Overleg</option><option>Deadline</option><option>Mijlpaal</option><option>Andere</option>
+                    </select>
+                  </div>
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; border-top:1px solid #f0f0ec; border-bottom:1px solid #f0f0ec; font-size:14px; flex-shrink:0;">
+                    <span>Hele dag</span>
+                    <span onClick="{{ toggleAllDay }}" style="{{ allDaySwitch }}"><span style="width:16px; height:16px; border-radius:999px; background:#fff;"></span></span>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                    <label style="font-size:13px; font-weight:600;">Start <span style="color:#b91c1c;">*</span></label>
+                    <div style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; display:flex; align-items:center; justify-content:space-between; font-size:15px;"><span>18 sep 2026</span><span style="color:#9a9a92; font-size:13px;">▦</span></div>
+                    <div style="{{ timeFieldStyleM }}"><span>10:00</span><span style="color:#9a9a92; font-size:11px;">▼</span></div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                    <label style="font-size:13px; font-weight:600;">Einde</label>
+                    <div style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; display:flex; align-items:center; justify-content:space-between; font-size:15px;"><span>18 sep 2026</span><span style="color:#9a9a92; font-size:13px;">▦</span></div>
+                    <div style="{{ timeFieldStyleM }}"><span>11:00</span><span style="color:#9a9a92; font-size:11px;">▼</span></div>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                    <label style="font-size:13px; font-weight:600;">Locatie</label>
+                    <input type="text" value="Videocall (Teams)" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+                  </div>
+                  <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; padding-top:12px; border-top:1px solid #f0f0ec; font-size:14px; flex-shrink:0;">
+                    <span style="display:flex; flex-direction:column; gap:1px;"><span>Zichtbaar voor de klant</span><span style="font-size:12px; color:#87877e;">{{ visHint }}</span></span>
+                    <span onClick="{{ toggleVisible }}" style="{{ visSwitch }}"><span style="width:16px; height:16px; border-radius:999px; background:#fff;"></span></span>
+                  </div>
+                </div>
+                <div style="padding:12px 14px 16px; border-top:1px solid #f0f0ec; display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+                  <button onClick="{{ closeSheetM }}" style="height:48px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;">Opslaan</button>
+                  <button onClick="{{ closeSheetM }}" style="height:44px; border-radius:10px; border:1px solid transparent; background:transparent; color:#6e6e66; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Annuleren</button>
+                </div>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="flex-shrink:0; width:340px; display:flex; flex-direction:column; gap:12px;">
+        <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Waarom lijst op mobiel</span>
+          <span style="font-size:13px; color:#55554f; line-height:1.55;">Een maandrooster van 375px maakt cellen van 50px: onleesbaar en niet aan te tikken. De lijst per dag is de standaard; de datumstrook bovenaan springt naar een dag en de knop ▦ opent een volledige maandkiezer.</span>
+        </div>
+        <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Achterstallige deadlines</span>
+          <span style="font-size:13px; color:#55554f; line-height:1.55;">Een deadline in het verleden die nog niet afgevinkt is, krijgt een rood balkje, rode tijd en de tekst “te laat”. In de maandweergave blijft de chip rood, ook bij een andere projectfilter.</span>
+        </div>
+        <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+          <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Zichtbaarheid</span>
+          <span style="font-size:13px; color:#55554f; line-height:1.55;">Overleg met de klant en deadlines voor de klant staan standaard aan; interne mijlpalen standaard uit. In het klantportaal verschijnen alleen items met “Gedeeld”.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const TYPES = {
+  deadline:  { label: 'Deadline',  color: '#8a4008', solid: '#b45309', bg: '#fbf0e2' },
+  meeting:   { label: 'Overleg',   color: '#0d3b33', solid: '#0d3b33', bg: '#e6efec' },
+  milestone: { label: 'Mijlpaal',  color: '#1e5f8a', solid: '#1e5f8a', bg: '#e6f0f6' },
+  other:     { label: 'Andere',    color: '#55554f', solid: '#9a9a92', bg: '#f2f2ee' }
+};
+const TORDER = ['deadline', 'meeting', 'milestone', 'other'];
+const EVENTS = [
+  { id: 1, day: 14, title: 'Teksten dienstenpagina aanleveren', type: 'deadline',  project: 'Onderhoud site',  client: 'Praktijk Dewulf',      allDay: true,  start: '', end: '', location: 'Geen', shared: true,  overdue: true,  desc: 'De klant moest de teksten voor de dienstenpagina aanleveren. Nog niets ontvangen; opvolgen via een telefoontje.' },
+  { id: 2, day: 16, title: 'Voorraadkoppeling nakijken', type: 'meeting',   project: 'Webshop',         client: 'De Groene Kruidenier', allDay: false, start: '14:00', end: '15:00', location: 'Videocall (Teams)', shared: true, overdue: false, desc: 'Samen met de leverancier de koppeling van de voorraad doorlopen en de foutmarges bekijken.' },
+  { id: 3, day: 18, title: 'Ontwerp homepagina bespreken', type: 'meeting',   project: 'Herbouw website', client: 'Verlinden & Zn',       allDay: false, start: '10:00', end: '11:00', location: 'Videocall (Teams)', shared: true, overdue: false, desc: 'Derde versie van de homepagina overlopen met Katrien. Feedback op de fotografie en de indeling van de realisaties.' },
+  { id: 4, day: 21, title: 'Testversie webshop online', type: 'milestone', project: 'Webshop',         client: 'De Groene Kruidenier', allDay: true,  start: '', end: '', location: 'Geen', shared: false, overdue: false, desc: 'Interne mijlpaal: de testomgeving moet volledig werkend online staan voor de klant erop kan.' },
+  { id: 5, day: 23, title: 'Kwartaaloverleg onderhoud', type: 'meeting',   project: 'Onderhoud site',  client: 'Bakkerij Vermeulen',   allDay: false, start: '09:30', end: '10:15', location: 'Sint-Niklaas, bakkerij', shared: true, overdue: false, desc: 'Vast kwartaaloverleg: openstaande meldingen, updates en plannen voor het najaar.' },
+  { id: 6, day: 25, title: 'Teksten aanleveren door klant', type: 'deadline',  project: 'Herbouw website', client: 'Verlinden & Zn',       allDay: true,  start: '', end: '', location: 'Geen', shared: true,  overdue: false, desc: 'Afspraak met de klant: alle teksten voor de nieuwe site aangeleverd, zodat de bouw kan starten.' },
+  { id: 7, day: 29, title: 'Factuur tweede schijf', type: 'other',     project: 'Herbouw website', client: 'Verlinden & Zn',       allDay: true,  start: '', end: '', location: 'Geen', shared: false, overdue: false, desc: 'Tweede schijf van 50% factureren zodra de ontwikkeling afgerond is.' },
+  { id: 8, day: 30, title: 'Maandelijkse update uitvoeren', type: 'deadline',  project: 'Onderhoud site',  client: 'Bakkerij Vermeulen',   allDay: true,  start: '', end: '', location: 'Geen', shared: true,  overdue: false, desc: 'Updates van het CMS en de plug-ins, plus een back-upcontrole.' }
+];
+const TODAY = 16;
+const DAY_NAMES = ['maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+const WEEK_SHORT = ['ma', 'di', 'wo', 'do', 'vr', 'za', 'zo'];
+const HOURS = ['08:00', '09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+
+class Component extends DCLogic {
+  state = {
+    view: 'month', type: 'all', project: 'all',
+    selected: null, selectedM: null, sheet: false, sheetM: false,
+    jump: false, allDay: false, visible: true, formType: 'meeting', jumpDay: TODAY
+  };
+
+  filtered() {
+    const s = this.state;
+    return EVENTS.filter(e => (s.type === 'all' || e.type === s.type) && (s.project === 'all' || e.project === s.project));
+  }
+
+  mark(type, overdue, size) {
+    const t = TYPES[type];
+    const c = overdue ? '#b91c1c' : t.solid;
+    if (type === 'deadline') return 'width:4px; height:' + (size || 12) + 'px; border-radius:2px; background:' + c + '; display:inline-block; flex-shrink:0;';
+    if (type === 'milestone') return 'width:8px; height:8px; background:' + c + '; display:inline-block; transform:rotate(45deg); flex-shrink:0;';
+    if (type === 'meeting') return 'width:8px; height:8px; border-radius:50%; background:' + c + '; display:inline-block; flex-shrink:0;';
+    return 'width:8px; height:8px; border-radius:2px; background:' + c + '; display:inline-block; flex-shrink:0;';
+  }
+
+  decorate(e) {
+    const t = TYPES[e.type];
+    const c = e.overdue ? '#b91c1c' : t.color;
+    const bg = e.overdue ? '#fdecec' : t.bg;
+    const timeLabel = e.allDay ? 'Hele dag' : e.start + ' – ' + e.end;
+    return Object.assign({}, e, {
+      typeLabel: t.label,
+      mark: this.mark(e.type, e.overdue, 12),
+      timeLabel: timeLabel,
+      timeShort: e.allDay ? 'hele' : e.start,
+      timeEnd: e.allDay ? 'dag' : e.end,
+      timeStyle: 'font-family:JetBrains Mono, monospace; font-size:13px; font-weight:500; color:' + (e.overdue ? '#b91c1c' : '#121212') + ';',
+      typePill: 'align-self:flex-start; display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border-radius:999px; background:' + bg + '; color:' + c + '; font-size:11px; font-weight:600;',
+      chipStyle: 'display:flex; align-items:center; gap:6px; padding:3px 6px; border-radius:6px; background:' + bg + '; cursor:pointer; overflow:hidden; min-width:0;',
+      chipTextStyle: 'min-width:0; flex:1; font-size:11px; font-weight:600; color:' + c + '; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;' + (e.overdue ? ' text-decoration:line-through;' : ''),
+      mobileCardStyle: 'border:1px solid #e3e3e0; border-left:3px solid ' + (e.overdue ? '#b91c1c' : t.solid) + '; border-radius:12px; background:#fff; padding:12px; cursor:pointer; flex-shrink:0;',
+      onClick: () => this.setState({ selected: e.id }),
+      onClickM: () => this.setState({ selectedM: e.id })
+    });
+  }
+
+  chip(label, active, onClick, count, mark) {
+    return {
+      label: label,
+      count: count,
+      mark: mark || 'display:none;',
+      onClick: onClick,
+      style: 'display:inline-flex; align-items:center; gap:7px; white-space:nowrap; cursor:pointer; font-weight:600; font-size:13px; padding:7px 12px; border-radius:999px; background:' +
+        (active ? '#121212' : '#fff') + '; color:' + (active ? '#fff' : '#55554f') + '; border:1px solid ' + (active ? '#121212' : '#dcdcd6') + ';',
+      countStyle: 'min-width:18px; height:18px; padding:0 5px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; background:' +
+        (active ? 'rgba(255,255,255,.18)' : '#f2f2ee') + '; color:' + (active ? '#ffffff' : '#6e6e66') + ';'
+    };
+  }
+
+  tabStyle(active) {
+    return 'padding:7px 16px; border-radius:8px; cursor:pointer; font-size:13px; font-weight:600; background:' +
+      (active ? '#fff' : 'transparent') + '; color:' + (active ? '#121212' : '#6e6e66') + ';' + (active ? ' box-shadow:0 1px 2px rgba(18,18,18,.05);' : '');
+  }
+
+  renderVals() {
+    const s = this.state;
+    const list = this.filtered();
+    const sel = EVENTS.filter(e => e.id === (s.selected || s.selectedM))[0] || EVENTS[2];
+    const selT = TYPES[sel.type];
+    const selC = sel.overdue ? '#b91c1c' : selT.color;
+
+    // september 2026 begins on tuesday → one leading blank
+    const cells = [];
+    for (let i = 0; i < 1; i++) cells.push({ blank: true });
+    for (let d = 1; d <= 30; d++) cells.push({ blank: false, day: d });
+    while (cells.length % 7 !== 0) cells.push({ blank: true });
+
+    const dayGroupKeys = [];
+    list.forEach(e => { if (dayGroupKeys.indexOf(e.day) < 0) dayGroupKeys.push(e.day); });
+    dayGroupKeys.sort((a, b) => a - b);
+
+    const dayLabel = d => {
+      if (d === TODAY) return 'Vandaag';
+      if (d === TODAY + 1) return 'Morgen';
+      if (d < TODAY) return 'Te laat';
+      const n = DAY_NAMES[((d - 14) % 7 + 7) % 7];
+      return n.charAt(0).toUpperCase() + n.slice(1);
+    };
+
+    return {
+      isMonth: s.view === 'month',
+      isWeek: s.view === 'week',
+      showMonth: () => this.setState({ view: 'month' }),
+      showWeek: () => this.setState({ view: 'week' }),
+      monthTabStyle: this.tabStyle(s.view === 'month'),
+      weekTabStyle: this.tabStyle(s.view === 'week'),
+
+      typeFilters: [this.chip('Alle', s.type === 'all', () => this.setState({ type: 'all' }),
+        EVENTS.filter(e => s.project === 'all' || e.project === s.project).length)]
+        .concat(TORDER.map(k => this.chip(TYPES[k].label, s.type === k, () => this.setState({ type: k }),
+          EVENTS.filter(e => e.type === k && (s.project === 'all' || e.project === s.project)).length,
+          this.mark(k, false, 12)))),
+      project: s.project,
+      onProject: e => this.setState({ project: e.target.value }),
+      visibleHint: list.filter(e => e.shared).length + ' van ' + list.length + ' items zijn zichtbaar voor de klant',
+
+      dayNames: DAY_NAMES,
+      monthCells: cells.map((c, i) => {
+        if (c.blank) {
+          return { day: '', more: '', events: [],
+            cellStyle: 'min-height:96px; padding:8px; border-right:1px solid #f0f0ec; border-bottom:1px solid #f0f0ec; background:#fcfcfa; display:flex; flex-direction:column; gap:6px;',
+            dayStyle: 'display:none;', moreStyle: 'display:none;' };
+        }
+        const evts = list.filter(e => e.day === c.day);
+        const isToday = c.day === TODAY;
+        return {
+          day: c.day,
+          more: evts.length > 2 ? '+' + (evts.length - 2) : '',
+          moreStyle: evts.length > 2 ? 'font-size:10px; color:#9a9a92; font-weight:600;' : 'display:none;',
+          cellStyle: 'min-height:96px; padding:8px; border-right:1px solid #f0f0ec; border-bottom:1px solid #f0f0ec; display:flex; flex-direction:column; gap:6px; background:' +
+            (isToday ? '#f6f8f7' : '#fff') + ';',
+          dayStyle: isToday
+            ? 'width:22px; height:22px; border-radius:999px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:Space Grotesk, sans-serif; font-size:12px; font-weight:700;'
+            : 'font-family:Space Grotesk, sans-serif; font-size:13px; font-weight:600; color:#2e2e2b; padding-left:2px;',
+          events: evts.slice(0, 2).map(e => this.decorate(e))
+        };
+      }),
+
+      hours: HOURS,
+      weekHeads: [14, 15, 16, 17, 18].map((d, i) => ({
+        name: WEEK_SHORT[i],
+        day: d,
+        style: 'padding:8px 12px; border-right:1px solid #f0f0ec; display:flex; flex-direction:column; gap:2px; background:' + (d === TODAY ? '#f6f8f7' : '#fff') + ';',
+        dayStyle: d === TODAY
+          ? 'font-family:Space Grotesk, sans-serif; font-size:17px; font-weight:700; color:#0d3b33;'
+          : 'font-family:Space Grotesk, sans-serif; font-size:17px; font-weight:600; color:#121212;'
+      })),
+      weekColumns: [14, 15, 16, 17, 18].map(d => {
+        const evts = list.filter(e => e.day === d);
+        return {
+          style: 'position:relative; border-right:1px solid #f0f0ec; background:' + (d === TODAY ? '#fbfcfb' : '#fff') + ';',
+          hours: HOURS,
+          events: evts.map(e => {
+            const t = TYPES[e.type];
+            const c = e.overdue ? '#b91c1c' : t.solid;
+            const bg = e.overdue ? '#fdecec' : t.bg;
+            const top = e.allDay ? 2 : (parseInt(e.start.split(':')[0], 10) - 8) * 54 + 2;
+            const height = e.allDay ? 44 : 104;
+            return Object.assign({}, this.decorate(e), {
+              blockStyle: 'position:absolute; left:6px; right:6px; top:' + top + 'px; height:' + height + 'px; border-radius:8px; border-left:3px solid ' + c +
+                '; background:' + bg + '; padding:6px 8px; display:flex; flex-direction:column; gap:2px; cursor:pointer; overflow:hidden;',
+              blockTitleStyle: 'font-size:12px; font-weight:600; color:' + (e.overdue ? '#b91c1c' : '#121212') + '; line-height:1.3;' + (e.overdue ? ' text-decoration:line-through;' : ''),
+              blockMetaStyle: 'font-size:11px; color:' + (e.overdue ? '#8a2020' : '#6e6e66') + '; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;'
+            });
+          })
+        };
+      }),
+
+      dateStrip: [14, 15, 16, 17, 18, 19, 20].map(d => {
+        const active = d === s.jumpDay;
+        const has = list.filter(e => e.day === d).length > 0;
+        return {
+          name: WEEK_SHORT[(d - 14) % 7],
+          num: d,
+          onClick: () => this.setState({ jumpDay: d }),
+          style: 'flex:1; min-width:44px; display:flex; flex-direction:column; align-items:center; gap:3px; padding:8px 4px; border-radius:10px; cursor:pointer; background:' +
+            (active ? '#121212' : '#f2f2ee') + ';',
+          nameStyle: 'font-size:10px; font-weight:600; color:' + (active ? 'rgba(255,255,255,.7)' : '#87877e') + ';',
+          numStyle: 'font-family:Space Grotesk, sans-serif; font-size:15px; font-weight:700; color:' + (active ? '#fff' : '#121212') + ';',
+          dotStyle: has ? 'width:5px; height:5px; border-radius:999px; background:' + (active ? '#fff' : '#0d3b33') + ';' : 'width:5px; height:5px; border-radius:999px; background:transparent;'
+        };
+      }),
+      jumpOpen: s.jump,
+      openJump: () => this.setState({ jump: true }),
+      closeJump: () => this.setState({ jump: false }),
+      jumpDays: (function (self) {
+        const out = [];
+        for (let d = 1; d <= 30; d++) {
+          const has = EVENTS.filter(e => e.day === d).length > 0;
+          const active = d === self.state.jumpDay;
+          out.push({
+            num: d,
+            onClick: () => self.setState({ jumpDay: d, jump: false }),
+            style: 'min-height:40px; display:flex; align-items:center; justify-content:center; border-radius:8px; cursor:pointer; font-weight:' +
+              (has ? '600' : '400') + '; background:' + (active ? '#0d3b33' : has ? '#f2f2ee' : 'transparent') + '; color:' + (active ? '#fff' : '#121212') + ';'
+          });
+        }
+        return out;
+      })(this),
+
+      dayGroups: dayGroupKeys.map(d => {
+        const evts = list.filter(e => e.day === d);
+        const late = d < TODAY;
+        return {
+          label: dayLabel(d),
+          date: d + ' september',
+          labelStyle: 'font-family:Space Grotesk, sans-serif; font-size:15px; font-weight:600; color:' + (late ? '#b91c1c' : d === TODAY ? '#0d3b33' : '#121212') + ';',
+          events: evts.map(e => this.decorate(e))
+        };
+      }),
+
+      popoverOpen: s.selected !== null,
+      closePopover: () => this.setState({ selected: null }),
+      detailOpenM: s.selectedM !== null,
+      closeDetailM: () => this.setState({ selectedM: null }),
+      popTitle: sel.title,
+      popTypeLabel: selT.label,
+      popType: 'align-self:flex-start; display:inline-flex; align-items:center; gap:7px; padding:4px 10px; border-radius:999px; background:' +
+        (sel.overdue ? '#fdecec' : selT.bg) + '; color:' + selC + '; font-size:12px; font-weight:600;',
+      popTypeMark: this.mark(sel.type, sel.overdue, 12),
+      popWhen: (sel.allDay ? '14 sep · hele dag' : sel.day + ' sep · ' + sel.start + ' – ' + sel.end) + (sel.overdue ? ' · te laat' : ''),
+      popWhenStyle: 'font-weight:500; text-align:right; color:' + (sel.overdue ? '#b91c1c' : '#121212') + ';',
+      popProject: sel.project,
+      popClient: sel.client,
+      popLocation: sel.location,
+      popDesc: sel.desc,
+      popVisLabel: sel.shared ? 'Gedeeld met de klant' : 'Intern',
+      popVisStyle: 'padding:4px 10px; border-radius:999px; background:' + (sel.shared ? '#e8f1e8' : '#f2f2ee') + '; color:' + (sel.shared ? '#2c6b34' : '#55554f') +
+        '; font-size:12px; font-weight:600; white-space:nowrap;',
+
+      sheetOpen: s.sheet,
+      openNew: () => this.setState({ sheet: true, selected: null }),
+      openEdit: () => this.setState({ sheet: true, selected: null }),
+      closeSheet: () => this.setState({ sheet: false }),
+      sheetTitle: 'Agenda-item',
+      sheetOpenM: s.sheetM,
+      openNewM: () => this.setState({ sheetM: true, selectedM: null }),
+      closeSheetM: () => this.setState({ sheetM: false }),
+      formTitle: 'Ontwerp homepagina bespreken',
+      formDesc: 'Derde versie van de homepagina overlopen met Katrien.',
+
+      typeOptions: TORDER.map(k => {
+        const active = s.formType === k;
+        const t = TYPES[k];
+        return {
+          label: t.label,
+          mark: this.mark(k, false, 12),
+          onClick: () => this.setState({ formType: k }),
+          style: 'flex:1; min-width:96px; height:40px; display:flex; align-items:center; justify-content:center; gap:8px; border-radius:10px; cursor:pointer; font-size:14px; font-weight:600; border:1px solid ' +
+            (active ? t.color : '#dcdcd6') + '; background:' + (active ? t.bg : '#fff') + '; color:' + (active ? t.color : '#55554f') + ';'
+        };
+      }),
+      typeHint: s.formType === 'deadline' ? 'Deadlines krijgen geen uur en vallen rood op als ze voorbij zijn.'
+        : s.formType === 'milestone' ? 'Mijlpalen zijn standaard intern.'
+        : s.formType === 'meeting' ? 'Overleg met de klant komt standaard in het portaal.'
+        : 'Vrij te gebruiken, bijvoorbeeld voor facturatiemomenten.',
+
+      allDay: s.allDay,
+      toggleAllDay: () => this.setState(st => ({ allDay: !st.allDay })),
+      allDaySwitch: 'width:38px; height:22px; border-radius:999px; padding:3px; display:flex; flex-shrink:0; cursor:pointer; background:' +
+        (s.allDay ? '#0d3b33' : '#cfcfc9') + ';' + (s.allDay ? ' justify-content:flex-end;' : ''),
+      allDayHint: s.allDay ? 'Geen uren; het item vult de hele dag.' : 'Met start- en einduur.',
+      startGridStyle: s.allDay ? 'display:grid; grid-template-columns:1fr; gap:8px;' : 'display:grid; grid-template-columns:1fr 112px; gap:8px;',
+      timeFieldStyle: s.allDay ? 'display:none;' : 'height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; display:flex; align-items:center; justify-content:space-between; font-size:14px; cursor:pointer;',
+      timeFieldStyleM: s.allDay ? 'display:none;' : 'height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; display:flex; align-items:center; justify-content:space-between; font-size:15px; cursor:pointer;',
+
+      visible: s.visible,
+      toggleVisible: () => this.setState(st => ({ visible: !st.visible })),
+      visSwitch: 'width:38px; height:22px; border-radius:999px; padding:3px; display:flex; flex-shrink:0; cursor:pointer; background:' +
+        (s.visible ? '#0d3b33' : '#cfcfc9') + ';' + (s.visible ? ' justify-content:flex-end;' : ''),
+      visHint: s.visible ? 'Staat in de agenda van het klantportaal.' : 'Blijft intern; de klant ziet dit niet.'
+    };
+  }
+}
+</script>
+</body>
+</html>

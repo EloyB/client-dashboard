@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#e8e8e3; }
+  a { color:#0d3b33; } a:hover { color:#0a2c26; }
+  * { box-sizing:border-box; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb { background:#d5d5cf; border-radius:4px; }
+</style>
+</helmet>
+
+<div style="font-family:'Instrument Sans',system-ui,sans-serif; color:#121212; padding:40px; display:flex; flex-direction:column; gap:28px;">
+
+  <div style="display:flex; flex-direction:column; gap:6px; max-width:84ch;">
+    <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#87877e; font-weight:600;">Beheer · aanmelden</div>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; letter-spacing:-.03em;">Aanmelden, wachtwoord vergeten en opnieuw instellen</div>
+    <div style="font-size:14px; color:#6e6e66; line-height:1.55;">Eén gecentreerde kaart op een neutrale achtergrond, geen marketing. De foutmelding bij een mislukte aanmelding is bewust neutraal: ze zegt niet of het e-mailadres bestaat.</div>
+    <div style="display:flex; flex-wrap:wrap; gap:6px; padding-top:6px;">
+      <sc-for list="{{ stateTabs }}" as="t" hint-placeholder-count="5">
+        <span onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</span>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start;">
+
+    <!-- ===================== DESKTOP ===================== -->
+    <div style="flex-shrink:0; display:flex; flex-direction:column; gap:10px;">
+      <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#87877e; font-weight:600;">Desktop · 1040 × 720</div>
+      <div style="width:1040px; height:720px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column;">
+
+        <div style="flex:1; min-height:0; display:flex; align-items:center; justify-content:center; padding:24px;">
+          <div style="width:420px; display:flex; flex-direction:column; gap:18px;">
+
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:32px; height:32px; border-radius:8px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:700;">S</div>
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">Studio</span>
+            </div>
+
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:24px; display:flex; flex-direction:column; gap:18px; box-shadow:0 1px 2px rgba(18,18,18,.05);">
+
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:600; letter-spacing:-.02em;">{{ title }}</h1>
+                <span style="font-size:14px; color:#87877e; line-height:1.5;">{{ subtitle }}</span>
+              </div>
+
+              <sc-if value="{{ showError }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; align-items:flex-start; gap:10px; border:1px solid #f0cfcf; border-radius:10px; background:#fdecec; padding:12px;">
+                  <span style="width:20px; height:20px; border-radius:999px; background:#fff; color:#b91c1c; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0;">!</span>
+                  <div style="display:flex; flex-direction:column; gap:2px;">
+                    <span style="font-size:13px; font-weight:600; color:#b91c1c;">Aanmelden is niet gelukt</span>
+                    <span style="font-size:13px; color:#8a2020; line-height:1.5;">Het e-mailadres of het wachtwoord is niet juist. Controleer beide en probeer opnieuw.</span>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- ---- aanmelden ---- -->
+              <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="font-size:13px; font-weight:600;">E-mailadres</label>
+                    <input type="text" value="jonas@studio.be" style="{{ inputStyle }}">
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <div style="display:flex; justify-content:space-between; align-items:baseline; gap:12px;">
+                      <label style="font-size:13px; font-weight:600;">Wachtwoord</label>
+                      <span onClick="{{ goForgot }}" style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer; text-decoration:underline;">Wachtwoord vergeten?</span>
+                    </div>
+                    <div style="{{ pwWrapStyle }}">
+                      <input type="password" value="••••••••••" style="border:none; outline:none; font-family:'Instrument Sans',sans-serif; font-size:14px; background:transparent; width:100%; color:#121212;">
+                      <span style="font-size:12px; color:#0d3b33; font-weight:600; cursor:pointer; white-space:nowrap;">Tonen</span>
+                    </div>
+                  </div>
+                  <label style="display:flex; align-items:center; gap:10px; font-size:14px; cursor:pointer;">
+                    <span style="width:18px; height:18px; border-radius:5px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0;">✓</span>
+                    Aangemeld blijven op dit toestel
+                  </label>
+                  <button onClick="{{ submit }}" style="{{ primaryStyle }}">{{ primaryLabel }}</button>
+                </div>
+              </sc-if>
+
+              <!-- ---- wachtwoord vergeten ---- -->
+              <sc-if value="{{ isForgot }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="font-size:13px; font-weight:600;">E-mailadres</label>
+                    <input type="text" placeholder="naam@studio.be" style="{{ inputStyle }}">
+                    <span style="font-size:12px; color:#87877e;">U ontvangt een link die één uur geldig blijft.</span>
+                  </div>
+                  <button onClick="{{ submit }}" style="{{ primaryStyle }}">{{ primaryLabel }}</button>
+                  <span onClick="{{ goLogin }}" style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer; text-align:center;">Terug naar aanmelden</span>
+                </div>
+              </sc-if>
+
+              <!-- ---- link verstuurd ---- -->
+              <sc-if value="{{ isSent }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div style="display:flex; align-items:flex-start; gap:12px; border:1px solid #e3e3e0; border-radius:10px; padding:14px; background:#fafaf8;">
+                    <span style="width:24px; height:24px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">✓</span>
+                    <span style="font-size:13px; color:#2e2e2b; line-height:1.55;">Bestaat er een account met dit e-mailadres, dan is de link onderweg. Kijk ook in de map ongewenste e-mail.</span>
+                  </div>
+                  <button onClick="{{ goLogin }}" style="{{ primaryStyle }}">Terug naar aanmelden</button>
+                  <span style="font-size:13px; color:#87877e; text-align:center;">Geen e-mail ontvangen? <span onClick="{{ goForgot }}" style="color:#0d3b33; font-weight:600; cursor:pointer; text-decoration:underline;">Opnieuw versturen</span></span>
+                </div>
+              </sc-if>
+
+              <!-- ---- nieuw wachtwoord ---- -->
+              <sc-if value="{{ isReset }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="font-size:13px; font-weight:600;">Nieuw wachtwoord</label>
+                    <div style="{{ pwWrapStyle }}">
+                      <input type="password" value="••••••••••••" style="border:none; outline:none; font-family:'Instrument Sans',sans-serif; font-size:14px; background:transparent; width:100%;">
+                      <span style="font-size:12px; color:#0d3b33; font-weight:600; cursor:pointer; white-space:nowrap;">Tonen</span>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:8px; padding-top:2px;">
+                      <div style="flex:1; height:4px; border-radius:2px; background:#2c6b34;"></div>
+                      <div style="flex:1; height:4px; border-radius:2px; background:#2c6b34;"></div>
+                      <div style="flex:1; height:4px; border-radius:2px; background:#2c6b34;"></div>
+                      <div style="flex:1; height:4px; border-radius:2px; background:#e3e3e0;"></div>
+                      <span style="font-size:12px; color:#2c6b34; font-weight:600; white-space:nowrap;">Sterk</span>
+                    </div>
+                    <span style="font-size:12px; color:#87877e;">Minimaal 12 tekens, met een cijfer of een symbool.</span>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="font-size:13px; font-weight:600;">Herhaal nieuw wachtwoord</label>
+                    <input type="password" value="•••••••••" style="height:40px; padding:0 12px; border:1px solid #b91c1c; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                    <span style="font-size:12px; color:#b91c1c; font-weight:500;">De twee wachtwoorden zijn niet gelijk.</span>
+                  </div>
+                  <button onClick="{{ submit }}" style="{{ primaryStyle }}">{{ primaryLabel }}</button>
+                </div>
+              </sc-if>
+
+              <!-- ---- gereed ---- -->
+              <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-direction:column; gap:16px;">
+                  <div style="display:flex; align-items:flex-start; gap:12px; border:1px solid #e3e3e0; border-radius:10px; padding:14px; background:#fafaf8;">
+                    <span style="width:24px; height:24px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">✓</span>
+                    <span style="font-size:13px; color:#2e2e2b; line-height:1.55;">Uw wachtwoord is aangepast. Andere toestellen zijn afgemeld.</span>
+                  </div>
+                  <button onClick="{{ goLogin }}" style="{{ primaryStyle }}">Aanmelden</button>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:12px; color:#9a9a92;">
+              <span>Studio · projectbeheer</span>
+              <span style="cursor:pointer;" style-hover="color:#0d3b33;">Hulp nodig?</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== MOBIEL ===================== -->
+    <div style="flex-shrink:0; display:flex; flex-direction:column; gap:10px;">
+      <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#87877e; font-weight:600;">Mobiel · 375 × 812</div>
+      <div style="width:375px; height:812px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="flex:1; min-height:0; overflow-y:auto; padding:28px 16px; display:flex; flex-direction:column; gap:18px;">
+
+          <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+            <div style="width:32px; height:32px; border-radius:8px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:700;">S</div>
+            <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">Studio</span>
+          </div>
+
+          <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:18px; display:flex; flex-direction:column; gap:16px; flex-shrink:0;">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; letter-spacing:-.02em;">{{ title }}</h1>
+              <span style="font-size:14px; color:#87877e; line-height:1.5;">{{ subtitle }}</span>
+            </div>
+
+            <sc-if value="{{ showError }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; align-items:flex-start; gap:10px; border:1px solid #f0cfcf; border-radius:10px; background:#fdecec; padding:12px;">
+                <span style="width:20px; height:20px; border-radius:999px; background:#fff; color:#b91c1c; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0;">!</span>
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                  <span style="font-size:13px; font-weight:600; color:#b91c1c;">Aanmelden is niet gelukt</span>
+                  <span style="font-size:13px; color:#8a2020; line-height:1.5;">Het e-mailadres of het wachtwoord is niet juist.</span>
+                </div>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex; flex-direction:column; gap:14px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">E-mailadres</label>
+                  <input type="text" value="jonas@studio.be" style="{{ inputStyleM }}">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Wachtwoord</label>
+                  <div style="{{ pwWrapStyleM }}">
+                    <input type="password" value="••••••••••" style="border:none; outline:none; font-family:'Instrument Sans',sans-serif; font-size:15px; background:transparent; width:100%;">
+                    <span style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer;">Tonen</span>
+                  </div>
+                </div>
+                <label style="display:flex; align-items:center; gap:10px; font-size:14px; min-height:44px; cursor:pointer;">
+                  <span style="width:20px; height:20px; border-radius:5px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">✓</span>
+                  Aangemeld blijven
+                </label>
+                <button onClick="{{ submit }}" style="{{ primaryStyleM }}">{{ primaryLabel }}</button>
+                <span onClick="{{ goForgot }}" style="font-size:14px; color:#0d3b33; font-weight:600; cursor:pointer; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;">Wachtwoord vergeten?</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isForgot }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; gap:14px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">E-mailadres</label>
+                  <input type="text" placeholder="naam@studio.be" style="{{ inputStyleM }}">
+                  <span style="font-size:12px; color:#87877e;">De link blijft één uur geldig.</span>
+                </div>
+                <button onClick="{{ submit }}" style="{{ primaryStyleM }}">{{ primaryLabel }}</button>
+                <span onClick="{{ goLogin }}" style="font-size:14px; color:#0d3b33; font-weight:600; cursor:pointer; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;">Terug naar aanmelden</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isSent }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; gap:14px;">
+                <div style="display:flex; align-items:flex-start; gap:12px; border:1px solid #e3e3e0; border-radius:10px; padding:14px; background:#fafaf8;">
+                  <span style="width:24px; height:24px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">✓</span>
+                  <span style="font-size:13px; color:#2e2e2b; line-height:1.55;">Bestaat er een account met dit e-mailadres, dan is de link onderweg.</span>
+                </div>
+                <button onClick="{{ goLogin }}" style="{{ primaryStyleM }}">Terug naar aanmelden</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isReset }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; gap:14px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Nieuw wachtwoord</label>
+                  <div style="{{ pwWrapStyleM }}">
+                    <input type="password" value="••••••••••••" style="border:none; outline:none; font-family:'Instrument Sans',sans-serif; font-size:15px; background:transparent; width:100%;">
+                    <span style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer;">Tonen</span>
+                  </div>
+                  <div style="display:flex; align-items:center; gap:8px; padding-top:2px;">
+                    <div style="flex:1; height:4px; border-radius:2px; background:#2c6b34;"></div>
+                    <div style="flex:1; height:4px; border-radius:2px; background:#2c6b34;"></div>
+                    <div style="flex:1; height:4px; border-radius:2px; background:#2c6b34;"></div>
+                    <div style="flex:1; height:4px; border-radius:2px; background:#e3e3e0;"></div>
+                    <span style="font-size:12px; color:#2c6b34; font-weight:600;">Sterk</span>
+                  </div>
+                  <span style="font-size:12px; color:#87877e;">Minimaal 12 tekens, met een cijfer of symbool.</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Herhaal nieuw wachtwoord</label>
+                  <input type="password" value="•••••••••" style="height:44px; padding:0 12px; border:1px solid #b91c1c; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+                  <span style="font-size:12px; color:#b91c1c; font-weight:500;">De twee wachtwoorden zijn niet gelijk.</span>
+                </div>
+                <button onClick="{{ submit }}" style="{{ primaryStyleM }}">{{ primaryLabel }}</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isDone }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; gap:14px;">
+                <div style="display:flex; align-items:flex-start; gap:12px; border:1px solid #e3e3e0; border-radius:10px; padding:14px; background:#fafaf8;">
+                  <span style="width:24px; height:24px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">✓</span>
+                  <span style="font-size:13px; color:#2e2e2b; line-height:1.55;">Uw wachtwoord is aangepast. Andere toestellen zijn afgemeld.</span>
+                </div>
+                <button onClick="{{ goLogin }}" style="{{ primaryStyleM }}">Aanmelden</button>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="font-size:12px; color:#9a9a92; text-align:center; flex-shrink:0;">Studio · projectbeheer</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== NOTITIES ===================== -->
+    <div style="flex-shrink:0; width:340px; display:flex; flex-direction:column; gap:12px; padding-top:28px;">
+      <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Neutrale foutmelding</span>
+        <span style="font-size:13px; color:#55554f; line-height:1.55;">Eén melding voor een onbekend e-mailadres, een verkeerd wachtwoord en een niet-geactiveerd account: “Het e-mailadres of het wachtwoord is niet juist.” Geen veld-specifieke fout, geen hint of het adres bestaat.</span>
+      </div>
+      <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Wachtwoord vergeten</span>
+        <span style="font-size:13px; color:#55554f; line-height:1.55;">De bevestiging is even neutraal: “Bestaat er een account met dit e-mailadres, dan is de link onderweg.” Dezelfde tekst en dezelfde responstijd, of het adres bestaat of niet.</span>
+      </div>
+      <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Laadstaat</span>
+        <span style="font-size:13px; color:#55554f; line-height:1.55;">De knop houdt zijn breedte, krijgt een spinner en de tekst “Aanmelden…”; velden worden vergrendeld. Na drie mislukte pogingen komt er een wachttijd van 30 seconden bij, zichtbaar in de knop.</span>
+      </div>
+      <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:10px;">
+        <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Verlopen link</span>
+        <div style="display:flex; align-items:flex-start; gap:10px; border:1px solid #ecd9bd; border-radius:10px; background:#fbf0e2; padding:12px;">
+          <span style="width:20px; height:20px; border-radius:999px; background:#fff; color:#8a4008; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0;">!</span>
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <span style="font-size:13px; font-weight:600; color:#8a4008;">Deze link is niet meer geldig</span>
+            <span style="font-size:13px; color:#7a3f10; line-height:1.5;">Vraag een nieuwe link aan om uw wachtwoord in te stellen.</span>
+          </div>
+        </div>
+        <button style="height:40px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Nieuwe link aanvragen</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const STATES = [
+  { key: 'login',   label: 'Aanmelden' },
+  { key: 'error',   label: 'Foutieve gegevens' },
+  { key: 'loading', label: 'Laden' },
+  { key: 'forgot',  label: 'Wachtwoord vergeten' },
+  { key: 'sent',    label: 'Link verstuurd' },
+  { key: 'reset',   label: 'Nieuw wachtwoord' },
+  { key: 'done',    label: 'Wachtwoord aangepast' }
+];
+const COPY = {
+  login:   { title: 'Aanmelden',            sub: 'Meld u aan met uw werkadres.' },
+  error:   { title: 'Aanmelden',            sub: 'Meld u aan met uw werkadres.' },
+  loading: { title: 'Aanmelden',            sub: 'Meld u aan met uw werkadres.' },
+  forgot:  { title: 'Wachtwoord vergeten',  sub: 'Vul uw e-mailadres in en we sturen u een link om een nieuw wachtwoord in te stellen.' },
+  sent:    { title: 'Controleer uw mailbox', sub: 'We hebben de aanvraag ontvangen.' },
+  reset:   { title: 'Nieuw wachtwoord',     sub: 'Kies een wachtwoord dat u nergens anders gebruikt.' },
+  done:    { title: 'Wachtwoord aangepast', sub: 'U kunt zich nu aanmelden.' }
+};
+
+class Component extends DCLogic {
+  state = { view: 'login' };
+
+  renderVals() {
+    const v = this.state.view;
+    const loading = v === 'loading';
+    const inputBase = 'padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:Instrument Sans, sans-serif; color:#121212; width:100%; background:' + (loading ? '#fafaf8' : '#fff') + ';';
+    const pwBase = 'padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; display:flex; align-items:center; gap:10px; background:' + (loading ? '#fafaf8' : '#fff') + ';';
+    const primary = 'display:flex; align-items:center; justify-content:center; gap:8px; border-radius:10px; border:1px solid #0d3b33; font-family:Instrument Sans, sans-serif; font-weight:600; cursor:' +
+      (loading ? 'progress' : 'pointer') + '; background:' + (loading ? '#2a5a51' : '#0d3b33') + '; color:#fff;';
+    const label = { login: 'Aanmelden', error: 'Aanmelden', loading: 'Aanmelden…', forgot: 'Stuur de link', reset: 'Wachtwoord instellen' };
+
+    return {
+      stateTabs: STATES.map(s => ({
+        label: s.label,
+        onClick: () => this.setState({ view: s.key }),
+        style: 'padding:7px 12px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; white-space:nowrap; background:' +
+          (v === s.key ? '#121212' : '#fff') + '; color:' + (v === s.key ? '#fff' : '#55554f') + '; border:1px solid ' + (v === s.key ? '#121212' : '#dcdcd6') + ';'
+      })),
+      title: COPY[v].title,
+      subtitle: COPY[v].sub,
+      showError: v === 'error',
+      isLogin: v === 'login' || v === 'error' || v === 'loading',
+      isForgot: v === 'forgot',
+      isSent: v === 'sent',
+      isReset: v === 'reset',
+      isDone: v === 'done',
+      inputStyle: 'height:40px; font-size:14px; ' + inputBase,
+      inputStyleM: 'height:44px; font-size:15px; ' + inputBase,
+      pwWrapStyle: 'height:40px; ' + pwBase,
+      pwWrapStyleM: 'height:44px; ' + pwBase,
+      primaryStyle: 'height:42px; font-size:14px; ' + primary,
+      primaryStyleM: 'height:48px; font-size:15px; ' + primary,
+      primaryLabel: label[v] || 'Aanmelden',
+      submit: () => this.setState({ view: v === 'login' ? 'loading' : v === 'loading' ? 'error' : v === 'forgot' ? 'sent' : v === 'reset' ? 'done' : 'login' }),
+      goForgot: () => this.setState({ view: 'forgot' }),
+      goLogin: () => this.setState({ view: 'login' })
+    };
+  }
+}
+</script>
+</body>
+</html>

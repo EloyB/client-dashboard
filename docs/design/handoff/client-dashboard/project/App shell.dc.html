@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#e8e8e3; }
+  a { color:#0d3b33; } a:hover { color:#0a2c26; }
+  * { box-sizing:border-box; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb { background:#d5d5cf; border-radius:4px; }
+</style>
+</helmet>
+
+<div style="font-family:'Instrument Sans',system-ui,sans-serif; color:#121212; padding:40px; display:flex; flex-direction:column; gap:36px;">
+
+  <div style="display:flex; flex-direction:column; gap:6px; max-width:80ch;">
+    <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#87877e; font-weight:600;">App shell</div>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; letter-spacing:-.03em;">Beheer en klantportaal</div>
+    <div style="font-size:14px; color:#6e6e66; line-height:1.55;">Dezelfde structuur voor beide zones: zijbalk van 248px op desktop, tabbalk onderaan op mobiel, en een paginakop met kruimelpad, titel en primaire actie. Het portaal gebruikt minder items, geen tellers op de navigatie en één vaste actie. Zijbalk inklappen, de gebruikersmenu's en het menu “Nieuw” zijn klikbaar.</div>
+  </div>
+
+  <!-- ============================ 1 · BEHEER, DESKTOP ============================ -->
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#87877e; font-weight:600;">Beheer · desktop 1440 × 900 · klik ‹‹ in de zijbalk om in te klappen</div>
+    <div style="width:1440px; height:900px; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; box-shadow:0 1px 2px rgba(18,18,18,.05);">
+
+      <aside style="{{ adminAsideStyle }}">
+        <div style="{{ adminBrandStyle }}">
+          <div style="width:28px; height:28px; border-radius:7px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700; flex-shrink:0;">S</div>
+          <span style="{{ adminBrandTextStyle }}">Studio</span>
+          <span onClick="{{ toggleCollapse }}" style="{{ collapseBtnStyle }}">{{ collapseIcon }}</span>
+        </div>
+
+        <div style="position:relative; display:flex; flex-direction:column; gap:8px;">
+          <button onClick="{{ toggleNew }}" style="{{ newBtnStyle }}"><span style="font-size:15px; line-height:1;">+</span><span style="{{ labelStyle }}">Nieuw</span></button>
+          <sc-if value="{{ newOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; top:46px; left:0; width:216px; z-index:5; background:#fff; border:1px solid #e3e3e0; border-radius:12px; box-shadow:0 8px 24px rgba(18,18,18,.10); padding:6px; display:flex; flex-direction:column;">
+              <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;"><span style="width:16px; text-align:center; color:#9a9a92;">◫</span>Taak</div>
+              <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;"><span style="width:16px; text-align:center; color:#9a9a92;">▤</span>Project</div>
+              <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;"><span style="width:16px; text-align:center; color:#9a9a92;">▦</span>Agenda-item</div>
+            </div>
+          </sc-if>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <div style="{{ sectionLabelStyle }}">Beheer</div>
+          <sc-for list="{{ adminNav }}" as="item" hint-placeholder-count="6">
+            <div onClick="{{ item.onClick }}" style="{{ item.style }}" title="{{ item.label }}">
+              <span style="display:flex; align-items:center; gap:10px; min-width:0;"><span style="{{ item.iconStyle }}">{{ item.icon }}</span><span style="{{ labelStyle }}">{{ item.label }}</span></span>
+              <span style="{{ item.badgeStyle }}">{{ item.badge }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <div style="margin-top:auto; position:relative; border-top:1px solid #f0f0ec; padding-top:8px;">
+          <sc-if value="{{ adminUserOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; bottom:52px; left:0; width:220px; z-index:5; background:#fff; border:1px solid #e3e3e0; border-radius:12px; box-shadow:0 8px 24px rgba(18,18,18,.10); padding:6px; display:flex; flex-direction:column;">
+              <div style="padding:8px 10px 6px; display:flex; flex-direction:column; gap:1px; border-bottom:1px solid #f0f0ec; margin-bottom:4px;">
+                <span style="font-size:13px; font-weight:600;">Jonas De Meyer</span>
+                <span style="font-size:11px; color:#9a9a92;">jonas@studio.be</span>
+              </div>
+              <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;"><span style="width:16px; text-align:center; color:#9a9a92;">◇</span>Profiel</div>
+              <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;"><span style="width:16px; text-align:center; color:#9a9a92;">▣</span>Instellingen</div>
+              <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; font-size:14px; color:#b91c1c; font-weight:600; cursor:pointer;" style-hover="background:#fdecec;"><span style="width:16px; text-align:center;">→</span>Afmelden</div>
+            </div>
+          </sc-if>
+          <div onClick="{{ toggleAdminUser }}" style="{{ userRowStyle }}">
+            <div style="width:28px; height:28px; border-radius:999px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#55554f; flex-shrink:0;">JD</div>
+            <div style="{{ userTextStyle }}"><span style="font-size:13px; font-weight:600;">Jonas De Meyer</span><span style="font-size:11px; color:#9a9a92;">Beheerder</span></div>
+            <span style="{{ userCaretStyle }}">⋯</span>
+          </div>
+        </div>
+      </aside>
+
+      <div style="flex:1; min-width:0; display:flex; flex-direction:column; overflow:hidden;">
+        <header style="background:#fff; border-bottom:1px solid #e3e3e0; padding:18px 28px; display:flex; flex-direction:column; gap:12px; flex-shrink:0;">
+          <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:#87877e;">
+            <span style="cursor:pointer;" style-hover="color:#0d3b33;">Projecten</span><span style="color:#cfcfc9;">/</span>
+            <span style="cursor:pointer;" style-hover="color:#0d3b33;">Verlinden &amp; Zn</span><span style="color:#cfcfc9;">/</span>
+            <span style="color:#121212; font-weight:600;">Herbouw website</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:24px; flex-wrap:wrap;">
+            <div style="display:flex; flex-direction:column; gap:5px;">
+              <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">Herbouw website</h1>
+              <div style="display:flex; align-items:center; gap:8px; font-size:12px; font-weight:600;">
+                <span style="padding:4px 10px; border-radius:999px; background:#e6efec; color:#0d3b33;">Ontwikkeling</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-weight:400; color:#9a9a92;">PRJ-0139</span>
+              </div>
+            </div>
+            <div style="display:flex; gap:8px; font-size:14px; font-weight:600;">
+              <button style="padding:9px 16px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font:inherit;" style-hover="background:#fafaf8;">Bewerken</button>
+              <button style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Taak toevoegen</button>
+            </div>
+          </div>
+        </header>
+        <div style="flex:1; min-height:0; overflow-y:auto; padding:24px 28px; display:flex; flex-direction:column; gap:14px;">
+          <div style="border:1px dashed #cfcfc9; border-radius:14px; background:#fff; flex:1; min-height:280px; display:flex; align-items:center; justify-content:center; text-align:center; padding:24px;">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Pagina-inhoud</span>
+              <span style="font-size:13px; color:#87877e;">Hier komt de inhoud van de route, bijvoorbeeld /app/projecten/[id].</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ 2 · BEHEER, MOBIEL ============================ -->
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#87877e; font-weight:600;">Beheer · mobiel 375 × 812 · tabbalk, menu en snelle actie</div>
+    <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
+
+      <div style="width:375px; height:812px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 1px 2px rgba(18,18,18,.05); position:relative;">
+        <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:10px 8px; display:flex; align-items:center; gap:4px; flex-shrink:0;">
+          <span style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; color:#2e2e2b; flex-shrink:0; cursor:pointer;" style-hover="background:#f2f2ee;">‹</span>
+          <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+            <span style="font-size:11px; color:#87877e;">Verlinden &amp; Zn</span>
+            <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Herbouw website</span>
+          </div>
+          <span onClick="{{ toggleMobileMenu }}" style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; color:#2e2e2b; flex-shrink:0; cursor:pointer;" style-hover="background:#f2f2ee;">☰</span>
+        </div>
+
+        <div style="padding:12px 14px; background:#fff; border-bottom:1px solid #e3e3e0; display:flex; gap:8px; flex-shrink:0;">
+          <button style="flex:1; height:44px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Taak toevoegen</button>
+          <button style="width:44px; height:44px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#2e2e2b; font-family:inherit; font-size:16px; cursor:pointer;">⋯</button>
+        </div>
+
+        <div style="flex:1; min-height:0; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px;">
+          <div style="border:1px dashed #cfcfc9; border-radius:14px; background:#fff; flex:1; min-height:220px; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px;">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Pagina-inhoud</span>
+              <span style="font-size:13px; color:#87877e;">Scrollt onder de vaste tabbalk.</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(5,1fr); background:#fff; border-top:1px solid #e3e3e0; padding:6px 4px 10px; flex-shrink:0;">
+          <sc-for list="{{ adminTabs }}" as="tab" hint-placeholder-count="5">
+            <div onClick="{{ tab.onClick }}" style="{{ tab.style }}">
+              <span style="font-size:17px;">{{ tab.icon }}</span>
+              <span style="{{ tab.labelStyle }}">{{ tab.label }}</span>
+              <span style="{{ tab.badgeStyle }}">{{ tab.badge }}</span>
+            </div>
+          </sc-for>
+        </div>
+
+        <sc-if value="{{ mobileMenuOpen }}" hint-placeholder-val="{{ false }}">
+          <div onClick="{{ toggleMobileMenu }}" style="position:absolute; inset:0; background:rgba(18,18,18,.35); display:flex; align-items:flex-end;">
+            <div style="width:100%; background:#fff; border-radius:16px 16px 0 0; padding:10px 14px 18px; display:flex; flex-direction:column; gap:6px;">
+              <div style="width:40px; height:4px; border-radius:2px; background:#e3e3e0; margin:2px auto 10px;"></div>
+              <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600; padding:0 2px 2px;">Alle onderdelen</div>
+              <sc-for list="{{ adminSheet }}" as="item" hint-placeholder-count="6">
+                <div style="{{ item.style }}">
+                  <span style="display:flex; align-items:center; gap:12px;"><span style="{{ item.iconStyle }}">{{ item.icon }}</span>{{ item.label }}</span>
+                  <span style="{{ item.badgeStyle }}">{{ item.badge }}</span>
+                </div>
+              </sc-for>
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 10px 4px; margin-top:6px; border-top:1px solid #f0f0ec;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                  <div style="width:32px; height:32px; border-radius:999px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#55554f;">JD</div>
+                  <div style="display:flex; flex-direction:column;"><span style="font-size:13px; font-weight:600;">Jonas De Meyer</span><span style="font-size:11px; color:#9a9a92;">Beheerder</span></div>
+                </div>
+                <span style="font-size:14px; font-weight:600; color:#b91c1c; padding:10px 12px; border-radius:10px; cursor:pointer;" style-hover="background:#fdecec;">Afmelden</span>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="width:320px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; padding-top:4px;">
+        <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:10px;">
+          <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Mobiele opzet</span>
+          <div style="font-size:13px; color:#55554f; line-height:1.55;">Vijf bestemmingen in de tabbalk, de rest in het menu achter ☰. De primaire actie van de pagina staat als volle-breedte knop onder de kopbalk, zodat de duim ze bereikt. De tabbalk krijgt <span style="font-family:'JetBrains Mono',monospace; font-size:12px;">pb-[env(safe-area-inset-bottom)]</span>.</div>
+        </div>
+        <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:10px;">
+          <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Ingeklapte zijbalk</span>
+          <div style="font-size:13px; color:#55554f; line-height:1.55;">Van 248px naar 68px: enkel iconen van 40px, labels verdwijnen, tellers worden een stip rechtsboven het icoon. Het label komt terug als tooltip. De staat wordt bewaard per gebruiker.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ 3 · KLANTPORTAAL ============================ -->
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#87877e; font-weight:600;">Klantportaal · desktop 1440 × 900 en mobiel 375 × 812</div>
+    <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
+
+      <div style="width:1440px; height:900px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; box-shadow:0 1px 2px rgba(18,18,18,.05);">
+        <aside style="width:248px; flex-shrink:0; background:#fff; border-right:1px solid #e3e3e0; padding:14px; display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:center; gap:10px; padding:2px 4px;">
+            <div style="width:28px; height:28px; border-radius:7px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700;">S</div>
+            <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Studio</span>
+          </div>
+
+          <div style="border:1px solid #e3e3e0; border-radius:10px; background:#fafaf8; padding:10px 12px; display:flex; flex-direction:column; gap:1px;">
+            <span style="font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600;">Klant</span>
+            <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Verlinden &amp; Zn</span>
+          </div>
+
+          <button style="display:flex; align-items:center; justify-content:center; gap:8px; height:40px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;" style-hover="background:#0a2c26;">Bug melden</button>
+
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <div style="font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600; padding:6px 8px;">Portaal</div>
+            <sc-for list="{{ portalNav }}" as="item" hint-placeholder-count="5">
+              <div onClick="{{ item.onClick }}" style="{{ item.style }}">
+                <span style="display:flex; align-items:center; gap:10px;"><span style="{{ item.iconStyle }}">{{ item.icon }}</span>{{ item.label }}</span>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="margin-top:auto; position:relative; border-top:1px solid #f0f0ec; padding-top:8px;">
+            <sc-if value="{{ portalUserOpen }}" hint-placeholder-val="{{ false }}">
+              <div style="position:absolute; bottom:52px; left:0; width:220px; z-index:5; background:#fff; border:1px solid #e3e3e0; border-radius:12px; box-shadow:0 8px 24px rgba(18,18,18,.10); padding:6px; display:flex; flex-direction:column;">
+                <div style="padding:8px 10px 6px; display:flex; flex-direction:column; gap:1px; border-bottom:1px solid #f0f0ec; margin-bottom:4px;">
+                  <span style="font-size:13px; font-weight:600;">Katrien Verlinden</span>
+                  <span style="font-size:11px; color:#9a9a92;">katrien@verlinden.be</span>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;"><span style="width:16px; text-align:center; color:#9a9a92;">◇</span>Mijn gegevens</div>
+                <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; font-size:14px; color:#b91c1c; font-weight:600; cursor:pointer;" style-hover="background:#fdecec;"><span style="width:16px; text-align:center;">→</span>Afmelden</div>
+              </div>
+            </sc-if>
+            <div onClick="{{ togglePortalUser }}" style="display:flex; align-items:center; gap:10px; padding:8px; border-radius:8px; cursor:pointer;" style-hover="background:#f2f2ee;">
+              <div style="width:28px; height:28px; border-radius:999px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#55554f; flex-shrink:0;">KV</div>
+              <div style="flex:1; min-width:0; display:flex; flex-direction:column;"><span style="font-size:13px; font-weight:600;">Katrien Verlinden</span><span style="font-size:11px; color:#9a9a92;">Verlinden &amp; Zn</span></div>
+              <span style="color:#9a9a92; font-size:14px;">⋯</span>
+            </div>
+          </div>
+        </aside>
+
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; overflow:hidden;">
+          <header style="background:#fff; border-bottom:1px solid #e3e3e0; padding:18px 28px; display:flex; flex-direction:column; gap:12px; flex-shrink:0;">
+            <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:#87877e;">
+              <span style="cursor:pointer;" style-hover="color:#0d3b33;">Projecten</span><span style="color:#cfcfc9;">/</span>
+              <span style="color:#121212; font-weight:600;">Herbouw website</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap;">
+              <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">Herbouw website</h1>
+              <button style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font:inherit; font-size:14px; font-weight:600; cursor:pointer;" style-hover="background:#0a2c26;">Bug melden</button>
+            </div>
+          </header>
+          <div style="flex:1; min-height:0; overflow-y:auto; padding:24px 28px; display:flex; flex-direction:column;">
+            <div style="border:1px dashed #cfcfc9; border-radius:14px; background:#fff; flex:1; min-height:280px; display:flex; align-items:center; justify-content:center; text-align:center; padding:24px;">
+              <div style="display:flex; flex-direction:column; gap:4px;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Pagina-inhoud</span>
+                <span style="font-size:13px; color:#87877e;">Bijvoorbeeld /portal/projecten/[id]. Geen tellers, geen interne taken.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:375px; height:812px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 1px 2px rgba(18,18,18,.05);">
+        <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-shrink:0;">
+          <div style="display:flex; flex-direction:column; min-width:0;">
+            <span style="font-size:11px; color:#87877e;">Verlinden &amp; Zn</span>
+            <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">Mijn projecten</span>
+          </div>
+          <div style="width:40px; height:40px; border-radius:999px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#55554f; flex-shrink:0; cursor:pointer;">KV</div>
+        </div>
+        <div style="flex:1; min-height:0; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px;">
+          <button style="height:48px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer; flex-shrink:0;">Bug melden</button>
+          <div style="border:1px dashed #cfcfc9; border-radius:14px; background:#fff; flex:1; min-height:220px; display:flex; align-items:center; justify-content:center; text-align:center; padding:20px;">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Pagina-inhoud</span>
+              <span style="font-size:13px; color:#87877e;">Vier bestemmingen, één vaste actie.</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); background:#fff; border-top:1px solid #e3e3e0; padding:6px 4px 10px; flex-shrink:0;">
+          <sc-for list="{{ portalTabs }}" as="tab" hint-placeholder-count="4">
+            <div onClick="{{ tab.onClick }}" style="{{ tab.style }}">
+              <span style="font-size:17px;">{{ tab.icon }}</span>
+              <span style="{{ tab.labelStyle }}">{{ tab.label }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ 4 · FOUTPAGINA'S ============================ -->
+  <div style="display:flex; flex-direction:column; gap:10px;">
+    <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#87877e; font-weight:600;">Foutpagina's in dezelfde shell</div>
+    <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">404 · beheer, desktop</span>
+        <div style="width:900px; height:520px; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; box-shadow:0 1px 2px rgba(18,18,18,.05);">
+          <aside style="width:68px; flex-shrink:0; background:#fff; border-right:1px solid #e3e3e0; padding:14px 0; display:flex; flex-direction:column; align-items:center; gap:8px;">
+            <div style="width:28px; height:28px; border-radius:7px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700;">S</div>
+            <div style="width:40px; height:40px; border-radius:10px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-size:17px; margin-top:6px;">+</div>
+            <div style="display:flex; flex-direction:column; gap:2px; margin-top:6px;">
+              <div style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#9a9a92;">◧</div>
+              <div style="width:40px; height:40px; border-radius:8px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-size:16px;">▤</div>
+              <div style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#9a9a92;">◇</div>
+              <div style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#9a9a92; position:relative;">◎<span style="position:absolute; top:6px; right:6px; width:7px; height:7px; border-radius:999px; background:#b91c1c;"></span></div>
+              <div style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#9a9a92;">◫</div>
+              <div style="width:40px; height:40px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; color:#9a9a92;">▦</div>
+            </div>
+            <div style="margin-top:auto; width:28px; height:28px; border-radius:999px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#55554f;">JD</div>
+          </aside>
+          <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+            <header style="background:#fff; border-bottom:1px solid #e3e3e0; padding:16px 24px; display:flex; flex-direction:column; gap:10px;">
+              <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:#87877e;">
+                <span style="cursor:pointer;" style-hover="color:#0d3b33;">Projecten</span><span style="color:#cfcfc9;">/</span><span style="color:#121212; font-weight:600;">Niet gevonden</span>
+              </div>
+              <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:600; letter-spacing:-.02em;">Pagina niet gevonden</h1>
+            </header>
+            <div style="flex:1; padding:24px; display:flex;">
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; text-align:center; padding:32px;">
+                <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#9a9a92;">404</span>
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:20px; font-weight:600; letter-spacing:-.02em;">Deze pagina bestaat niet</span>
+                <span style="font-size:14px; color:#87877e; max-width:46ch; line-height:1.55;">Mogelijk is het project verwijderd of is de link verouderd. Controleer de link of ga terug naar het overzicht.</span>
+                <div style="display:flex; gap:8px; margin-top:6px; font-size:14px; font-weight:600;">
+                  <button style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Naar dashboard</button>
+                  <button style="padding:9px 16px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font:inherit;" style-hover="background:#fafaf8;">Vorige pagina</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">Fout · klantportaal, mobiel</span>
+        <div style="width:375px; height:520px; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 1px 2px rgba(18,18,18,.05);">
+          <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-shrink:0;">
+            <div style="display:flex; flex-direction:column;">
+              <span style="font-size:11px; color:#87877e;">Verlinden &amp; Zn</span>
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">Er ging iets mis</span>
+            </div>
+            <div style="width:40px; height:40px; border-radius:999px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#55554f;">KV</div>
+          </div>
+          <div style="flex:1; min-height:0; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px;">
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:24px 16px; display:flex; flex-direction:column; align-items:center; gap:10px; text-align:center; flex-shrink:0;">
+              <div style="width:40px; height:40px; border-radius:999px; background:#fdecec; color:#b91c1c; display:flex; align-items:center; justify-content:center; font-size:19px; font-weight:700;">!</div>
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600; letter-spacing:-.02em;">Er ging iets mis</span>
+              <span style="font-size:14px; color:#87877e; line-height:1.55;">We konden deze pagina niet laden. Probeer het opnieuw; blijft het misgaan, dan is de melding al bij ons binnengekomen.</span>
+              <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#9a9a92;">Foutcode 500 · 16 sep 09:41</span>
+              <div style="display:flex; flex-direction:column; gap:8px; width:100%; margin-top:6px;">
+                <button style="height:44px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Opnieuw proberen</button>
+                <button style="height:44px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Naar start</button>
+              </div>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(4,1fr); background:#fff; border-top:1px solid #e3e3e0; padding:6px 4px 10px; flex-shrink:0;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#0d3b33;"><span style="font-size:17px;">◧</span><span style="font-size:10px; font-weight:600;">Start</span></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">▤</span><span style="font-size:10px;">Projecten</span></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">◎</span><span style="font-size:10px;">Tickets</span></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">▦</span><span style="font-size:10px;">Agenda</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const ADMIN = [
+  { key: 'dashboard', label: 'Dashboard', icon: '◧' },
+  { key: 'projecten', label: 'Projecten', icon: '▤' },
+  { key: 'klanten',   label: 'Klanten',   icon: '◇' },
+  { key: 'tickets',   label: 'Tickets',   icon: '◎', badge: 7 },
+  { key: 'taken',     label: 'Taken',     icon: '◫' },
+  { key: 'agenda',    label: 'Agenda',    icon: '▦' }
+];
+const ADMIN_TABS = [
+  { key: 'dashboard', label: 'Start',     icon: '◧' },
+  { key: 'projecten', label: 'Projecten', icon: '▤' },
+  { key: 'taken',     label: 'Taken',     icon: '◫' },
+  { key: 'tickets',   label: 'Tickets',   icon: '◎', badge: 7 },
+  { key: 'agenda',    label: 'Agenda',    icon: '▦' }
+];
+const PORTAL = [
+  { key: 'start',      label: 'Start',      icon: '◧' },
+  { key: 'projecten',  label: 'Projecten',  icon: '▤' },
+  { key: 'tickets',    label: 'Tickets',    icon: '◎' },
+  { key: 'agenda',     label: 'Agenda',     icon: '▦' },
+  { key: 'documenten', label: 'Documenten', icon: '▣' }
+];
+const PORTAL_TABS = [
+  { key: 'projecten',  label: 'Projecten',  icon: '▤' },
+  { key: 'tickets',    label: 'Tickets',    icon: '◎' },
+  { key: 'agenda',     label: 'Agenda',     icon: '▦' },
+  { key: 'documenten', label: 'Documenten', icon: '▣' }
+];
+
+class Component extends DCLogic {
+  state = {
+    collapsed: false, newOpen: false, adminUserOpen: false, portalUserOpen: false,
+    mobileMenuOpen: false, admin: 'projecten', adminTab: 'projecten', portal: 'projecten', portalTab: 'projecten'
+  };
+
+  navItem(item, active, collapsed, onClick) {
+    const pad = collapsed ? 'padding:0; width:40px; height:40px; justify-content:center;' : 'padding:9px 10px;';
+    return {
+      label: item.label,
+      icon: item.icon,
+      badge: item.badge || '',
+      onClick: onClick,
+      style: 'display:flex; align-items:center; justify-content:space-between; gap:8px; border-radius:8px; font-size:14px; cursor:pointer; position:relative; ' + pad +
+        (active ? ' background:#e6efec; color:#0d3b33; font-weight:600;' : ' color:#2e2e2b;'),
+      iconStyle: 'width:16px; text-align:center; flex-shrink:0;' + (active ? '' : ' color:#9a9a92;'),
+      badgeStyle: !item.badge ? 'display:none;'
+        : collapsed
+          ? 'position:absolute; top:5px; right:5px; width:7px; height:7px; border-radius:999px; background:#b91c1c; color:transparent; font-size:0; overflow:hidden;'
+          : 'min-width:20px; height:20px; padding:0 6px; border-radius:999px; background:#fdecec; color:#b91c1c; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0;'
+    };
+  }
+
+  tab(item, active, onClick) {
+    return {
+      label: item.label,
+      icon: item.icon,
+      badge: item.badge || '',
+      onClick: onClick,
+      style: 'display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; cursor:pointer; position:relative; color:' + (active ? '#0d3b33' : '#87877e') + ';',
+      labelStyle: 'font-size:10px;' + (active ? ' font-weight:600;' : ''),
+      badgeStyle: item.badge
+        ? 'position:absolute; top:2px; right:16px; min-width:16px; height:16px; border-radius:999px; background:#b91c1c; color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center;'
+        : 'display:none;'
+    };
+  }
+
+  renderVals() {
+    const s = this.state;
+    const c = s.collapsed;
+    return {
+      adminAsideStyle: 'width:' + (c ? '68' : '248') + 'px; flex-shrink:0; background:#fff; border-right:1px solid #e3e3e0; padding:14px ' + (c ? '14px' : '14px') + '; display:flex; flex-direction:column; gap:14px; align-items:' + (c ? 'center' : 'stretch') + '; transition:width .15s ease;',
+      adminBrandStyle: 'display:flex; align-items:center; gap:10px; padding:2px 4px;' + (c ? ' flex-direction:column;' : ''),
+      adminBrandTextStyle: c ? 'display:none;' : 'font-family:Space Grotesk, sans-serif; font-size:15px; font-weight:600; flex:1;',
+      labelStyle: c ? 'display:none;' : 'overflow:hidden; text-overflow:ellipsis; white-space:nowrap;',
+      sectionLabelStyle: c ? 'display:none;' : 'font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600; padding:6px 8px;',
+      collapseBtnStyle: 'width:' + (c ? '40' : '28') + 'px; height:' + (c ? '40' : '28') + 'px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:13px; color:#9a9a92; cursor:pointer; flex-shrink:0;',
+      collapseIcon: c ? '››' : '‹‹',
+      toggleCollapse: () => this.setState(st => ({ collapsed: !st.collapsed, newOpen: false, adminUserOpen: false })),
+
+      newBtnStyle: 'display:flex; align-items:center; justify-content:center; gap:8px; height:40px; ' + (c ? 'width:40px; padding:0;' : 'padding:0 14px;') +
+        ' border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:Instrument Sans, sans-serif; font-size:14px; font-weight:600; cursor:pointer;',
+      newOpen: s.newOpen && !c,
+      toggleNew: () => this.setState(st => ({ newOpen: !st.newOpen, adminUserOpen: false })),
+
+      adminNav: ADMIN.map(i => this.navItem(i, s.admin === i.key, c, () => this.setState({ admin: i.key }))),
+      portalNav: PORTAL.map(i => this.navItem(i, s.portal === i.key, false, () => this.setState({ portal: i.key }))),
+      adminTabs: ADMIN_TABS.map(i => this.tab(i, s.adminTab === i.key, () => this.setState({ adminTab: i.key }))),
+      portalTabs: PORTAL_TABS.map(i => this.tab(i, s.portalTab === i.key, () => this.setState({ portalTab: i.key }))),
+      adminSheet: ADMIN.map(i => {
+        const active = s.adminTab === i.key;
+        return {
+          label: i.label, icon: i.icon, badge: i.badge || '',
+          style: 'display:flex; align-items:center; justify-content:space-between; gap:10px; min-height:48px; padding:0 10px; border-radius:10px; font-size:15px;' +
+            (active ? ' background:#e6efec; color:#0d3b33; font-weight:600;' : ' color:#2e2e2b;'),
+          iconStyle: 'width:18px; text-align:center;' + (active ? '' : ' color:#9a9a92;'),
+          badgeStyle: i.badge ? 'min-width:20px; height:20px; padding:0 6px; border-radius:999px; background:#fdecec; color:#b91c1c; font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center;' : 'display:none;'
+        };
+      }),
+
+      userRowStyle: 'display:flex; align-items:center; gap:10px; padding:8px; border-radius:8px; cursor:pointer;' + (c ? ' justify-content:center;' : ''),
+      userTextStyle: c ? 'display:none;' : 'flex:1; min-width:0; display:flex; flex-direction:column;',
+      userCaretStyle: c ? 'display:none;' : 'color:#9a9a92; font-size:14px;',
+      adminUserOpen: s.adminUserOpen && !c,
+      toggleAdminUser: () => this.setState(st => ({ adminUserOpen: !st.adminUserOpen, newOpen: false })),
+      portalUserOpen: s.portalUserOpen,
+      togglePortalUser: () => this.setState(st => ({ portalUserOpen: !st.portalUserOpen })),
+      mobileMenuOpen: s.mobileMenuOpen,
+      toggleMobileMenu: () => this.setState(st => ({ mobileMenuOpen: !st.mobileMenuOpen }))
+    };
+  }
+}
+</script>
+</body>
+</html>

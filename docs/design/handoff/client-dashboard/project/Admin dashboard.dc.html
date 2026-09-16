@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#e8e8e3; }
+  a { color:#0d3b33; } a:hover { color:#0a2c26; }
+  * { box-sizing:border-box; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb { background:#d5d5cf; border-radius:4px; }
+</style>
+</helmet>
+
+<div style="font-family:'Instrument Sans',system-ui,sans-serif; color:#121212; padding:40px; display:flex; flex-direction:column; gap:24px;">
+
+  <div style="display:flex; flex-direction:column; gap:6px;">
+    <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#87877e; font-weight:600;">Beheer · dashboard</div>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; letter-spacing:-.03em;">Wat vraagt vandaag aandacht</div>
+    <div style="font-size:14px; color:#6e6e66;">Vier secties in vaste prioriteit. Klik de lege-staatschakelaar om per sectie de lege variant te zien.</div>
+    <div style="display:flex; align-items:center; gap:8px; padding-top:4px;">
+      <span onClick="{{ toggleEmpty }}" style="{{ emptyToggleStyle }}">{{ emptyToggleLabel }}</span>
+    </div>
+  </div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:32px; align-items:flex-start;">
+
+    <!-- ===================== DESKTOP ===================== -->
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#87877e; font-weight:600;">Desktop · 1440 × 1000</div>
+      <div style="width:1440px; height:1000px; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; box-shadow:0 1px 2px rgba(18,18,18,.05);">
+
+        <aside style="width:248px; flex-shrink:0; background:#fff; border-right:1px solid #e3e3e0; padding:14px; display:flex; flex-direction:column; gap:14px;">
+          <div style="display:flex; align-items:center; gap:10px; padding:2px 4px;">
+            <div style="width:28px; height:28px; border-radius:7px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:13px; font-weight:700;">S</div>
+            <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Studio</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:2px;">
+            <div style="font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600; padding:6px 8px;">Beheer</div>
+            <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; background:#e6efec; color:#0d3b33; font-size:14px; font-weight:600;"><span style="width:16px; text-align:center;">◧</span>Dashboard</div>
+            <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; color:#2e2e2b; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;"><span style="width:16px; text-align:center; color:#9a9a92;">◇</span>Klanten</div>
+            <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; color:#2e2e2b; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;"><span style="width:16px; text-align:center; color:#9a9a92;">▤</span>Projecten</div>
+            <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; color:#2e2e2b; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;"><span style="width:16px; text-align:center; color:#9a9a92;">◫</span>Takenbord</div>
+            <div style="display:flex; align-items:center; justify-content:space-between; padding:9px 10px; border-radius:8px; color:#2e2e2b; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;">
+              <span style="display:flex; align-items:center; gap:10px;"><span style="width:16px; text-align:center; color:#9a9a92;">◎</span>Tickets</span>
+              <span style="{{ sidebarTicketBadge }}">{{ newTicketCount }}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; color:#2e2e2b; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;"><span style="width:16px; text-align:center; color:#9a9a92;">▦</span>Agenda</div>
+            <div style="display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:8px; color:#2e2e2b; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;"><span style="width:16px; text-align:center; color:#9a9a92;">▣</span>Documenten</div>
+          </div>
+          <div style="margin-top:auto; display:flex; align-items:center; gap:10px; padding:8px; border-top:1px solid #f0f0ec;">
+            <div style="width:28px; height:28px; border-radius:999px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:#55554f;">JD</div>
+            <div style="display:flex; flex-direction:column;"><span style="font-size:13px; font-weight:600;">Jonas De Meyer</span><span style="font-size:11px; color:#9a9a92;">Beheerder</span></div>
+          </div>
+        </aside>
+
+        <div style="flex:1; min-width:0; display:flex; flex-direction:column; overflow:hidden;">
+
+          <header style="background:#fff; border-bottom:1px solid #e3e3e0; padding:18px 28px; display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap;">
+            <div style="display:flex; flex-direction:column; gap:4px;">
+              <span style="font-size:13px; color:#87877e;">Woensdag 16 september 2026</span>
+              <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">Goeiemorgen, Jonas</h1>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600;">
+              <button style="display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;"><span style="font-size:15px; line-height:1;">+</span>Taak</button>
+              <button style="display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font:inherit;" style-hover="background:#fafaf8;"><span style="font-size:15px; line-height:1; color:#6e6e66;">+</span>Project</button>
+              <button style="display:inline-flex; align-items:center; gap:8px; padding:9px 14px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font:inherit;" style-hover="background:#fafaf8;"><span style="font-size:15px; line-height:1; color:#6e6e66;">+</span>Agenda-item</button>
+            </div>
+          </header>
+
+          <div style="flex:1; min-height:0; overflow-y:auto; padding:22px 28px 32px; display:flex; flex-direction:column; gap:18px;">
+
+            <!-- 1 · NIEUWE TICKETS -->
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden; flex-shrink:0;">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #f0f0ec;">
+                <span style="display:flex; align-items:center; gap:10px;">
+                  <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Nieuwe tickets</span>
+                  <span style="{{ newTicketChip }}">{{ newTicketCount }}</span>
+                </span>
+                <span style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer;">Alle tickets</span>
+              </div>
+              <sc-if value="{{ hasTickets }}" hint-placeholder-val="{{ true }}">
+                <div>
+                  <div style="display:grid; grid-template-columns:minmax(0,1.9fr) minmax(150px,1fr) minmax(110px,.55fr) minmax(100px,.5fr) 210px; gap:12px; padding:10px 18px; background:#fafaf8; border-bottom:1px solid #f0f0ec; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#6e6e66; font-weight:600;">
+                    <span>Melding</span><span>Klant · project</span><span>Prioriteit</span><span>Gemeld</span><span></span>
+                  </div>
+                  <sc-for list="{{ tickets }}" as="t" hint-placeholder-count="3">
+                    <div style="{{ t.rowStyle }}">
+                      <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
+                        <span style="font-size:14px; font-weight:600;">{{ t.title }}</span>
+                        <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9a92;">{{ t.id }}{{ t.attach }}</span>
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
+                        <span style="font-size:13px; color:#2e2e2b;">{{ t.client }}</span>
+                        <span style="font-size:12px; color:#9a9a92;">{{ t.project }}</span>
+                      </div>
+                      <span><span style="{{ t.prioStyle }}"><span style="{{ t.prioDot }}"></span>{{ t.prioLabel }}</span></span>
+                      <span style="{{ t.agoStyle }}">{{ t.ago }}</span>
+                      <div style="display:flex; justify-content:flex-end; gap:8px; font-size:13px; font-weight:600;">
+                        <button style="padding:7px 12px; border-radius:8px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font:inherit;" style-hover="background:#fafaf8;">Naar taak</button>
+                        <button style="padding:7px 12px; border-radius:8px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Openen</button>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              <sc-if value="{{ noTickets }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:26px 18px; display:flex; align-items:center; gap:12px;">
+                  <div style="width:28px; height:28px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0;">✓</div>
+                  <div style="display:flex; flex-direction:column; gap:2px;">
+                    <span style="font-size:14px; font-weight:600;">Geen nieuwe tickets</span>
+                    <span style="font-size:13px; color:#87877e;">Alle meldingen zijn opgevolgd.</span>
+                  </div>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px; align-items:start; flex-shrink:0;">
+
+              <!-- 2 · VANDAAG EN KOMENDE DAGEN -->
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #f0f0ec;">
+                  <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Vandaag en komende 7 dagen</span>
+                  <span style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer;">Volledige agenda</span>
+                </div>
+                <sc-if value="{{ hasAgenda }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding:4px 18px 14px; display:flex; flex-direction:column;">
+                    <sc-for list="{{ agenda }}" as="a" hint-placeholder-count="5">
+                      <div style="{{ a.rowStyle }}">
+                        <div style="{{ a.dateBoxStyle }}">
+                          <span style="font-size:10px; text-transform:uppercase; color:#9a9a92; font-weight:600;">{{ a.month }}</span>
+                          <span style="{{ a.dayStyle }}">{{ a.day }}</span>
+                        </div>
+                        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                          <span style="font-size:14px; font-weight:600;">{{ a.title }}</span>
+                          <span style="font-size:12px; color:#87877e;">{{ a.meta }}</span>
+                        </div>
+                        <span style="{{ a.tagStyle }}">{{ a.tag }}</span>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ noAgenda }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:26px 18px; display:flex; align-items:center; gap:12px;">
+                    <div style="width:28px; height:28px; border-radius:999px; background:#f2f2ee; color:#6e6e66; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0;">–</div>
+                    <div style="display:flex; flex-direction:column; gap:2px;">
+                      <span style="font-size:14px; font-weight:600;">Niets gepland deze week</span>
+                      <span style="font-size:13px; color:#87877e;">Ruimte om aan lopend werk te schuiven.</span>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+
+              <!-- 3 · MIJN TAKEN -->
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #f0f0ec;">
+                  <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Mijn taken</span>
+                  <span style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer;">Naar takenbord</span>
+                </div>
+                <sc-if value="{{ hasTasks }}" hint-placeholder-val="{{ true }}">
+                  <div>
+                    <div style="display:flex; align-items:center; gap:8px; padding:10px 18px; background:#fafaf8; border-bottom:1px solid #f0f0ec; font-size:12px; font-weight:600;">
+                      <span style="color:#6e6e66;">Sorteren</span>
+                      <span onClick="{{ sortByDate }}" style="{{ sortDateStyle }}">Vervaldatum</span>
+                      <span onClick="{{ sortByPrio }}" style="{{ sortPrioStyle }}">Prioriteit</span>
+                    </div>
+                    <div style="padding:4px 18px 14px; display:flex; flex-direction:column;">
+                      <sc-for list="{{ taskGroups }}" as="g" hint-placeholder-count="3">
+                        <div style="display:flex; flex-direction:column;">
+                          <div style="{{ g.headerStyle }}">{{ g.label }}</div>
+                          <sc-for list="{{ g.tasks }}" as="t" hint-placeholder-count="2">
+                            <div style="display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid #f5f5f1;">
+                              <span style="{{ t.markStyle }}"></span>
+                              <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                                <span style="font-size:14px; font-weight:600;">{{ t.title }}</span>
+                                <span style="font-size:12px; color:#9a9a92;">{{ t.project }} · {{ t.id }}</span>
+                              </div>
+                              <span style="{{ t.prioStyle }}"><span style="{{ t.prioDot }}"></span>{{ t.prioLabel }}</span>
+                              <span style="{{ t.dueStyle }}">{{ t.due }}</span>
+                            </div>
+                          </sc-for>
+                        </div>
+                      </sc-for>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ noTasks }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:22px 18px; display:flex; align-items:center; gap:12px;">
+                    <div style="width:28px; height:28px; border-radius:999px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0;">+</div>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                      <span style="font-size:14px; font-weight:600;">Geen taken deze week</span>
+                      <span style="font-size:13px; color:#87877e;">Niets vervallen en niets in uitvoering.</span>
+                    </div>
+                    <button style="padding:8px 14px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font:inherit; font-size:13px; font-weight:600; cursor:pointer;" style-hover="background:#0a2c26;">Taak toevoegen</button>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+
+            <!-- 4 · ACTIEVE PROJECTEN -->
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden; flex-shrink:0;">
+              <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #f0f0ec;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Actieve projecten</span>
+                <span style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer;">Alle projecten</span>
+              </div>
+              <div style="display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1.1fr) minmax(130px,.7fr) minmax(150px,.8fr) minmax(120px,.6fr); gap:12px; padding:10px 18px; background:#fafaf8; border-bottom:1px solid #f0f0ec; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#6e6e66; font-weight:600;">
+                <span>Project</span><span>Klant</span><span>Status</span><span>Volgende deadline</span><span>Open tickets</span>
+              </div>
+              <sc-for list="{{ projects }}" as="p" hint-placeholder-count="4">
+                <div style="{{ p.rowStyle }}">
+                  <span style="font-size:14px; font-weight:600; min-width:0;">{{ p.name }}</span>
+                  <span style="font-size:13px; color:#55554f; min-width:0;">{{ p.client }}</span>
+                  <span><span style="{{ p.statusStyle }}">{{ p.statusLabel }}</span></span>
+                  <div style="display:flex; flex-direction:column; gap:1px; min-width:0;">
+                    <span style="{{ p.deadlineStyle }}">{{ p.deadline }}</span>
+                    <span style="font-size:11px; color:#9a9a92;">{{ p.deadlineNote }}</span>
+                  </div>
+                  <span style="{{ p.ticketStyle }}">{{ p.tickets }}</span>
+                </div>
+              </sc-for>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== MOBIEL ===================== -->
+    <div style="display:flex; flex-direction:column; gap:10px;">
+      <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#87877e; font-weight:600;">Mobiel · 375 × 812</div>
+      <div style="width:375px; height:812px; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; box-shadow:0 1px 2px rgba(18,18,18,.05);">
+
+        <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:10px 14px; display:flex; align-items:center; justify-content:space-between; gap:8px; flex-shrink:0;">
+          <div style="display:flex; flex-direction:column;">
+            <span style="font-size:11px; color:#87877e;">wo 16 september</span>
+            <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">Goeiemorgen, Jonas</span>
+          </div>
+          <div style="width:40px; height:40px; border-radius:999px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#55554f; flex-shrink:0;">JD</div>
+        </div>
+
+        <div style="flex:1; min-height:0; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:14px;">
+
+          <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:8px; flex-shrink:0;">
+            <button style="height:44px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">+ Taak</button>
+            <button style="height:44px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">+ Project</button>
+            <button style="height:44px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">+ Agenda</button>
+          </div>
+
+          <!-- 1 · nieuwe tickets -->
+          <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden; flex-shrink:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:13px 14px; border-bottom:1px solid #f0f0ec;">
+              <span style="display:flex; align-items:center; gap:8px;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Nieuwe tickets</span>
+                <span style="{{ newTicketChip }}">{{ newTicketCount }}</span>
+              </span>
+              <span style="font-size:13px; color:#0d3b33; font-weight:600;">Alle</span>
+            </div>
+            <sc-if value="{{ hasTickets }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:12px 14px; display:flex; flex-direction:column; gap:8px;">
+                <sc-for list="{{ ticketsMobile }}" as="t" hint-placeholder-count="2">
+                  <div style="border:1px solid #e3e3e0; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9a92;">{{ t.id }}</span>
+                      <span style="{{ t.prioStyle }}"><span style="{{ t.prioDot }}"></span>{{ t.prioLabel }}</span>
+                    </div>
+                    <span style="font-size:15px; font-weight:600; line-height:1.35;">{{ t.title }}</span>
+                    <span style="font-size:12px; color:#87877e;">{{ t.client }} · {{ t.project }}</span>
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; padding-top:8px; border-top:1px solid #f0f0ec;">
+                      <span style="{{ t.agoStyle }}">{{ t.ago }}</span>
+                      <div style="display:flex; gap:8px;">
+                        <button style="height:40px; padding:0 12px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;">Naar taak</button>
+                        <button style="height:40px; padding:0 14px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;">Openen</button>
+                      </div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noTickets }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:20px 14px; display:flex; align-items:center; gap:12px;">
+                <div style="width:28px; height:28px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0;">✓</div>
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                  <span style="font-size:14px; font-weight:600;">Geen nieuwe tickets</span>
+                  <span style="font-size:13px; color:#87877e;">Alle meldingen zijn opgevolgd.</span>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <!-- 2 · agenda -->
+          <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden; flex-shrink:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:13px 14px; border-bottom:1px solid #f0f0ec;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Vandaag en komende 7 dagen</span>
+              <span style="font-size:13px; color:#0d3b33; font-weight:600;">Alle</span>
+            </div>
+            <sc-if value="{{ hasAgenda }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:4px 14px 12px; display:flex; flex-direction:column;">
+                <sc-for list="{{ agendaMobile }}" as="a" hint-placeholder-count="4">
+                  <div style="{{ a.rowStyle }}">
+                    <div style="{{ a.dateBoxStyle }}">
+                      <span style="font-size:10px; text-transform:uppercase; color:#9a9a92; font-weight:600;">{{ a.month }}</span>
+                      <span style="{{ a.dayStyle }}">{{ a.day }}</span>
+                    </div>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                      <span style="font-size:14px; font-weight:600; line-height:1.35;">{{ a.title }}</span>
+                      <span style="font-size:12px; color:#87877e;">{{ a.meta }}</span>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noAgenda }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:20px 14px; display:flex; align-items:center; gap:12px;">
+                <div style="width:28px; height:28px; border-radius:999px; background:#f2f2ee; color:#6e6e66; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0;">–</div>
+                <div style="display:flex; flex-direction:column; gap:2px;">
+                  <span style="font-size:14px; font-weight:600;">Niets gepland deze week</span>
+                  <span style="font-size:13px; color:#87877e;">Ruimte voor lopend werk.</span>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+
+          <!-- 3 · mijn taken -->
+          <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden; flex-shrink:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:13px 14px; border-bottom:1px solid #f0f0ec;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Mijn taken</span>
+              <span style="font-size:13px; color:#0d3b33; font-weight:600;">Bord</span>
+            </div>
+            <sc-if value="{{ hasTasks }}" hint-placeholder-val="{{ true }}">
+              <div style="padding:4px 14px 12px; display:flex; flex-direction:column;">
+                <sc-for list="{{ taskGroupsMobile }}" as="g" hint-placeholder-count="2">
+                  <div style="display:flex; flex-direction:column;">
+                    <div style="{{ g.headerStyle }}">{{ g.label }}</div>
+                    <sc-for list="{{ g.tasks }}" as="t" hint-placeholder-count="2">
+                      <div style="display:flex; align-items:flex-start; gap:10px; padding:10px 0; border-bottom:1px solid #f5f5f1;">
+                        <span style="{{ t.markStyle }}"></span>
+                        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:3px;">
+                          <span style="font-size:14px; font-weight:600; line-height:1.35;">{{ t.title }}</span>
+                          <span style="font-size:12px; color:#9a9a92;">{{ t.project }}</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0;">
+                          <span style="{{ t.prioStyle }}"><span style="{{ t.prioDot }}"></span>{{ t.prioLabel }}</span>
+                          <span style="{{ t.dueStyle }}">{{ t.due }}</span>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noTasks }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:18px 14px; display:flex; flex-direction:column; gap:12px;">
+                <div style="display:flex; align-items:center; gap:12px;">
+                  <div style="width:28px; height:28px; border-radius:999px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0;">+</div>
+                  <div style="display:flex; flex-direction:column; gap:2px;">
+                    <span style="font-size:14px; font-weight:600;">Geen taken deze week</span>
+                    <span style="font-size:13px; color:#87877e;">Niets vervallen of in uitvoering.</span>
+                  </div>
+                </div>
+                <button style="height:44px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Taak toevoegen</button>
+              </div>
+            </sc-if>
+          </div>
+
+          <!-- 4 · actieve projecten -->
+          <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden; flex-shrink:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:13px 14px; border-bottom:1px solid #f0f0ec;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Actieve projecten</span>
+              <span style="font-size:13px; color:#0d3b33; font-weight:600;">Alle</span>
+            </div>
+            <div style="padding:12px 14px; display:flex; flex-direction:column; gap:8px;">
+              <sc-for list="{{ projectsMobile }}" as="p" hint-placeholder-count="3">
+                <div style="border:1px solid #e3e3e0; border-radius:12px; padding:12px; display:flex; flex-direction:column; gap:8px;">
+                  <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+                    <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
+                      <span style="font-size:14px; font-weight:600; line-height:1.35;">{{ p.name }}</span>
+                      <span style="font-size:12px; color:#87877e;">{{ p.client }}</span>
+                    </div>
+                    <span style="{{ p.statusStyle }}">{{ p.statusLabel }}</span>
+                  </div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding-top:8px; border-top:1px solid #f0f0ec;">
+                    <span style="{{ p.deadlineStyle }}">{{ p.deadline }}</span>
+                    <span style="{{ p.ticketStyle }}">{{ p.tickets }}</span>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(5,1fr); background:#fff; border-top:1px solid #e3e3e0; padding:6px 4px 10px; flex-shrink:0;">
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#0d3b33;"><span style="font-size:17px;">◧</span><span style="font-size:10px; font-weight:600;">Start</span></div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">▤</span><span style="font-size:10px;">Projecten</span></div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">◫</span><span style="font-size:10px;">Taken</span></div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e; position:relative;"><span style="font-size:17px;">◎</span><span style="font-size:10px;">Tickets</span><span style="{{ mobileTabBadge }}">{{ newTicketCount }}</span></div>
+          <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">▦</span><span style="font-size:10px;">Agenda</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const PRIO = {
+  low:    { label: 'Laag',   border: '#e3e3e0', color: '#6e6e66', dot: '#9a9a92', rank: 3 },
+  medium: { label: 'Middel', border: '#ecd9bd', color: '#8a4008', dot: '#b45309', rank: 2 },
+  high:   { label: 'Hoog',   border: '#f0cfcf', color: '#b91c1c', dot: '#b91c1c', rank: 1 }
+};
+
+const TICKETS = [
+  { id: 'TCK-2041', title: 'Contactformulier verzendt niet', client: 'Verlinden & Zn', project: 'Herbouw website', prio: 'high',   ago: '2 u geleden',  urgent: true,  attach: ' · 1 schermafbeelding' },
+  { id: 'TCK-2044', title: 'Webshop toont verkeerde voorraad', client: 'De Groene Kruidenier', project: 'Webshop', prio: 'high',   ago: '5 u geleden',  urgent: true,  attach: '' },
+  { id: 'TCK-2045', title: 'Openingsuren feestdagen aanpassen', client: 'Bakkerij Vermeulen', project: 'Onderhoud site', prio: 'medium', ago: 'gisteren',     urgent: false, attach: '' },
+  { id: 'TCK-2046', title: 'Nieuwsbriefknop valt weg op tablet', client: 'Praktijk Dewulf', project: 'Onderhoud site', prio: 'low',    ago: '2 dagen geleden', urgent: false, attach: ' · 2 schermafbeeldingen' }
+];
+
+const AGENDA = [
+  { day: '16', month: 'sep', title: 'Voorraadkoppeling nakijken met leverancier', meta: '14:00 – 15:00 · De Groene Kruidenier', tag: 'Vandaag',  kind: 'today' },
+  { day: '14', month: 'sep', title: 'Teksten dienstenpagina aanleveren', meta: 'Deadline klant · Praktijk Dewulf', tag: 'Te laat', kind: 'overdue' },
+  { day: '18', month: 'sep', title: 'Ontwerp homepagina bespreken', meta: '10:00 – 11:00 · Verlinden & Zn', tag: 'Vrijdag', kind: 'soon' },
+  { day: '21', month: 'sep', title: 'Testversie webshop online zetten', meta: 'Mijlpaal · De Groene Kruidenier', tag: 'Maandag', kind: 'soon' },
+  { day: '23', month: 'sep', title: 'Kwartaaloverleg onderhoud', meta: '09:30 – 10:15 · Bakkerij Vermeulen', tag: 'Woensdag', kind: 'soon' }
+];
+
+const TASKS = [
+  { id: 'TSK-398', title: 'Productcatalogus koppelen aan CMS',   project: 'Webshop De Groene Kruidenier', prio: 'high',   due: '4 dagen te laat', state: 'overdue',     order: 0 },
+  { id: 'TSK-412', title: 'SSL-certificaat vernieuwen',           project: 'Onderhoud Bakkerij Vermeulen', prio: 'high',   due: '1 dag te laat',   state: 'overdue',     order: 1 },
+  { id: 'TSK-401', title: 'Contactformulier opnieuw opbouwen',    project: 'Herbouw Verlinden & Zn',       prio: 'medium', due: 'vandaag',         state: 'in_progress', order: 2 },
+  { id: 'TSK-415', title: 'Voorraad-API testen op staging',       project: 'Webshop De Groene Kruidenier', prio: 'high',   due: 'morgen',          state: 'in_progress', order: 3 },
+  { id: 'TSK-402', title: 'Cookiebanner instellen',               project: 'Herbouw Verlinden & Zn',       prio: 'medium', due: 'vr 18 sep',       state: 'week',        order: 4 },
+  { id: 'TSK-418', title: 'Backups controleren',                  project: 'Onderhoud Praktijk Dewulf',    prio: 'low',    due: 'za 19 sep',       state: 'week',        order: 5 }
+];
+
+const PROJECTS = [
+  { name: 'Herbouw website',   client: 'Verlinden & Zn',       status: 'active',      deadline: '21 okt 2026', note: 'oplevering',        tickets: 3, urgent: false },
+  { name: 'Webshop',           client: 'De Groene Kruidenier', status: 'active',      deadline: '21 sep 2026', note: 'testversie online', tickets: 2, urgent: true },
+  { name: 'Onderhoud site',    client: 'Bakkerij Vermeulen',   status: 'maintenance', deadline: '30 sep 2026', note: 'maandelijkse update', tickets: 1, urgent: false },
+  { name: 'Onderhoud site',    client: 'Praktijk Dewulf',      status: 'maintenance', deadline: '14 sep 2026', note: 'teksten klant',     tickets: 0, urgent: true }
+];
+
+const STATUS = {
+  active:      { label: 'Actief',    bg: '#e6efec', color: '#0d3b33' },
+  maintenance: { label: 'Onderhoud', bg: '#f2f2ee', color: '#55554f' }
+};
+
+const GROUPS = [
+  { key: 'overdue',     label: 'Te laat' },
+  { key: 'in_progress', label: 'In uitvoering' },
+  { key: 'week',        label: 'Deze week' }
+];
+
+class Component extends DCLogic {
+  state = { empty: false, sort: 'date' };
+
+  prio(key, size) {
+    const p = PRIO[key];
+    return {
+      prioLabel: p.label,
+      prioStyle: 'display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border-radius:999px; border:1px solid ' + p.border + '; color:' + p.color + '; font-size:' + size + 'px; font-weight:600; white-space:nowrap;',
+      prioDot: 'width:6px; height:6px; border-radius:50%; background:' + p.dot + '; display:inline-block;'
+    };
+  }
+
+  row(last, pad) {
+    return 'display:grid; gap:12px; padding:' + pad + '; align-items:center; cursor:pointer;' +
+      (last ? '' : ' border-bottom:1px solid #f0f0ec;');
+  }
+
+  ticketRows() {
+    return TICKETS.map((t, i) => Object.assign({}, t, this.prio(t.prio, 12), {
+      rowStyle: 'display:grid; grid-template-columns:minmax(0,1.9fr) minmax(150px,1fr) minmax(110px,.55fr) minmax(100px,.5fr) 210px; gap:12px; padding:13px 18px; align-items:center;' +
+        (i === TICKETS.length - 1 ? '' : ' border-bottom:1px solid #f0f0ec;'),
+      agoStyle: t.urgent ? 'font-size:13px; color:#b91c1c; font-weight:600;' : 'font-size:13px; color:#87877e;'
+    }));
+  }
+
+  agendaRows(list) {
+    return list.map((a, i) => {
+      const overdue = a.kind === 'overdue';
+      const today = a.kind === 'today';
+      return Object.assign({}, a, {
+        rowStyle: 'display:flex; align-items:center; gap:12px; padding:11px 0;' + (i === list.length - 1 ? '' : ' border-bottom:1px solid #f5f5f1;'),
+        dateBoxStyle: 'width:42px; flex-shrink:0; display:flex; flex-direction:column; align-items:center; border-right:1px solid #f0f0ec; padding-right:10px;',
+        dayStyle: 'font-family:Space Grotesk, sans-serif; font-size:17px; font-weight:700; line-height:1; color:' + (overdue ? '#b91c1c' : '#121212') + ';',
+        tagStyle: 'padding:4px 10px; border-radius:999px; font-size:11px; font-weight:600; white-space:nowrap; flex-shrink:0; background:' +
+          (overdue ? '#fdecec' : today ? '#e6efec' : '#f2f2ee') + '; color:' + (overdue ? '#b91c1c' : today ? '#0d3b33' : '#6e6e66') + ';'
+      });
+    });
+  }
+
+  taskGroups(limit) {
+    const sorted = this.state.sort === 'date'
+      ? TASKS.slice().sort((a, b) => a.order - b.order)
+      : TASKS.slice().sort((a, b) => PRIO[a.prio].rank - PRIO[b.prio].rank || a.order - b.order);
+    const shown = sorted.slice(0, limit);
+    const marks = { overdue: '#b91c1c', in_progress: '#0d3b33', week: '#cfcfc9' };
+    if (this.state.sort === 'prio') {
+      return [{
+        label: 'Op prioriteit',
+        headerStyle: 'font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600; padding:12px 0 4px;',
+        tasks: shown.map(t => this.taskRow(t, marks))
+      }];
+    }
+    return GROUPS.map(g => {
+      const items = shown.filter(t => t.state === g.key);
+      if (!items.length) return null;
+      return {
+        label: g.label,
+        headerStyle: 'font-size:11px; letter-spacing:.08em; text-transform:uppercase; font-weight:600; padding:12px 0 4px; color:' + (g.key === 'overdue' ? '#b91c1c' : '#9a9a92') + ';',
+        tasks: items.map(t => this.taskRow(t, marks))
+      };
+    }).filter(Boolean);
+  }
+
+  taskRow(t, marks) {
+    return Object.assign({}, t, this.prio(t.prio, 11), {
+      markStyle: 'width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; background:' + marks[t.state] + ';',
+      dueStyle: 'font-size:12px; white-space:nowrap; flex-shrink:0; color:' + (t.state === 'overdue' ? '#b91c1c' : '#87877e') + '; font-weight:' + (t.state === 'overdue' ? '600' : '400') + ';'
+    });
+  }
+
+  projectRows(list, mobile) {
+    return list.map((p, i) => {
+      const s = STATUS[p.status];
+      return Object.assign({}, p, {
+        rowStyle: 'display:grid; grid-template-columns:minmax(0,1.7fr) minmax(0,1.1fr) minmax(130px,.7fr) minmax(150px,.8fr) minmax(120px,.6fr); gap:12px; padding:13px 18px; align-items:center; cursor:pointer;' +
+          (i === list.length - 1 ? '' : ' border-bottom:1px solid #f0f0ec;'),
+        statusLabel: s.label,
+        statusStyle: 'padding:4px 10px; border-radius:999px; background:' + s.bg + '; color:' + s.color + '; font-size:12px; font-weight:600; white-space:nowrap;',
+        deadline: p.deadline,
+        deadlineNote: p.note,
+        deadlineStyle: 'font-size:' + (mobile ? '12' : '13') + 'px; white-space:nowrap; color:' + (p.urgent ? '#b91c1c' : '#2e2e2b') + '; font-weight:' + (p.urgent ? '600' : '400') + ';',
+        tickets: p.tickets === 0 ? 'geen' : p.tickets === 1 ? '1 ticket' : p.tickets + ' tickets',
+        ticketStyle: 'font-size:' + (mobile ? '12' : '13') + 'px; white-space:nowrap; color:' + (p.tickets > 0 ? '#2e2e2b' : '#9a9a92') + '; font-weight:' + (p.tickets > 1 ? '600' : '400') + ';'
+      });
+    });
+  }
+
+  sortBtn(key) {
+    const active = this.state.sort === key;
+    return 'padding:4px 10px; border-radius:999px; cursor:pointer; font-size:12px; font-weight:600; background:' +
+      (active ? '#121212' : '#fff') + '; color:' + (active ? '#fff' : '#55554f') + '; border:1px solid ' + (active ? '#121212' : '#dcdcd6') + ';';
+  }
+
+  renderVals() {
+    const e = this.state.empty;
+    const count = e ? 0 : TICKETS.length;
+    return {
+      toggleEmpty: () => this.setState(s => ({ empty: !s.empty })),
+      emptyToggleLabel: e ? 'Lege staten aan' : 'Lege staten uit',
+      emptyToggleStyle: 'padding:7px 13px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; background:' +
+        (e ? '#121212' : '#fff') + '; color:' + (e ? '#fff' : '#55554f') + '; border:1px solid ' + (e ? '#121212' : '#dcdcd6') + ';',
+
+      hasTickets: !e, noTickets: e,
+      hasAgenda: !e, noAgenda: e,
+      hasTasks: !e, noTasks: e,
+
+      newTicketCount: count,
+      newTicketChip: 'min-width:20px; height:20px; padding:0 6px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; background:' +
+        (count ? '#fdecec' : '#f2f2ee') + '; color:' + (count ? '#b91c1c' : '#6e6e66') + ';',
+      sidebarTicketBadge: 'min-width:20px; height:20px; padding:0 6px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; background:' +
+        (count ? '#fdecec' : '#f2f2ee') + '; color:' + (count ? '#b91c1c' : '#6e6e66') + ';',
+      mobileTabBadge: count
+        ? 'position:absolute; top:2px; right:16px; min-width:16px; height:16px; border-radius:999px; background:#b91c1c; color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center;'
+        : 'display:none;',
+
+      tickets: this.ticketRows(),
+      ticketsMobile: this.ticketRows().slice(0, 2),
+      agenda: this.agendaRows(AGENDA),
+      agendaMobile: this.agendaRows(AGENDA.slice(0, 4)),
+      taskGroups: this.taskGroups(6),
+      taskGroupsMobile: this.taskGroups(4),
+      projects: this.projectRows(PROJECTS, false),
+      projectsMobile: this.projectRows(PROJECTS.slice(0, 3), true),
+
+      sortByDate: () => this.setState({ sort: 'date' }),
+      sortByPrio: () => this.setState({ sort: 'prio' }),
+      sortDateStyle: this.sortBtn('date'),
+      sortPrioStyle: this.sortBtn('prio')
+    };
+  }
+}
+</script>
+</body>
+</html>

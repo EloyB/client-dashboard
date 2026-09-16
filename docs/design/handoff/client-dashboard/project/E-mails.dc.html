@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#e8e8e3; }
+  a { color:#0d3b33; } a:hover { color:#0a2c26; }
+  * { box-sizing:border-box; }
+</style>
+</helmet>
+
+<div style="font-family:'Instrument Sans',system-ui,sans-serif; color:#121212; padding:40px; display:flex; flex-direction:column; gap:24px;">
+
+  <div style="display:flex; flex-direction:column; gap:6px; max-width:84ch;">
+    <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#87877e; font-weight:600;">Transactionele e-mails</div>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; letter-spacing:-.03em;">Vier e-mails, verzendklaar</div>
+    <div style="font-size:14px; color:#6e6e66; line-height:1.55;">Eén kolom van 600px, tabelopbouw, alle stijlen inline, geen afbeeldingen en geen webfonts. Elk bestand is een losse HTML die je in je mailtool kan plakken. De onderstaande voorbeelden zijn de echte bestanden.</div>
+  </div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
+    <sc-for list="{{ mails }}" as="m" hint-placeholder-count="4">
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px; width:640px;">
+        <div style="display:flex; flex-direction:column; gap:2px;">
+          <span style="font-size:13px; font-weight:600;">{{ m.title }}</span>
+          <span style="font-size:12px; color:#87877e;">Onderwerp: {{ m.subject }}</span>
+          <span style="font-family:monospace; font-size:11px; color:#9a9a92;">{{ m.file }}</span>
+        </div>
+        <div style="border:1px solid #d5d5cf; border-radius:12px; overflow:hidden; background:#eeeeea;">
+          <iframe src="{{ m.file }}" style="width:640px; height:760px; border:none; display:block;" title="{{ m.title }}"></iframe>
+        </div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:flex-start;">
+    <div style="flex-shrink:0; width:400px; border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+      <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Donkere modus</span>
+      <span style="font-size:13px; color:#55554f; line-height:1.55;">Geen pure zwart-witvlakken: de kaart is #FDFDFB op een achtergrond van #EEEEEA, met tekst in #1A1A18. Een media query zet de kaart in donkere modus op #26261F met tekst in #F0F0EA. Clients die de query negeren tonen de lichte versie, die daar ook leesbaar blijft.</span>
+    </div>
+    <div style="flex-shrink:0; width:400px; border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+      <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Letters en knoppen</span>
+      <span style="font-size:13px; color:#55554f; line-height:1.55;">Space Grotesk en Instrument Sans gaan niet door in e-mail; de stack is Arial met Helvetica als terugval, zodat het beeld dicht bij de app blijft. Knoppen zijn een gevulde tabelcel met een blokniveau-link, dus ook klikbaar in Outlook.</span>
+    </div>
+    <div style="flex-shrink:0; width:400px; border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+      <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Voor verzending</span>
+      <span style="font-size:13px; color:#55554f; line-height:1.55;">De URL's, het telefoonnummer en het postadres in de voettekst zijn voorbeelden: vervang ze door de echte. De knoplinks moeten ook als tekstlink in de voettekst staan, wat nu al zo is.</span>
+    </div>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      mails: [
+        { title: '1 · Uitnodiging voor de klant', subject: 'Uitnodiging voor het projectportaal van Verlinden & Zn', file: 'emails/1-uitnodiging.html' },
+        { title: '2 · Aanmeldlink', subject: 'Uw aanmeldlink voor het projectportaal', file: 'emails/2-aanmeldlink.html' },
+        { title: '3 · Melding ontvangen (klant)', subject: 'We hebben uw melding ontvangen — TCK-2041', file: 'emails/3-melding-ontvangen.html' },
+        { title: '4 · Nieuw ticket (intern)', subject: 'Nieuw ticket · Verlinden & Zn · TCK-2041', file: 'emails/4-nieuw-ticket-intern.html' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

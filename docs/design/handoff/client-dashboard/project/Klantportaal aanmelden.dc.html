@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#e8e8e3; }
+  a { color:#0d3b33; } a:hover { color:#0a2c26; }
+  * { box-sizing:border-box; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb { background:#d5d5cf; border-radius:4px; }
+</style>
+</helmet>
+
+<div style="font-family:'Instrument Sans',system-ui,sans-serif; color:#121212; padding:40px; display:flex; flex-direction:column; gap:28px;">
+
+  <div style="display:flex; flex-direction:column; gap:6px; max-width:84ch;">
+    <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#87877e; font-weight:600;">Klantportaal · aanmelden</div>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; letter-spacing:-.03em;">Aanmelden met een link, zonder wachtwoord</div>
+    <div style="font-size:14px; color:#6e6e66; line-height:1.55;">Vier schermen voor klantgebruikers. De teksten leggen in gewone taal uit wat er gebeurt, met een voorbeeld van de e-mail die ze krijgen. Klik de pillen om tussen de schermen te wisselen; de knoppen werken ook.</div>
+    <div style="display:flex; flex-wrap:wrap; gap:6px; padding-top:6px;">
+      <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+        <span onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.label }}</span>
+      </sc-for>
+    </div>
+  </div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:24px; align-items:flex-start;">
+
+    <!-- ===================== DESKTOP ===================== -->
+    <div style="flex-shrink:0; display:flex; flex-direction:column; gap:10px;">
+      <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#87877e; font-weight:600;">Desktop · 1040 × 760</div>
+      <div style="width:1040px; height:760px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="flex:1; min-height:0; overflow-y:auto; display:flex; align-items:center; justify-content:center; padding:32px 24px;">
+          <div style="width:520px; display:flex; flex-direction:column; gap:16px; flex-shrink:0;">
+
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:32px; height:32px; border-radius:8px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:700;">S</div>
+              <div style="display:flex; flex-direction:column;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Studio</span>
+                <span style="font-size:12px; color:#87877e;">Projectportaal voor klanten</span>
+              </div>
+            </div>
+
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:26px; display:flex; flex-direction:column; gap:20px; box-shadow:0 1px 2px rgba(18,18,18,.05);">
+
+              <!-- ---------- 1 · UITNODIGING ---------- -->
+              <sc-if value="{{ isInvite }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                  <div style="display:flex; flex-direction:column; gap:8px;">
+                    <span style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600;">Uitnodiging van Studio</span>
+                    <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em; line-height:1.25;">Welkom in het portaal van Verlinden &amp; Zn</h1>
+                    <p style="margin:0; font-size:15px; color:#2e2e2b; line-height:1.6;">Jonas De Meyer heeft u uitgenodigd. In dit portaal volgt u uw website-project: u ziet de planning, meldt problemen en vindt uw documenten terug.</p>
+                  </div>
+
+                  <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fafaf8; padding:16px; display:flex; flex-direction:column; gap:14px;">
+                    <span style="font-size:13px; font-weight:600;">Kloppen uw gegevens?</span>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      <label style="font-size:13px; font-weight:600;">Uw naam</label>
+                      <input type="text" value="Katrien Verlinden" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:6px;">
+                      <label style="font-size:13px; font-weight:600;">Uw e-mailadres</label>
+                      <input type="text" value="katrien@verlinden.be" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                      <span style="font-size:12px; color:#87877e;">Op dit adres ontvangt u uw aanmeldlink en de meldingen over uw project.</span>
+                    </div>
+                  </div>
+
+                  <div style="display:flex; flex-direction:column; gap:10px;">
+                    <span style="font-size:13px; font-weight:600;">Zo werkt aanmelden</span>
+                    <div style="display:flex; flex-direction:column; gap:10px; font-size:14px; color:#2e2e2b; line-height:1.5;">
+                      <div style="display:flex; gap:12px; align-items:flex-start;"><span style="width:22px; height:22px; border-radius:999px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">1</span><span>U vult uw e-mailadres in.</span></div>
+                      <div style="display:flex; gap:12px; align-items:flex-start;"><span style="width:22px; height:22px; border-radius:999px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">2</span><span>U krijgt een e-mail met één knop.</span></div>
+                      <div style="display:flex; gap:12px; align-items:flex-start;"><span style="width:22px; height:22px; border-radius:999px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; flex-shrink:0;">3</span><span>U klikt op die knop en bent aangemeld. Een wachtwoord hebt u niet nodig.</span></div>
+                    </div>
+                  </div>
+
+                  <button onClick="{{ next }}" style="{{ primary }}">Doorgaan</button>
+                  <span style="font-size:12px; color:#87877e; text-align:center; line-height:1.5;">Klopt er iets niet? Antwoord op de uitnodigingsmail, dan passen we het aan.</span>
+                </div>
+              </sc-if>
+
+              <!-- ---------- 2 · AANMELDEN ---------- -->
+              <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                  <div style="display:flex; flex-direction:column; gap:8px;">
+                    <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">Aanmelden</h1>
+                    <p style="margin:0; font-size:15px; color:#2e2e2b; line-height:1.6;">Vul uw e-mailadres in. U ontvangt een e-mail met een knop om aan te melden. Zo hoeft u geen wachtwoord te onthouden.</p>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="font-size:13px; font-weight:600;">E-mailadres</label>
+                    <input type="text" value="katrien@verlinden.be" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                    <span style="font-size:12px; color:#87877e;">Gebruik het adres waarop u de uitnodiging kreeg.</span>
+                  </div>
+                  <button onClick="{{ next }}" style="{{ primary }}">Stuur mij een aanmeldlink</button>
+                  <div style="display:flex; flex-direction:column; gap:6px; padding-top:4px; border-top:1px solid #f0f0ec;">
+                    <span style="font-size:13px; font-weight:600; padding-top:12px;">Geen uitnodiging ontvangen?</span>
+                    <span style="font-size:13px; color:#87877e; line-height:1.55;">Alleen adressen die wij toevoegden krijgen toegang. Vraag uw contactpersoon bij ons om u toe te voegen, of bel 09 225 44 18.</span>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- ---------- 3 · MAILBOX ---------- -->
+              <sc-if value="{{ isSent }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                  <div style="display:flex; flex-direction:column; gap:8px;">
+                    <span style="width:40px; height:40px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700;">✓</span>
+                    <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">Kijk in uw mailbox</h1>
+                    <p style="margin:0; font-size:15px; color:#2e2e2b; line-height:1.6;">We hebben een e-mail gestuurd naar <span style="font-weight:600;">katrien@verlinden.be</span>. Klik in die e-mail op <span style="font-weight:600;">Aanmelden bij het portaal</span> en u bent binnen.</p>
+                  </div>
+
+                  <div style="border:1px solid #e3e3e0; border-radius:12px; overflow:hidden;">
+                    <div style="padding:10px 14px; background:#fafaf8; border-bottom:1px solid #e3e3e0; display:flex; flex-direction:column; gap:2px;">
+                      <span style="font-size:11px; color:#9a9a92;">Afzender</span>
+                      <span style="font-size:13px; font-weight:600;">Studio · portaal@studio.be</span>
+                    </div>
+                    <div style="padding:14px; display:flex; flex-direction:column; gap:10px;">
+                      <span style="font-size:14px; font-weight:600;">Uw aanmeldlink voor het portaal</span>
+                      <span style="font-size:13px; color:#55554f; line-height:1.55;">Klik op de knop om aan te melden. De link werkt 15 minuten en kan één keer gebruikt worden.</span>
+                      <span style="align-self:flex-start; padding:9px 14px; border-radius:10px; background:#0d3b33; color:#fff; font-size:13px; font-weight:600;">Aanmelden bij het portaal</span>
+                    </div>
+                  </div>
+
+                  <div style="display:flex; flex-direction:column; gap:10px; font-size:13px; color:#55554f; line-height:1.55;">
+                    <div style="display:flex; gap:10px;"><span style="color:#9a9a92;">·</span><span>De e-mail komt meestal binnen één minuut aan.</span></div>
+                    <div style="display:flex; gap:10px;"><span style="color:#9a9a92;">·</span><span>Niets te zien? Kijk in de map ongewenste e-mail of spam.</span></div>
+                    <div style="display:flex; gap:10px;"><span style="color:#9a9a92;">·</span><span>Open de link op het toestel waarop u wilt werken.</span></div>
+                  </div>
+
+                  <div style="display:flex; flex-direction:column; gap:8px; padding-top:4px; border-top:1px solid #f0f0ec;">
+                    <button onClick="{{ resend }}" style="{{ resendStyle }}">{{ resendLabel }}</button>
+                    <span onClick="{{ goLogin }}" style="font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer; text-align:center;">Ander e-mailadres gebruiken</span>
+                  </div>
+                </div>
+              </sc-if>
+
+              <!-- ---------- 4 · VERLOPEN LINK ---------- -->
+              <sc-if value="{{ isExpired }}" hint-placeholder-val="{{ false }}">
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                  <div style="display:flex; flex-direction:column; gap:8px;">
+                    <span style="width:40px; height:40px; border-radius:999px; background:#fbf0e2; color:#8a4008; display:flex; align-items:center; justify-content:center; font-size:19px; font-weight:700;">!</span>
+                    <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">Deze link werkt niet meer</h1>
+                    <p style="margin:0; font-size:15px; color:#2e2e2b; line-height:1.6;">Dat is normaal: een aanmeldlink is 15 minuten geldig en kan één keer gebruikt worden. Vraag hieronder een nieuwe aan, dan staat er binnen een minuut een verse e-mail klaar.</p>
+                  </div>
+                  <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fafaf8; padding:14px; display:flex; flex-direction:column; gap:8px; font-size:13px; color:#55554f; line-height:1.55;">
+                    <span style="font-weight:600; color:#121212;">Waarom gebeurt dit?</span>
+                    <span>U klikte de link al eerder aan, of ze stond langer dan 15 minuten in uw mailbox. Soms opent uw e-mailprogramma de link ook automatisch; vraag in dat geval gewoon een nieuwe aan.</span>
+                  </div>
+                  <div style="display:flex; flex-direction:column; gap:6px;">
+                    <label style="font-size:13px; font-weight:600;">E-mailadres</label>
+                    <input type="text" value="katrien@verlinden.be" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                  </div>
+                  <button onClick="{{ next }}" style="{{ primary }}">Nieuwe aanmeldlink sturen</button>
+                  <span style="font-size:12px; color:#87877e; text-align:center; line-height:1.55;">Blijft het misgaan? Bel 09 225 44 18 of antwoord op een eerdere e-mail van Studio.</span>
+                </div>
+              </sc-if>
+            </div>
+
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:12px; color:#9a9a92;">
+              <span>Studio · Gent</span>
+              <span style="cursor:pointer;" style-hover="color:#0d3b33;">Privacy</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== MOBIEL ===================== -->
+    <div style="flex-shrink:0; display:flex; flex-direction:column; gap:10px;">
+      <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#87877e; font-weight:600;">Mobiel · 375 × 812</div>
+      <div style="width:375px; height:812px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column;">
+        <div style="flex:1; min-height:0; overflow-y:auto; padding:24px 16px; display:flex; flex-direction:column; gap:16px;">
+
+          <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+            <div style="width:32px; height:32px; border-radius:8px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk',sans-serif; font-size:14px; font-weight:700;">S</div>
+            <div style="display:flex; flex-direction:column;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Studio</span>
+              <span style="font-size:11px; color:#87877e;">Projectportaal</span>
+            </div>
+          </div>
+
+          <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:18px; display:flex; flex-direction:column; gap:16px; flex-shrink:0;">
+
+            <sc-if value="{{ isInvite }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex; flex-direction:column; gap:16px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <span style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#9a9a92; font-weight:600;">Uitnodiging</span>
+                  <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600; letter-spacing:-.02em; line-height:1.25;">Welkom in het portaal van Verlinden &amp; Zn</h1>
+                  <p style="margin:0; font-size:15px; color:#2e2e2b; line-height:1.6;">Jonas De Meyer heeft u uitgenodigd. Hier volgt u uw project, meldt u problemen en vindt u uw documenten.</p>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Uw naam</label>
+                  <input type="text" value="Katrien Verlinden" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Uw e-mailadres</label>
+                  <input type="text" value="katrien@verlinden.be" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+                  <span style="font-size:12px; color:#87877e;">Hierop komt uw aanmeldlink toe.</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px; font-size:14px; color:#2e2e2b; line-height:1.5; padding-top:4px; border-top:1px solid #f0f0ec;">
+                  <span style="font-size:13px; font-weight:600; padding-top:10px;">Zo werkt aanmelden</span>
+                  <div style="display:flex; gap:10px; align-items:flex-start;"><span style="width:20px; height:20px; border-radius:999px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0;">1</span><span>U vult uw e-mailadres in.</span></div>
+                  <div style="display:flex; gap:10px; align-items:flex-start;"><span style="width:20px; height:20px; border-radius:999px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0;">2</span><span>U krijgt een e-mail met één knop.</span></div>
+                  <div style="display:flex; gap:10px; align-items:flex-start;"><span style="width:20px; height:20px; border-radius:999px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0;">3</span><span>U klikt erop en bent aangemeld. Geen wachtwoord nodig.</span></div>
+                </div>
+                <button onClick="{{ next }}" style="{{ primaryM }}">Doorgaan</button>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isLogin }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; gap:16px;">
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600; letter-spacing:-.02em;">Aanmelden</h1>
+                  <p style="margin:0; font-size:15px; color:#2e2e2b; line-height:1.6;">Vul uw e-mailadres in. U krijgt een e-mail met een knop om aan te melden — geen wachtwoord nodig.</p>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">E-mailadres</label>
+                  <input type="text" value="katrien@verlinden.be" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+                  <span style="font-size:12px; color:#87877e;">Gebruik het adres waarop u de uitnodiging kreeg.</span>
+                </div>
+                <button onClick="{{ next }}" style="{{ primaryM }}">Stuur mij een aanmeldlink</button>
+                <span style="font-size:13px; color:#87877e; line-height:1.55; padding-top:10px; border-top:1px solid #f0f0ec;">Geen uitnodiging gekregen? Vraag uw contactpersoon bij Studio om u toe te voegen, of bel 09 225 44 18.</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isSent }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; gap:16px;">
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  <span style="width:40px; height:40px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:700;">✓</span>
+                  <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600; letter-spacing:-.02em;">Kijk in uw mailbox</h1>
+                  <p style="margin:0; font-size:15px; color:#2e2e2b; line-height:1.6;">We stuurden een e-mail naar <span style="font-weight:600;">katrien@verlinden.be</span>. Klik daarin op <span style="font-weight:600;">Aanmelden bij het portaal</span>.</p>
+                </div>
+                <div style="border:1px solid #e3e3e0; border-radius:12px; overflow:hidden;">
+                  <div style="padding:10px 12px; background:#fafaf8; border-bottom:1px solid #e3e3e0; font-size:12px; color:#6e6e66;">Studio · portaal@studio.be</div>
+                  <div style="padding:12px; display:flex; flex-direction:column; gap:8px;">
+                    <span style="font-size:14px; font-weight:600;">Uw aanmeldlink voor het portaal</span>
+                    <span style="font-size:13px; color:#55554f; line-height:1.55;">De link werkt 15 minuten en kan één keer gebruikt worden.</span>
+                    <span style="align-self:flex-start; padding:9px 14px; border-radius:10px; background:#0d3b33; color:#fff; font-size:13px; font-weight:600;">Aanmelden bij het portaal</span>
+                  </div>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px; font-size:13px; color:#55554f; line-height:1.55;">
+                  <div style="display:flex; gap:8px;"><span style="color:#9a9a92;">·</span><span>Meestal binnen één minuut aangekomen.</span></div>
+                  <div style="display:flex; gap:8px;"><span style="color:#9a9a92;">·</span><span>Niets te zien? Kijk bij ongewenste e-mail.</span></div>
+                </div>
+                <button onClick="{{ resend }}" style="{{ resendStyleM }}">{{ resendLabel }}</button>
+                <span onClick="{{ goLogin }}" style="font-size:14px; color:#0d3b33; font-weight:600; cursor:pointer; text-align:center; min-height:44px; display:flex; align-items:center; justify-content:center;">Ander e-mailadres gebruiken</span>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ isExpired }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex; flex-direction:column; gap:16px;">
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  <span style="width:40px; height:40px; border-radius:999px; background:#fbf0e2; color:#8a4008; display:flex; align-items:center; justify-content:center; font-size:19px; font-weight:700;">!</span>
+                  <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600; letter-spacing:-.02em;">Deze link werkt niet meer</h1>
+                  <p style="margin:0; font-size:15px; color:#2e2e2b; line-height:1.6;">Een aanmeldlink is 15 minuten geldig en werkt één keer. Vraag hieronder een nieuwe aan.</p>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">E-mailadres</label>
+                  <input type="text" value="katrien@verlinden.be" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+                </div>
+                <button onClick="{{ next }}" style="{{ primaryM }}">Nieuwe aanmeldlink sturen</button>
+                <span style="font-size:12px; color:#87877e; text-align:center; line-height:1.55;">Blijft het misgaan? Bel 09 225 44 18.</span>
+              </div>
+            </sc-if>
+          </div>
+
+          <div style="font-size:12px; color:#9a9a92; text-align:center; flex-shrink:0;">Studio · Gent</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== NOTITIES ===================== -->
+    <div style="flex-shrink:0; width:340px; display:flex; flex-direction:column; gap:12px; padding-top:28px;">
+      <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Taal en toon</span>
+        <span style="font-size:13px; color:#55554f; line-height:1.55;">“U”-vorm, korte zinnen, geen jargon. Nergens “magic link”, “token” of “authenticatie”: het heet een <span style="font-weight:600;">aanmeldlink</span>, en de verlopen link krijgt uitleg waarom dat normaal is.</span>
+      </div>
+      <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Opnieuw versturen</span>
+        <span style="font-size:13px; color:#55554f; line-height:1.55;">De knop staat 45 seconden uit en toont de resterende tijd, zodat mensen niet vijf keer klikken. Daarna wordt ze weer een gewone outline-knop. Klik ze aan om het te zien.</span>
+      </div>
+      <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Geen account tonen</span>
+        <span style="font-size:13px; color:#55554f; line-height:1.55;">Het bevestigingsscherm is hetzelfde of het adres bestaat of niet. Wie niet uitgenodigd is, krijgt geen e-mail en leest op het aanmeldscherm hoe hij toegang vraagt.</span>
+      </div>
+      <div style="border:1px solid #e3e3e0; border-radius:12px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Na aanmelden</span>
+        <span style="font-size:13px; color:#55554f; line-height:1.55;">De sessie blijft 30 dagen geldig op het toestel, zodat klanten niet bij elk bezoek opnieuw een link nodig hebben. Op een gedeelde computer kan men zich afmelden via het gebruikersmenu.</span>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const TABS = [
+  { key: 'invite',  label: '1 · Uitnodiging' },
+  { key: 'login',   label: '2 · Aanmelden' },
+  { key: 'sent',    label: '3 · Kijk in uw mailbox' },
+  { key: 'expired', label: '4 · Link verlopen' }
+];
+
+class Component extends DCLogic {
+  state = { view: 'invite', cooldown: 0 };
+
+  componentWillUnmount() { clearInterval(this.timer); }
+
+  startCooldown() {
+    clearInterval(this.timer);
+    this.setState({ cooldown: 45 });
+    this.timer = setInterval(() => {
+      this.setState(s => {
+        if (s.cooldown <= 1) { clearInterval(this.timer); return { cooldown: 0 }; }
+        return { cooldown: s.cooldown - 1 };
+      });
+    }, 1000);
+  }
+
+  renderVals() {
+    const v = this.state.view;
+    const cd = this.state.cooldown;
+    const primaryBase = 'display:flex; align-items:center; justify-content:center; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:Instrument Sans, sans-serif; font-weight:600; cursor:pointer; width:100%;';
+    const resendBase = 'display:flex; align-items:center; justify-content:center; border-radius:10px; font-family:Instrument Sans, sans-serif; font-weight:600; width:100%; border:1px solid ' +
+      (cd ? '#e3e3e0' : '#dcdcd6') + '; background:' + (cd ? '#fafaf8' : '#fff') + '; color:' + (cd ? '#9a9a92' : '#121212') + '; cursor:' + (cd ? 'not-allowed' : 'pointer') + ';';
+    return {
+      tabs: TABS.map(t => ({
+        label: t.label,
+        onClick: () => this.setState({ view: t.key }),
+        style: 'padding:7px 12px; border-radius:999px; cursor:pointer; font-size:13px; font-weight:600; white-space:nowrap; background:' +
+          (v === t.key ? '#121212' : '#fff') + '; color:' + (v === t.key ? '#fff' : '#55554f') + '; border:1px solid ' + (v === t.key ? '#121212' : '#dcdcd6') + ';'
+      })),
+      isInvite: v === 'invite',
+      isLogin: v === 'login',
+      isSent: v === 'sent',
+      isExpired: v === 'expired',
+      primary: 'height:44px; font-size:15px; ' + primaryBase,
+      primaryM: 'height:48px; font-size:15px; ' + primaryBase,
+      resendStyle: 'height:42px; font-size:14px; ' + resendBase,
+      resendStyleM: 'height:48px; font-size:15px; ' + resendBase,
+      resendLabel: cd ? 'Opnieuw versturen kan over ' + cd + ' seconden' : 'E-mail opnieuw versturen',
+      resend: () => { if (!cd) this.startCooldown(); },
+      next: () => {
+        if (v === 'invite') this.setState({ view: 'login' });
+        else { this.setState({ view: 'sent' }); this.startCooldown(); }
+      },
+      goLogin: () => this.setState({ view: 'login' })
+    };
+  }
+}
+</script>
+</body>
+</html>

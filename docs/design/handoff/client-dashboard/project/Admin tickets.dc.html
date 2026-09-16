@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  body { margin:0; background:#e8e8e3; }
+  a { color:#0d3b33; } a:hover { color:#0a2c26; }
+  * { box-sizing:border-box; }
+  ::-webkit-scrollbar { width:8px; height:8px; }
+  ::-webkit-scrollbar-thumb { background:#d5d5cf; border-radius:4px; }
+</style>
+</helmet>
+
+<div style="font-family:'Instrument Sans',system-ui,sans-serif; color:#121212; padding:40px; display:flex; flex-direction:column; gap:36px;">
+
+  <div style="display:flex; flex-direction:column; gap:6px; max-width:84ch;">
+    <div style="font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:#87877e; font-weight:600;">Beheer · tickets</div>
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:28px; font-weight:700; letter-spacing:-.03em;">Tickets over alle projecten</div>
+    <div style="font-size:14px; color:#6e6e66; line-height:1.55;">Nieuwe tickets krijgen een accentrand links en een blauwe statusbadge, zodat ze in de lijst opvallen. Alle filters werken; status en prioriteit in het detail zijn instelbaar en “Omzetten naar taak” opent het paneel.</div>
+  </div>
+
+  <!-- ============================ 1 · OVERZICHT ============================ -->
+  <div style="display:flex; flex-direction:column; gap:12px;">
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600; letter-spacing:-.02em;">1 · Ticketoverzicht</div>
+    <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">Desktop 1160</span>
+        <div style="width:1160px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column;">
+          <header style="background:#fff; border-bottom:1px solid #e3e3e0; padding:18px 24px; display:flex; justify-content:space-between; align-items:center; gap:20px; flex-wrap:wrap;">
+            <div style="display:flex; flex-direction:column; gap:3px;">
+              <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">Tickets</h1>
+              <span style="font-size:13px; color:#87877e;">{{ countLabel }}</span>
+            </div>
+            <div style="display:flex; gap:8px; font-size:14px; font-weight:600;">
+              <button style="padding:9px 16px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font:inherit;" style-hover="background:#fafaf8;">Exporteren</button>
+              <button style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Ticket toevoegen</button>
+            </div>
+          </header>
+
+          <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:14px 24px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center; justify-content:space-between;">
+              <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <sc-for list="{{ statusFilters }}" as="f" hint-placeholder-count="5">
+                  <span onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }} <span style="{{ f.countStyle }}">{{ f.count }}</span></span>
+                </sc-for>
+              </div>
+              <span onClick="{{ resetAll }}" style="{{ resetStyle }}">Filters wissen</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px; align-items:center;">
+              <div style="display:flex; align-items:center; gap:6px;">
+                <span style="font-size:12px; color:#87877e; font-weight:600;">Prioriteit</span>
+                <sc-for list="{{ prioFilters }}" as="f" hint-placeholder-count="4">
+                  <span onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</span>
+                </sc-for>
+              </div>
+              <select value="{{ client }}" onChange="{{ onClient }}" style="height:34px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer;">
+                <option value="all">Alle klanten</option>
+                <option value="Verlinden &amp; Zn">Verlinden &amp; Zn</option>
+                <option value="De Groene Kruidenier">De Groene Kruidenier</option>
+                <option value="Bakkerij Vermeulen">Bakkerij Vermeulen</option>
+                <option value="Praktijk Dewulf">Praktijk Dewulf</option>
+              </select>
+              <select value="{{ project }}" onChange="{{ onProject }}" style="height:34px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:13px; font-weight:600; cursor:pointer;">
+                <option value="all">Alle projecten</option>
+                <option value="Herbouw website">Herbouw website</option>
+                <option value="Webshop">Webshop</option>
+                <option value="Onderhoud site">Onderhoud site</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="background:#fff;">
+            <div style="display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1.1fr) minmax(140px,.8fr) minmax(110px,.55fr) minmax(130px,.7fr) minmax(90px,.45fr); gap:12px; padding:10px 24px 10px 27px; background:#fafaf8; border-bottom:1px solid #f0f0ec; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#6e6e66; font-weight:600;">
+              <span>Ticket</span><span>Klant · project</span><span>Status</span><span>Prioriteit</span><span>Gemeld door</span><span>Leeftijd</span>
+            </div>
+            <sc-if value="{{ hasRows }}" hint-placeholder-val="{{ true }}">
+              <div>
+                <sc-for list="{{ rows }}" as="t" hint-placeholder-count="6">
+                  <div style="{{ t.rowStyle }}">
+                    <div style="display:flex; flex-direction:column; gap:2px; min-width:0;">
+                      <span style="font-size:14px; font-weight:600;">{{ t.title }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9a92;">{{ t.id }}{{ t.extra }}</span>
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:1px; min-width:0;">
+                      <span style="font-size:13px; color:#2e2e2b;">{{ t.client }}</span>
+                      <span style="font-size:12px; color:#9a9a92;">{{ t.project }}</span>
+                    </div>
+                    <span><span style="{{ t.statusStyle }}">{{ t.statusLabel }}</span></span>
+                    <span><span style="{{ t.prioStyle }}"><span style="{{ t.prioDot }}"></span>{{ t.prioLabel }}</span></span>
+                    <span style="font-size:13px; color:#55554f;">{{ t.reporter }}</span>
+                    <span style="{{ t.ageStyle }}">{{ t.age }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
+              <div style="padding:40px 24px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">Geen tickets met deze filters</span>
+                <span style="font-size:14px; color:#87877e; max-width:44ch; line-height:1.5;">Pas status, prioriteit, klant of project aan.</span>
+                <button onClick="{{ resetAll }}" style="margin-top:6px; padding:9px 16px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font:inherit; font-size:14px; font-weight:600; cursor:pointer;" style-hover="background:#fafaf8;">Filters wissen</button>
+              </div>
+            </sc-if>
+            <div style="padding:14px 24px; display:flex; align-items:center; justify-content:space-between; gap:12px; border-top:1px solid #f0f0ec; font-size:13px; color:#87877e;">
+              <span>{{ pageLabel }}</span>
+              <span>{{ newHint }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">Mobiel 375</span>
+        <div style="width:375px; height:812px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column;">
+          <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:12px 14px; display:flex; flex-direction:column; gap:10px; flex-shrink:0;">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:18px; font-weight:600;">Tickets</span>
+              <span style="width:40px; height:40px; border-radius:10px; border:1px solid #dcdcd6; display:flex; align-items:center; justify-content:center; font-size:15px; color:#2e2e2b;">⚙</span>
+            </div>
+            <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:2px;">
+              <sc-for list="{{ statusFiltersMobile }}" as="f" hint-placeholder-count="5">
+                <span onClick="{{ f.onClick }}" style="{{ f.style }}">{{ f.label }}</span>
+              </sc-for>
+            </div>
+          </div>
+          <div style="flex:1; min-height:0; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:8px;">
+            <sc-for list="{{ rowsMobile }}" as="t" hint-placeholder-count="4">
+              <div style="{{ t.cardStyle }}">
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#9a9a92;">{{ t.id }}</span>
+                  <span style="{{ t.statusStyle }}">{{ t.statusLabel }}</span>
+                </div>
+                <span style="font-size:15px; font-weight:600; line-height:1.35;">{{ t.title }}</span>
+                <span style="font-size:12px; color:#87877e;">{{ t.client }} · {{ t.project }}</span>
+                <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; padding-top:8px; border-top:1px solid #f0f0ec;">
+                  <span style="{{ t.ageStyle }}">{{ t.age }}</span>
+                  <span style="{{ t.prioStyle }}"><span style="{{ t.prioDot }}"></span>{{ t.prioLabel }}</span>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ noRows }}" hint-placeholder-val="{{ false }}">
+              <div style="border:1px dashed #cfcfc9; border-radius:14px; background:#fff; padding:32px 16px; display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; flex-shrink:0;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Geen tickets met deze filters</span>
+                <button onClick="{{ resetAll }}" style="margin-top:4px; height:44px; padding:0 16px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Filters wissen</button>
+              </div>
+            </sc-if>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(5,1fr); background:#fff; border-top:1px solid #e3e3e0; padding:6px 4px 10px; flex-shrink:0;">
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">◧</span><span style="font-size:10px;">Start</span></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">▤</span><span style="font-size:10px;">Projecten</span></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">◫</span><span style="font-size:10px;">Taken</span></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#0d3b33; position:relative;"><span style="font-size:17px;">◎</span><span style="font-size:10px; font-weight:600;">Tickets</span><span style="position:absolute; top:2px; right:16px; min-width:16px; height:16px; border-radius:999px; background:#b91c1c; color:#fff; font-size:10px; font-weight:700; display:flex; align-items:center; justify-content:center;">3</span></div>
+            <div style="display:flex; flex-direction:column; align-items:center; gap:3px; padding:6px 0; color:#87877e;"><span style="font-size:17px;">▦</span><span style="font-size:10px;">Agenda</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================ 2 · DETAIL ============================ -->
+  <div style="display:flex; flex-direction:column; gap:12px;">
+    <div style="font-family:'Space Grotesk',sans-serif; font-size:21px; font-weight:600; letter-spacing:-.02em;">2 · Ticketdetail</div>
+    <div style="display:flex; flex-wrap:wrap; gap:20px; align-items:flex-start;">
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">Desktop 1160 · wijzig status of prioriteit, klik “Omzetten naar taak”</span>
+        <div style="width:1160px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; position:relative;">
+          <header style="background:#fff; border-bottom:1px solid #e3e3e0; padding:18px 24px; display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; align-items:center; gap:6px; font-size:13px; color:#87877e;">
+              <span style="cursor:pointer;" style-hover="color:#0d3b33;">Tickets</span><span style="color:#cfcfc9;">/</span><span style="color:#121212; font-weight:600;">TCK-2041</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:20px; flex-wrap:wrap;">
+              <div style="display:flex; flex-direction:column; gap:6px; min-width:0;">
+                <h1 style="margin:0; font-family:'Space Grotesk',sans-serif; font-size:24px; font-weight:600; letter-spacing:-.02em;">Contactformulier verzendt niet</h1>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-size:12px; font-weight:600;">
+                  <span style="{{ dStatusBadge }}">{{ dStatusLabel }}</span>
+                  <span style="{{ dPrioBadge }}"><span style="{{ dPrioDot }}"></span>{{ dPrioLabel }}</span>
+                  <span style="font-weight:400; color:#87877e;">Verlinden &amp; Zn · Herbouw website · 2 u oud</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; position:relative;">
+                <button onClick="{{ openConvert }}" style="{{ convertBtnStyle }}">{{ convertBtnLabel }}</button>
+                <button style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Reageren</button>
+                <span onClick="{{ toggleMore }}" style="width:40px; height:40px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; display:flex; align-items:center; justify-content:center; font-size:16px; cursor:pointer;" style-hover="background:#fafaf8;">⋯</span>
+                <sc-if value="{{ moreOpen }}" hint-placeholder-val="{{ false }}">
+                  <div style="position:absolute; top:48px; right:0; width:220px; z-index:7; background:#fff; border:1px solid #e3e3e0; border-radius:12px; box-shadow:0 8px 24px rgba(18,18,18,.10); padding:6px; display:flex; flex-direction:column; font-weight:400;">
+                    <div style="padding:9px 10px; border-radius:8px; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;">Toewijzen aan ander project</div>
+                    <div style="padding:9px 10px; border-radius:8px; font-size:14px; cursor:pointer;" style-hover="background:#f2f2ee;">Interne notitie toevoegen</div>
+                    <div style="height:1px; background:#f0f0ec; margin:4px 0;"></div>
+                    <div style="padding:9px 10px; border-radius:8px; font-size:14px; color:#b91c1c; font-weight:600; cursor:pointer;" style-hover="background:#fdecec;">Archiveren</div>
+                    <div style="padding:9px 10px; border-radius:8px; font-size:14px; color:#b91c1c; font-weight:600; cursor:pointer;" style-hover="background:#fdecec;">Verwijderen</div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </header>
+
+          <div style="padding:20px 24px 24px; display:grid; grid-template-columns:minmax(0,1.65fr) minmax(0,1fr); gap:18px; align-items:start;">
+            <div style="display:flex; flex-direction:column; gap:18px; min-width:0;">
+
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:18px; display:flex; flex-direction:column; gap:14px;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Melding van de klant</span>
+                <p style="margin:0; font-size:15px; line-height:1.65; color:#2e2e2b; text-wrap:pretty;">Wanneer ik het contactformulier op de pagina Contact verstuur, krijg ik wel de bevestiging op de site, maar er komt geen e-mail toe. Ook niet in de map ongewenste e-mail. Dit gebeurt sinds vorige week.</p>
+                <div style="display:flex; align-items:center; gap:10px; padding:10px 12px; border:1px solid #e3e3e0; border-radius:10px; background:#fafaf8;">
+                  <span style="font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#9a9a92; font-weight:600; flex-shrink:0;">Pagina</span>
+                  <span style="font-family:'JetBrains Mono',monospace; font-size:13px; color:#0d3b33; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">https://verlinden.be/contact</span>
+                  <span style="font-size:12px; color:#0d3b33; font-weight:600; cursor:pointer; white-space:nowrap; margin-left:auto;">Openen</span>
+                </div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap; padding-top:12px; border-top:1px solid #f0f0ec;">
+                  <div style="width:172px; display:flex; flex-direction:column; gap:6px; cursor:pointer;">
+                    <div style="height:118px; border:1px solid #e3e3e0; border-radius:10px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:#6e6e66;">PNG · 1,2 MB</div>
+                    <span style="font-size:12px; color:#87877e; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">schermafbeelding-contact.png</span>
+                  </div>
+                  <div style="width:172px; display:flex; flex-direction:column; gap:6px; cursor:pointer;">
+                    <div style="height:118px; border:1px solid #e3e3e0; border-radius:10px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:11px; color:#6e6e66;">PNG · 840 kB</div>
+                    <span style="font-size:12px; color:#87877e; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">foutmelding-mobiel.png</span>
+                  </div>
+                </div>
+              </div>
+
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 18px; border-bottom:1px solid #f0f0ec; gap:12px;">
+                  <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Gekoppelde taak</span>
+                  <span style="{{ linkTaskStyle }}">Taak koppelen</span>
+                </div>
+                <sc-if value="{{ hasTask }}" hint-placeholder-val="{{ true }}">
+                  <div style="padding:14px 18px; display:flex; align-items:center; gap:12px; cursor:pointer;" style-hover="background:#fafaf8;">
+                    <span style="width:8px; height:8px; border-radius:50%; background:#0d3b33; flex-shrink:0;"></span>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                      <span style="font-size:14px; font-weight:600;">{{ taskTitle }}</span>
+                      <span style="font-size:12px; color:#9a9a92;">{{ taskId }} · Herbouw website · vervalt {{ taskDue }}</span>
+                    </div>
+                    <span style="{{ taskStatusStyle }}">{{ taskStatusLabel }}</span>
+                    <span style="font-size:13px; color:#0d3b33; font-weight:600; white-space:nowrap;">Naar taak</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ noTask }}" hint-placeholder-val="{{ false }}">
+                  <div style="padding:20px 18px; display:flex; align-items:center; gap:12px;">
+                    <div style="width:28px; height:28px; border-radius:999px; background:#e6efec; color:#0d3b33; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0;">+</div>
+                    <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                      <span style="font-size:14px; font-weight:600;">Nog geen taak gekoppeld</span>
+                      <span style="font-size:13px; color:#87877e;">Zet het ticket om naar een taak om het op het bord te zetten.</span>
+                    </div>
+                    <button onClick="{{ openConvert }}" style="padding:8px 14px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font:inherit; font-size:13px; font-weight:600; cursor:pointer;" style-hover="background:#0a2c26;">Omzetten naar taak</button>
+                  </div>
+                </sc-if>
+              </div>
+
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Tijdlijn</span>
+                <div style="display:flex; flex-direction:column; gap:12px; font-size:13px;">
+                  <sc-for list="{{ timeline }}" as="e" hint-placeholder-count="3">
+                    <div style="display:flex; gap:10px;">
+                      <span style="{{ e.dotStyle }}"></span>
+                      <div style="line-height:1.55;">{{ e.text }} <span style="color:#87877e;">· {{ e.time }}</span></div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:18px; min-width:0;">
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:18px; display:flex; flex-direction:column; gap:16px;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Opvolging</span>
+                <div style="display:flex; flex-direction:column; gap:6px;">
+                  <label style="font-size:13px; font-weight:600;">Status</label>
+                  <select value="{{ dStatus }}" onChange="{{ onStatus }}" style="height:40px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:14px; cursor:pointer;">
+                    <option value="new">Nieuw</option>
+                    <option value="in_progress">In behandeling</option>
+                    <option value="resolved">Opgelost</option>
+                    <option value="closed">Gesloten</option>
+                  </select>
+                  <span style="font-size:12px; color:#87877e;">{{ statusHint }}</span>
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                  <label style="font-size:13px; font-weight:600;">Prioriteit</label>
+                  <div style="display:flex; gap:8px;">
+                    <sc-for list="{{ prioOptions }}" as="p" hint-placeholder-count="3">
+                      <div onClick="{{ p.onClick }}" style="{{ p.style }}"><span style="{{ p.dot }}"></span>{{ p.label }}</div>
+                    </sc-for>
+                  </div>
+                </div>
+                <label style="display:flex; align-items:flex-start; gap:10px; font-size:14px; cursor:pointer; padding-top:12px; border-top:1px solid #f0f0ec;">
+                  <span style="width:18px; height:18px; border-radius:5px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; margin-top:1px;">✓</span>
+                  <span style="display:flex; flex-direction:column; gap:1px;"><span>Klant verwittigen bij wijziging</span><span style="font-size:12px; color:#87877e;">Stuurt een e-mail naar Katrien Verlinden.</span></span>
+                </label>
+              </div>
+
+              <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:18px; display:flex; flex-direction:column; gap:12px;">
+                <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600;">Gegevens</span>
+                <div style="display:flex; flex-direction:column;">
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Ticket</span><span style="font-family:'JetBrains Mono',monospace; font-weight:500;">TCK-2041</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Klant</span><span style="font-weight:500; text-align:right;">Verlinden &amp; Zn</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Project</span><span style="font-weight:500; text-align:right;">Herbouw website</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Gemeld door</span><span style="font-weight:500; text-align:right;">Katrien Verlinden</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; border-bottom:1px solid #f0f0ec; font-size:13px;"><span style="color:#87877e;">Gemeld op</span><span style="font-weight:500; text-align:right;">16 sep 2026, 08:14</span></div>
+                  <div style="display:flex; justify-content:space-between; gap:16px; padding:9px 0; font-size:13px;"><span style="color:#87877e;">Bijlagen</span><span style="font-weight:500;">2 schermafbeeldingen</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- omzetten naar taak -->
+          <sc-if value="{{ convertOpen }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; inset:0; z-index:8; background:rgba(18,18,18,.28); display:flex; justify-content:flex-end;">
+              <div style="width:460px; background:#fff; border-left:1px solid #e3e3e0; display:flex; flex-direction:column; box-shadow:-8px 0 24px rgba(18,18,18,.10);">
+                <div style="padding:16px 18px; border-bottom:1px solid #f0f0ec; display:flex; justify-content:space-between; align-items:flex-start; gap:12px; flex-shrink:0;">
+                  <div style="display:flex; flex-direction:column; gap:2px;">
+                    <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">{{ convertTitle }}</span>
+                    <span style="font-size:12px; color:#87877e;">Uit TCK-2041 · Herbouw website</span>
+                  </div>
+                  <span onClick="{{ closeConvert }}" style="width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#9a9a92; font-size:14px; cursor:pointer; flex-shrink:0;" style-hover="background:#f2f2ee;">✕</span>
+                </div>
+
+                <sc-if value="{{ convertForm }}" hint-placeholder-val="{{ true }}">
+                  <div style="flex:1; min-height:0; display:flex; flex-direction:column;">
+                    <div style="flex:1; min-height:0; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:16px;">
+                      <span style="font-size:13px; color:#55554f; line-height:1.55; flex-shrink:0;">Titel en omschrijving komen uit het ticket. Pas ze aan naar iets waar u zelf mee verder kunt; de klant ziet deze taak niet.</span>
+                      <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                        <label style="font-size:13px; font-weight:600;">Titel <span style="color:#b91c1c;">*</span></label>
+                        <input type="text" value="Contactformulier opnieuw opbouwen" style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%;">
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                        <label style="font-size:13px; font-weight:600;">Omschrijving</label>
+                        <textarea rows="5" style="padding:10px 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:14px; background:#fff; width:100%; resize:vertical; line-height:1.5;">Uit melding TCK-2041: het contactformulier op verlinden.be/contact geeft wel een bevestiging, maar verstuurt geen e-mail. Mailinstellingen van de server nakijken.</textarea>
+                      </div>
+                      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; flex-shrink:0;">
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                          <label style="font-size:13px; font-weight:600;">Status</label>
+                          <select style="height:40px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:14px; cursor:pointer;">
+                            <option>Bezig</option><option>Te doen</option><option>Review</option><option>Klaar</option>
+                          </select>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:6px;">
+                          <label style="font-size:13px; font-weight:600;">Prioriteit</label>
+                          <select style="height:40px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:14px; cursor:pointer;">
+                            <option>Hoog</option><option>Middel</option><option>Laag</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px; flex-shrink:0;">
+                        <label style="font-size:13px; font-weight:600;">Vervaldatum</label>
+                        <div style="height:40px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; display:flex; align-items:center; justify-content:space-between; font-size:14px; cursor:pointer;"><span>19 september 2026</span><span style="color:#9a9a92; font-size:13px;">▦</span></div>
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:10px; padding-top:12px; border-top:1px solid #f0f0ec; font-size:14px; flex-shrink:0;">
+                        <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
+                          <span style="width:18px; height:18px; border-radius:5px; background:#0d3b33; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; margin-top:1px;">✓</span>
+                          <span style="display:flex; flex-direction:column; gap:1px;"><span>Ticket op “In behandeling” zetten</span><span style="font-size:12px; color:#87877e;">De klant ziet dat er aan gewerkt wordt.</span></span>
+                        </label>
+                        <label style="display:flex; align-items:flex-start; gap:10px; cursor:pointer;">
+                          <span style="width:18px; height:18px; border-radius:5px; border:1px solid #cfcfc9; background:#fff; flex-shrink:0; margin-top:1px;"></span>
+                          <span style="display:flex; flex-direction:column; gap:1px;"><span>Schermafbeeldingen meenemen</span><span style="font-size:12px; color:#87877e;">Kopieert de twee bijlagen naar de taak.</span></span>
+                        </label>
+                      </div>
+                    </div>
+                    <div style="padding:14px 18px; border-top:1px solid #f0f0ec; display:flex; justify-content:flex-end; gap:8px; font-size:14px; font-weight:600; flex-shrink:0;">
+                      <button onClick="{{ closeConvert }}" style="padding:9px 16px; border-radius:10px; border:1px solid transparent; background:transparent; color:#6e6e66; cursor:pointer; font:inherit;" style-hover="background:#f2f2ee;">Annuleren</button>
+                      <button onClick="{{ doConvert }}" style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Taak aanmaken</button>
+                    </div>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{ convertDone }}" hint-placeholder-val="{{ false }}">
+                  <div style="flex:1; min-height:0; display:flex; flex-direction:column;">
+                    <div style="flex:1; min-height:0; overflow-y:auto; padding:18px; display:flex; flex-direction:column; gap:16px;">
+                      <div style="display:flex; align-items:flex-start; gap:12px; border:1px solid #e3e3e0; border-radius:12px; background:#fafaf8; padding:14px; flex-shrink:0;">
+                        <span style="width:28px; height:28px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0;">✓</span>
+                        <div style="display:flex; flex-direction:column; gap:3px;">
+                          <span style="font-size:14px; font-weight:600;">Taak TSK-401 aangemaakt</span>
+                          <span style="font-size:13px; color:#55554f; line-height:1.55;">De taak staat in de kolom Bezig van Herbouw website en is gekoppeld aan dit ticket. Het ticket staat nu op In behandeling.</span>
+                        </div>
+                      </div>
+                      <div style="border:1px solid #e3e3e0; border-radius:12px; padding:14px; display:flex; align-items:center; gap:12px; flex-shrink:0;">
+                        <span style="width:8px; height:8px; border-radius:50%; background:#0d3b33; flex-shrink:0;"></span>
+                        <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                          <span style="font-size:14px; font-weight:600;">Contactformulier opnieuw opbouwen</span>
+                          <span style="font-size:12px; color:#9a9a92;">TSK-401 · vervalt 19 sep</span>
+                        </div>
+                        <span style="padding:4px 10px; border-radius:999px; background:#e6efec; color:#0d3b33; font-size:12px; font-weight:600;">Bezig</span>
+                      </div>
+                    </div>
+                    <div style="padding:14px 18px; border-top:1px solid #f0f0ec; display:flex; justify-content:flex-end; gap:8px; font-size:14px; font-weight:600; flex-shrink:0;">
+                      <button onClick="{{ closeConvert }}" style="padding:9px 16px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font:inherit;" style-hover="background:#fafaf8;">Bij ticket blijven</button>
+                      <button onClick="{{ closeConvert }}" style="padding:9px 16px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; cursor:pointer; font:inherit;" style-hover="background:#0a2c26;">Naar de taak</button>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+
+      <div style="flex-shrink:0; display:flex; flex-direction:column; gap:8px;">
+        <span style="font-size:12px; color:#6e6e66; font-weight:600;">Mobiel 375 · zelfde acties onderaan</span>
+        <div style="width:375px; height:812px; flex-shrink:0; background:#f2f2ee; border:1px solid #d5d5cf; border-radius:14px; overflow:hidden; display:flex; flex-direction:column; position:relative;">
+          <div style="background:#fff; border-bottom:1px solid #e3e3e0; padding:10px 8px; display:flex; align-items:center; gap:4px; flex-shrink:0;">
+            <span style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; color:#2e2e2b; flex-shrink:0;">‹</span>
+            <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+              <span style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#87877e;">TCK-2041</span>
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:16px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">Contactformulier</span>
+            </div>
+            <span style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:17px; color:#2e2e2b; flex-shrink:0;">⋯</span>
+          </div>
+          <div style="flex:1; min-height:0; overflow-y:auto; padding:14px; display:flex; flex-direction:column; gap:12px;">
+
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:10px; flex-shrink:0;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600; line-height:1.3;">Contactformulier verzendt niet</span>
+              <div style="display:flex; flex-wrap:wrap; gap:6px; font-size:12px; font-weight:600;">
+                <span style="{{ dStatusBadge }}">{{ dStatusLabel }}</span>
+                <span style="{{ dPrioBadge }}"><span style="{{ dPrioDot }}"></span>{{ dPrioLabel }}</span>
+              </div>
+              <span style="font-size:12px; color:#87877e;">Verlinden &amp; Zn · Herbouw website · Katrien Verlinden · 2 u oud</span>
+            </div>
+
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:14px; flex-shrink:0;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Opvolging</span>
+              <div style="display:flex; flex-direction:column; gap:6px;">
+                <label style="font-size:13px; font-weight:600;">Status</label>
+                <select value="{{ dStatus }}" onChange="{{ onStatus }}" style="height:44px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:15px; cursor:pointer;">
+                  <option value="new">Nieuw</option>
+                  <option value="in_progress">In behandeling</option>
+                  <option value="resolved">Opgelost</option>
+                  <option value="closed">Gesloten</option>
+                </select>
+              </div>
+              <div style="display:flex; flex-direction:column; gap:8px;">
+                <label style="font-size:13px; font-weight:600;">Prioriteit</label>
+                <div style="display:flex; gap:8px;">
+                  <sc-for list="{{ prioOptionsM }}" as="p" hint-placeholder-count="3">
+                    <div onClick="{{ p.onClick }}" style="{{ p.style }}"><span style="{{ p.dot }}"></span>{{ p.label }}</div>
+                  </sc-for>
+                </div>
+              </div>
+            </div>
+
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; padding:16px; display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+              <span style="font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Melding van de klant</span>
+              <p style="margin:0; font-size:15px; line-height:1.65; color:#2e2e2b;">Wanneer ik het contactformulier verstuur, krijg ik wel de bevestiging, maar er komt geen e-mail toe. Dit gebeurt sinds vorige week.</p>
+              <div style="padding:10px 12px; border:1px solid #e3e3e0; border-radius:10px; background:#fafaf8; display:flex; flex-direction:column; gap:2px;">
+                <span style="font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:#9a9a92; font-weight:600;">Pagina</span>
+                <span style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#0d3b33; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">verlinden.be/contact</span>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; padding-top:6px;">
+                <div style="height:96px; border:1px solid #e3e3e0; border-radius:10px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:#6e6e66;">PNG · 1,2 MB</div>
+                <div style="height:96px; border:1px solid #e3e3e0; border-radius:10px; background:#f2f2ee; display:flex; align-items:center; justify-content:center; font-family:'JetBrains Mono',monospace; font-size:10px; color:#6e6e66;">PNG · 840 kB</div>
+              </div>
+            </div>
+
+            <div style="border:1px solid #e3e3e0; border-radius:14px; background:#fff; overflow:hidden; flex-shrink:0;">
+              <div style="padding:13px 14px; border-bottom:1px solid #f0f0ec; font-family:'Space Grotesk',sans-serif; font-size:15px; font-weight:600;">Gekoppelde taak</div>
+              <sc-if value="{{ hasTask }}" hint-placeholder-val="{{ true }}">
+                <div style="padding:14px; display:flex; align-items:center; gap:10px;">
+                  <span style="width:8px; height:8px; border-radius:50%; background:#0d3b33; flex-shrink:0;"></span>
+                  <div style="flex:1; min-width:0; display:flex; flex-direction:column; gap:2px;">
+                    <span style="font-size:14px; font-weight:600; line-height:1.35;">{{ taskTitle }}</span>
+                    <span style="font-size:12px; color:#9a9a92;">{{ taskId }} · vervalt {{ taskDue }}</span>
+                  </div>
+                  <span style="{{ taskStatusStyle }}">{{ taskStatusLabel }}</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ noTask }}" hint-placeholder-val="{{ false }}">
+                <div style="padding:16px 14px; display:flex; flex-direction:column; gap:10px;">
+                  <span style="font-size:13px; color:#87877e; line-height:1.55;">Nog geen taak gekoppeld. Zet het ticket om om het op het bord te krijgen.</span>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="padding:12px 14px 16px; background:#fff; border-top:1px solid #e3e3e0; display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+            <button onClick="{{ openConvertM }}" style="{{ convertBtnStyleM }}">{{ convertBtnLabel }}</button>
+            <button style="height:44px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Reageren naar klant</button>
+          </div>
+
+          <sc-if value="{{ convertOpenM }}" hint-placeholder-val="{{ false }}">
+            <div style="position:absolute; inset:0; z-index:8; background:rgba(18,18,18,.3); display:flex; align-items:flex-end;">
+              <div style="width:100%; max-height:92%; background:#fff; border-radius:16px 16px 0 0; display:flex; flex-direction:column;">
+                <div style="padding:10px 14px 12px; border-bottom:1px solid #f0f0ec; display:flex; flex-direction:column; gap:8px; flex-shrink:0;">
+                  <div style="width:40px; height:4px; border-radius:2px; background:#e3e3e0; margin:0 auto;"></div>
+                  <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                    <span style="font-family:'Space Grotesk',sans-serif; font-size:17px; font-weight:600;">{{ convertTitleM }}</span>
+                    <span onClick="{{ closeConvertM }}" style="width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#9a9a92; font-size:15px; cursor:pointer;">✕</span>
+                  </div>
+                </div>
+                <sc-if value="{{ convertFormM }}" hint-placeholder-val="{{ true }}">
+                  <div style="display:flex; flex-direction:column;">
+                    <div style="padding:14px; display:flex; flex-direction:column; gap:14px;">
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:13px; font-weight:600;">Titel <span style="color:#b91c1c;">*</span></label>
+                        <input type="text" value="Contactformulier opnieuw opbouwen" style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%;">
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:13px; font-weight:600;">Omschrijving</label>
+                        <textarea rows="4" style="padding:12px; border:1px solid #dcdcd6; border-radius:10px; font-family:'Instrument Sans',sans-serif; font-size:15px; background:#fff; width:100%; resize:none; line-height:1.5;">Uit melding TCK-2041: formulier geeft bevestiging maar verstuurt geen e-mail.</textarea>
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:13px; font-weight:600;">Status</label>
+                        <select style="height:44px; padding:0 10px; border:1px solid #dcdcd6; border-radius:10px; background:#fff; font-family:'Instrument Sans',sans-serif; font-size:15px; cursor:pointer;"><option>Bezig</option><option>Te doen</option><option>Review</option></select>
+                      </div>
+                      <div style="display:flex; flex-direction:column; gap:6px;">
+                        <label style="font-size:13px; font-weight:600;">Vervaldatum</label>
+                        <div style="height:44px; padding:0 12px; border:1px solid #dcdcd6; border-radius:10px; display:flex; align-items:center; justify-content:space-between; font-size:15px;"><span>19 sep 2026</span><span style="color:#9a9a92; font-size:13px;">▦</span></div>
+                      </div>
+                    </div>
+                    <div style="padding:12px 14px 16px; border-top:1px solid #f0f0ec; display:flex; flex-direction:column; gap:8px;">
+                      <button onClick="{{ doConvertM }}" style="height:48px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;">Taak aanmaken</button>
+                      <button onClick="{{ closeConvertM }}" style="height:44px; border-radius:10px; border:1px solid transparent; background:transparent; color:#6e6e66; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Annuleren</button>
+                    </div>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ convertDoneM }}" hint-placeholder-val="{{ false }}">
+                  <div style="display:flex; flex-direction:column;">
+                    <div style="padding:14px; display:flex; flex-direction:column; gap:14px;">
+                      <div style="display:flex; align-items:flex-start; gap:12px; border:1px solid #e3e3e0; border-radius:12px; background:#fafaf8; padding:14px;">
+                        <span style="width:28px; height:28px; border-radius:999px; background:#e8f1e8; color:#2c6b34; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:700; flex-shrink:0;">✓</span>
+                        <div style="display:flex; flex-direction:column; gap:3px;">
+                          <span style="font-size:14px; font-weight:600;">Taak TSK-401 aangemaakt</span>
+                          <span style="font-size:13px; color:#55554f; line-height:1.55;">Gekoppeld aan dit ticket; het ticket staat nu op In behandeling.</span>
+                        </div>
+                      </div>
+                    </div>
+                    <div style="padding:12px 14px 16px; border-top:1px solid #f0f0ec; display:flex; flex-direction:column; gap:8px;">
+                      <button onClick="{{ closeConvertM }}" style="height:48px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;">Naar de taak</button>
+                      <button onClick="{{ closeConvertM }}" style="height:44px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer;">Bij ticket blijven</button>
+                    </div>
+                  </div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const STATUS = {
+  new:         { label: 'Nieuw',          bg: '#e6f0f6', color: '#1e5f8a', hint: 'Nog niet bekeken. De klant ziet “Nieuw”.' },
+  in_progress: { label: 'In behandeling', bg: '#e6efec', color: '#0d3b33', hint: 'De klant ziet dat er aan gewerkt wordt.' },
+  resolved:    { label: 'Opgelost',       bg: '#e8f1e8', color: '#2c6b34', hint: 'De klant krijgt de vraag om na te kijken of alles werkt.' },
+  closed:      { label: 'Gesloten',       bg: '#f2f2ee', color: '#6e6e66', hint: 'Afgehandeld en afgesloten; geen verdere meldingen.' }
+};
+const SORDER = ['new', 'in_progress', 'resolved', 'closed'];
+const PRIO = {
+  low:    { label: 'Laag',   border: '#e3e3e0', color: '#6e6e66', dot: '#9a9a92' },
+  medium: { label: 'Middel', border: '#ecd9bd', color: '#8a4008', dot: '#b45309' },
+  high:   { label: 'Hoog',   border: '#f0cfcf', color: '#b91c1c', dot: '#b91c1c' }
+};
+const PORDER = ['high', 'medium', 'low'];
+const TICKETS = [
+  { id: 'TCK-2041', title: 'Contactformulier verzendt niet',        client: 'Verlinden & Zn',       project: 'Herbouw website', status: 'new',         prio: 'high',   reporter: 'Katrien Verlinden', age: '2 u',     urgent: true,  extra: ' · 2 bijlagen' },
+  { id: 'TCK-2044', title: 'Webshop toont verkeerde voorraad',      client: 'De Groene Kruidenier', project: 'Webshop',         status: 'new',         prio: 'high',   reporter: 'Tom Peeters',       age: '5 u',     urgent: true,  extra: '' },
+  { id: 'TCK-2046', title: 'Nieuwsbriefknop valt weg op tablet',    client: 'Praktijk Dewulf',      project: 'Onderhoud site',  status: 'new',         prio: 'low',    reporter: 'Lien Dewulf',       age: '2 dagen', urgent: false, extra: ' · 2 bijlagen' },
+  { id: 'TCK-2038', title: "Foto's van de toonzaal laden traag",    client: 'Verlinden & Zn',       project: 'Herbouw website', status: 'in_progress', prio: 'medium', reporter: 'Katrien Verlinden', age: '5 dagen', urgent: false, extra: ' · 2 reacties' },
+  { id: 'TCK-2035', title: 'Bestelbevestiging komt dubbel toe',     client: 'De Groene Kruidenier', project: 'Webshop',         status: 'in_progress', prio: 'high',   reporter: 'Tom Peeters',       age: '8 dagen', urgent: true,  extra: '' },
+  { id: 'TCK-2029', title: 'Openingsuren feestdagen aanpassen',     client: 'Bakkerij Vermeulen',   project: 'Onderhoud site',  status: 'resolved',    prio: 'medium', reporter: 'Ann Vermeulen',     age: '15 dagen', urgent: false, extra: '' },
+  { id: 'TCK-2021', title: 'Cookiemelding blijft terugkomen',       client: 'Praktijk Dewulf',      project: 'Onderhoud site',  status: 'closed',      prio: 'low',    reporter: 'Lien Dewulf',       age: '23 dagen', urgent: false, extra: '' }
+];
+
+class Component extends DCLogic {
+  state = {
+    filter: 'new', prio: 'all', client: 'all', project: 'all',
+    dStatus: 'new', dPrio: 'high', task: null, moreOpen: false, convert: null, convertM: null
+  };
+
+  visible() {
+    const s = this.state;
+    return TICKETS.filter(t => {
+      if (s.filter !== 'all' && t.status !== s.filter) return false;
+      if (s.prio !== 'all' && t.prio !== s.prio) return false;
+      if (s.client !== 'all' && t.client !== s.client) return false;
+      if (s.project !== 'all' && t.project !== s.project) return false;
+      return true;
+    }).sort((a, b) => SORDER.indexOf(a.status) - SORDER.indexOf(b.status) || PORDER.indexOf(a.prio) - PORDER.indexOf(b.prio));
+  }
+
+  matchOthers(overrideKey, overrideVal) {
+    const s = Object.assign({}, this.state);
+    s[overrideKey] = overrideVal;
+    return TICKETS.filter(t => {
+      if (overrideKey !== 'filter' && s.filter !== 'all' && t.status !== s.filter) return false;
+      if (overrideKey === 'filter' && overrideVal !== 'all' && t.status !== overrideVal) return false;
+      if (overrideKey !== 'prio' && s.prio !== 'all' && t.prio !== s.prio) return false;
+      if (overrideKey === 'prio' && overrideVal !== 'all' && t.prio !== overrideVal) return false;
+      if (s.client !== 'all' && t.client !== s.client) return false;
+      if (s.project !== 'all' && t.project !== s.project) return false;
+      return true;
+    }).length;
+  }
+
+  chip(key, label, active, onClick, mobile, count) {
+    const o = {
+      label: label,
+      onClick: onClick,
+      style: 'display:inline-flex; align-items:center; gap:6px; white-space:nowrap; cursor:pointer; font-weight:600; font-size:13px; ' +
+        (mobile ? 'height:36px; padding:0 12px;' : 'padding:7px 12px;') +
+        ' border-radius:999px; background:' + (active ? '#121212' : '#fff') + '; color:' + (active ? '#fff' : '#55554f') +
+        '; border:1px solid ' + (active ? '#121212' : '#dcdcd6') + ';',
+      countStyle: count === undefined ? 'display:none;'
+        : 'min-width:18px; height:18px; padding:0 5px; border-radius:999px; display:inline-flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; background:' +
+          (active ? 'rgba(255,255,255,.18)' : '#f2f2ee') + '; color:' + (active ? '#ffffff' : '#6e6e66') + ';'
+    };
+    if (count !== undefined) o.count = count;
+    return o;
+  }
+
+  smallChip(key, label, active, onClick) {
+    return {
+      label: label,
+      onClick: onClick,
+      style: 'display:inline-flex; align-items:center; gap:5px; height:34px; padding:0 11px; border-radius:999px; white-space:nowrap; cursor:pointer; font-size:12px; font-weight:600; background:' +
+        (active ? '#121212' : '#fff') + '; color:' + (active ? '#fff' : '#55554f') + '; border:1px solid ' + (active ? '#121212' : '#dcdcd6') + ';'
+    };
+  }
+
+  decorate(t, i, len, mobile) {
+    const s = STATUS[t.status];
+    const p = PRIO[t.prio];
+    const isNew = t.status === 'new';
+    return Object.assign({}, t, {
+      statusLabel: s.label,
+      statusStyle: 'padding:4px 10px; border-radius:999px; background:' + s.bg + '; color:' + s.color + '; font-size:' + (mobile ? '11' : '12') + 'px; font-weight:600; white-space:nowrap; flex-shrink:0;',
+      prioLabel: p.label,
+      prioStyle: 'display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border-radius:999px; border:1px solid ' + p.border + '; color:' + p.color + '; font-size:' + (mobile ? '11' : '12') + 'px; font-weight:600; white-space:nowrap;',
+      prioDot: 'width:6px; height:6px; border-radius:50%; background:' + p.dot + '; display:inline-block;',
+      ageStyle: 'font-size:' + (mobile ? '12' : '13') + 'px; white-space:nowrap; color:' + (t.urgent && isNew ? '#b91c1c' : '#87877e') + '; font-weight:' + (t.urgent && isNew ? '600' : '400') + ';',
+      rowStyle: 'display:grid; grid-template-columns:minmax(0,2fr) minmax(0,1.1fr) minmax(140px,.8fr) minmax(110px,.55fr) minmax(130px,.7fr) minmax(90px,.45fr); gap:12px; padding:13px 24px; align-items:center; cursor:pointer; border-left:3px solid ' +
+        (isNew ? '#1e5f8a' : 'transparent') + ';' + (i === len - 1 ? '' : ' border-bottom:1px solid #f0f0ec;') + (isNew ? ' background:#fcfdfe;' : ''),
+      cardStyle: 'border:1px solid #e3e3e0; border-left:3px solid ' + (isNew ? '#1e5f8a' : '#e3e3e0') +
+        '; border-radius:12px; background:#fff; padding:12px; display:flex; flex-direction:column; gap:7px; flex-shrink:0;'
+    });
+  }
+
+  renderVals() {
+    const list = this.visible();
+    const st = STATUS[this.state.dStatus];
+    const pr = PRIO[this.state.dPrio];
+    const task = this.state.task;
+    const filtered = this.state.filter !== 'all' || this.state.prio !== 'all' || this.state.client !== 'all' || this.state.project !== 'all';
+    const newCount = TICKETS.filter(t => t.status === 'new').length;
+
+    return {
+      statusFilters: [this.chip('all', 'Alle', this.state.filter === 'all', () => this.setState({ filter: 'all' }), false, this.matchOthers('filter', 'all'))]
+        .concat(SORDER.map(k => this.chip(k, STATUS[k].label, this.state.filter === k, () => this.setState({ filter: k }), false, this.matchOthers('filter', k)))),
+      statusFiltersMobile: [this.chip('all', 'Alle', this.state.filter === 'all', () => this.setState({ filter: 'all' }), true)]
+        .concat(SORDER.map(k => this.chip(k, STATUS[k].label, this.state.filter === k, () => this.setState({ filter: k }), true))),
+      prioFilters: [this.smallChip('all', 'Alle', this.state.prio === 'all', () => this.setState({ prio: 'all' }))]
+        .concat(PORDER.map(k => this.smallChip(k, PRIO[k].label, this.state.prio === k, () => this.setState({ prio: k })))),
+      client: this.state.client,
+      onClient: e => this.setState({ client: e.target.value }),
+      project: this.state.project,
+      onProject: e => this.setState({ project: e.target.value }),
+      resetAll: () => this.setState({ filter: 'all', prio: 'all', client: 'all', project: 'all' }),
+      resetStyle: filtered
+        ? 'font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer; text-decoration:underline;'
+        : 'display:none;',
+
+      rows: list.map((t, i) => this.decorate(t, i, list.length, false)),
+      rowsMobile: list.map((t, i) => this.decorate(t, i, list.length, true)),
+      hasRows: list.length > 0,
+      noRows: list.length === 0,
+      countLabel: list.length === 1 ? '1 ticket' : list.length + ' tickets',
+      pageLabel: list.length ? '1–' + list.length + ' van ' + list.length : 'geen resultaten',
+      newHint: newCount + ' nieuw, gemarkeerd met een accentrand',
+
+      dStatus: this.state.dStatus,
+      onStatus: e => this.setState({ dStatus: e.target.value }),
+      dStatusLabel: st.label,
+      dStatusBadge: 'padding:4px 10px; border-radius:999px; background:' + st.bg + '; color:' + st.color + '; font-size:12px; font-weight:600; white-space:nowrap;',
+      statusHint: st.hint,
+      dPrioLabel: pr.label,
+      dPrioBadge: 'display:inline-flex; align-items:center; gap:6px; padding:3px 9px; border-radius:999px; border:1px solid ' + pr.border + '; color:' + pr.color + '; font-size:12px; font-weight:600; white-space:nowrap;',
+      dPrioDot: 'width:6px; height:6px; border-radius:50%; background:' + pr.dot + '; display:inline-block;',
+      prioOptions: PORDER.map(k => {
+        const p = PRIO[k];
+        const active = this.state.dPrio === k;
+        return {
+          label: p.label,
+          onClick: () => this.setState({ dPrio: k }),
+          style: 'flex:1; min-width:0; height:40px; display:flex; align-items:center; justify-content:center; gap:7px; border-radius:10px; cursor:pointer; font-size:14px; font-weight:600; border:1px solid ' +
+            (active ? p.color : '#dcdcd6') + '; background:' + (active ? '#fafaf8' : '#fff') + '; color:' + (active ? p.color : '#55554f') + ';',
+          dot: 'width:8px; height:8px; border-radius:50%; background:' + p.dot + '; display:inline-block;'
+        };
+      }),
+      prioOptionsM: PORDER.map(k => {
+        const p = PRIO[k];
+        const active = this.state.dPrio === k;
+        return {
+          label: p.label,
+          onClick: () => this.setState({ dPrio: k }),
+          style: 'flex:1; min-width:0; height:44px; display:flex; align-items:center; justify-content:center; gap:7px; border-radius:10px; cursor:pointer; font-size:14px; font-weight:600; border:1px solid ' +
+            (active ? p.color : '#dcdcd6') + '; background:' + (active ? '#fafaf8' : '#fff') + '; color:' + (active ? p.color : '#55554f') + ';',
+          dot: 'width:8px; height:8px; border-radius:50%; background:' + p.dot + '; display:inline-block;'
+        };
+      }),
+
+      hasTask: task !== null,
+      noTask: task === null,
+      taskTitle: 'Contactformulier opnieuw opbouwen',
+      taskId: 'TSK-401',
+      taskDue: '19 sep',
+      taskStatusLabel: 'Bezig',
+      taskStatusStyle: 'padding:4px 10px; border-radius:999px; background:#e6efec; color:#0d3b33; font-size:12px; font-weight:600; white-space:nowrap; flex-shrink:0;',
+      linkTaskStyle: task === null ? 'font-size:13px; color:#0d3b33; font-weight:600; cursor:pointer;' : 'display:none;',
+
+      timeline: [
+        { text: task !== null ? 'Taak TSK-401 gekoppeld' : 'Prioriteit gezet op Hoog', time: task !== null ? 'vandaag 09:02' : 'vandaag 08:20', dotStyle: 'width:6px; height:6px; border-radius:50%; background:#0d3b33; margin-top:7px; flex-shrink:0;' },
+        { text: 'Katrien Verlinden meldde dit ticket via het portaal', time: 'vandaag 08:14', dotStyle: 'width:6px; height:6px; border-radius:50%; background:#cfcfc9; margin-top:7px; flex-shrink:0;' },
+        { text: 'Automatische melding verstuurd naar de klant', time: 'vandaag 08:14', dotStyle: 'width:6px; height:6px; border-radius:50%; background:#cfcfc9; margin-top:7px; flex-shrink:0;' }
+      ],
+
+      moreOpen: this.state.moreOpen,
+      toggleMore: () => this.setState(s => ({ moreOpen: !s.moreOpen })),
+
+      convertBtnLabel: task !== null ? 'Naar gekoppelde taak' : 'Omzetten naar taak',
+      convertBtnStyle: 'padding:9px 16px; border-radius:10px; border:1px solid #dcdcd6; background:#fff; color:#121212; cursor:pointer; font-family:Instrument Sans, sans-serif; font-size:14px; font-weight:600;',
+      convertBtnStyleM: 'height:48px; border-radius:10px; border:1px solid #0d3b33; background:#0d3b33; color:#fff; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer;',
+
+      convertOpen: this.state.convert !== null,
+      convertForm: this.state.convert === 'form',
+      convertDone: this.state.convert === 'done',
+      convertTitle: this.state.convert === 'done' ? 'Taak aangemaakt' : 'Omzetten naar taak',
+      openConvert: () => this.setState({ convert: 'form', moreOpen: false }),
+      closeConvert: () => this.setState({ convert: null }),
+      doConvert: () => this.setState({ convert: 'done', task: 'TSK-401', dStatus: 'in_progress' }),
+
+      convertOpenM: this.state.convertM !== null,
+      convertFormM: this.state.convertM === 'form',
+      convertDoneM: this.state.convertM === 'done',
+      convertTitleM: this.state.convertM === 'done' ? 'Taak aangemaakt' : 'Omzetten naar taak',
+      openConvertM: () => this.setState({ convertM: 'form' }),
+      closeConvertM: () => this.setState({ convertM: null }),
+      doConvertM: () => this.setState({ convertM: 'done', task: 'TSK-401', dStatus: 'in_progress' })
+    };
+  }
+}
+</script>
+</body>
+</html>
