@@ -1,24 +1,25 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { Suspense } from 'react';
 
 import { AuthCard } from '@/components/shared/AuthCard';
 import { getCurrentUser } from '@/lib/access';
-import { LoginForm } from './LoginForm';
+import { AanmeldenForm } from './AanmeldenForm';
 
-export default async function LoginPage() {
+export default async function AanmeldenPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const currentUser = await getCurrentUser(await headers());
   if (currentUser) {
     redirect(currentUser.role === 'admin' ? '/app' : '/portal');
   }
 
+  const { error } = await searchParams;
+
   return (
-    <AuthCard variant="admin">
-      <p className="font-display text-h2">Aanmelden</p>
-      <p className="text-body text-muted-foreground mt-1 mb-6">Meld u aan met uw werkadres.</p>
-      <Suspense>
-        <LoginForm />
-      </Suspense>
+    <AuthCard variant="portal">
+      <AanmeldenForm initialError={error ?? null} />
     </AuthCard>
   );
 }

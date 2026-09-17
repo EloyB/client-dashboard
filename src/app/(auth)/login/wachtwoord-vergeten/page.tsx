@@ -1,12 +1,11 @@
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { Suspense } from 'react';
 
 import { AuthCard } from '@/components/shared/AuthCard';
 import { getCurrentUser } from '@/lib/access';
-import { LoginForm } from './LoginForm';
+import { ForgotPasswordForm } from './ForgotPasswordForm';
 
-export default async function LoginPage() {
+export default async function ForgotPasswordPage() {
   const currentUser = await getCurrentUser(await headers());
   if (currentUser) {
     redirect(currentUser.role === 'admin' ? '/app' : '/portal');
@@ -14,11 +13,7 @@ export default async function LoginPage() {
 
   return (
     <AuthCard variant="admin">
-      <p className="font-display text-h2">Aanmelden</p>
-      <p className="text-body text-muted-foreground mt-1 mb-6">Meld u aan met uw werkadres.</p>
-      <Suspense>
-        <LoginForm />
-      </Suspense>
+      <ForgotPasswordForm />
     </AuthCard>
   );
 }

@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -84,13 +85,21 @@ export function LoginForm() {
           placeholder="jonas@studio.be"
           required
         />
-        <PasswordField
-          control={control}
-          name="password"
-          label="Wachtwoord"
-          autoComplete="current-password"
-          required
-        />
+        <div className="relative">
+          <PasswordField
+            control={control}
+            name="password"
+            label="Wachtwoord"
+            autoComplete="current-password"
+            required
+          />
+          <Link
+            href="/login/wachtwoord-vergeten"
+            className="text-small text-primary absolute top-0 right-0 font-semibold underline"
+          >
+            Wachtwoord vergeten?
+          </Link>
+        </div>
         <CheckboxField
           control={control}
           name="rememberMe"
