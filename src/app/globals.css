@@ -22,6 +22,7 @@
   --primary: 168 64% 14%; /* #0D3B33 */
   --primary-hover: 168 64% 11%; /* #0A2C26 */
   --primary-foreground: 0 0% 100%;
+  --primary-foreground-muted: 165 26% 84%; /* #CFE0DB — bijtekst op accentvlak (actiekaart) */
 
   --secondary: 60 14% 96%; /* #F2F2EE */
   --secondary-foreground: 60 4% 32%; /* #55554F */
@@ -49,6 +50,12 @@
   --info: 203 64% 33%; /* #1E5F8A */
   --info-foreground: 0 0% 100%;
   --info-muted: 203 50% 93%; /* #E6F0F6 */
+
+  /* Vlakken */
+  --surface-sunken: 60 9% 91%; /* #ECECE7 — kanbankolom, verzonken vlak */
+  --overlay: 0 0% 7%; /* scrim, gebruikt op 28% alpha */
+  --skeleton: 60 14% 96%; /* #F2F2EE */
+  --skeleton-soft: 60 17% 96%; /* #F6F6F3 */
 
   /* Lijnen en velden */
   --border: 60 5% 89%; /* #E3E3E0 */
@@ -101,6 +108,7 @@
   --primary: 166 36% 55%;
   --primary-hover: 166 36% 62%;
   --primary-foreground: 168 64% 10%;
+  --primary-foreground-muted: 168 30% 26%;
 
   --secondary: 60 3% 15%;
   --secondary-foreground: 60 9% 94%;
@@ -127,6 +135,11 @@
   --info: 203 52% 60%;
   --info-foreground: 203 64% 13%;
   --info-muted: 203 30% 18%;
+
+  --surface-sunken: 60 3% 13%;
+  --overlay: 0 0% 0%;
+  --skeleton: 60 3% 16%;
+  --skeleton-soft: 60 3% 14%;
 
   --border: 60 3% 20%;
   --border-strong: 60 3% 26%;
@@ -170,6 +183,7 @@
   --color-primary: hsl(var(--primary));
   --color-primary-hover: hsl(var(--primary-hover));
   --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary-foreground-muted: hsl(var(--primary-foreground-muted));
   --color-secondary: hsl(var(--secondary));
   --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-muted: hsl(var(--muted));
@@ -192,6 +206,10 @@
   --color-info: hsl(var(--info));
   --color-info-foreground: hsl(var(--info-foreground));
   --color-info-muted: hsl(var(--info-muted));
+
+  --color-surface-sunken: hsl(var(--surface-sunken));
+  --color-skeleton: hsl(var(--skeleton));
+  --color-skeleton-soft: hsl(var(--skeleton-soft));
 
   --color-border: hsl(var(--border));
   --color-border-strong: hsl(var(--border-strong));

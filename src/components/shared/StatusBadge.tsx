@@ -11,17 +11,30 @@ const taskStatusConfig: Record<TaskStatus, { label: string; className: string }>
   done: { label: 'Klaar', className: 'bg-success-muted text-success hover:bg-success-muted' },
 };
 
-const ticketStatusConfig: Record<TicketStatus, { label: string; className: string }> = {
-  new: { label: 'Nieuw', className: 'bg-info-muted text-info hover:bg-info-muted' },
-  in_progress: {
-    label: 'In behandeling',
-    className: 'bg-accent text-accent-foreground hover:bg-accent',
+export type TicketStatusAudience = 'admin' | 'portal';
+
+const ticketStatusClassName: Record<TicketStatus, string> = {
+  new: 'bg-info-muted text-info hover:bg-info-muted',
+  in_progress: 'bg-accent text-accent-foreground hover:bg-accent',
+  resolved: 'bg-success-muted text-success hover:bg-success-muted',
+  closed: 'bg-muted text-neutral-500 hover:bg-muted',
+};
+
+// Same colors in both places; the portal uses friendlier wording for clients
+// (see docs/design/INDEX.md, slice 5).
+const ticketStatusLabel: Record<TicketStatusAudience, Record<TicketStatus, string>> = {
+  admin: {
+    new: 'Nieuw',
+    in_progress: 'In behandeling',
+    resolved: 'Opgelost',
+    closed: 'Gesloten',
   },
-  resolved: {
-    label: 'Opgelost',
-    className: 'bg-success-muted text-success hover:bg-success-muted',
+  portal: {
+    new: 'Ontvangen',
+    in_progress: 'We zijn ermee bezig',
+    resolved: 'Opgelost',
+    closed: 'Afgesloten',
   },
-  closed: { label: 'Gesloten', className: 'bg-muted text-neutral-500 hover:bg-muted' },
 };
 
 const visibilityConfig = {
@@ -34,16 +47,27 @@ const visibilityConfig = {
 
 type StatusBadgeProps =
   | { domain: 'task'; status: TaskStatus; className?: string }
-  | { domain: 'ticket'; status: TicketStatus; className?: string }
+  | {
+      domain: 'ticket';
+      status: TicketStatus;
+      audience?: TicketStatusAudience;
+      className?: string;
+    }
   | { domain: 'document'; visibleToClient: boolean; className?: string };
 
 export function StatusBadge(props: StatusBadgeProps) {
-  const config =
-    props.domain === 'task'
-      ? taskStatusConfig[props.status]
-      : props.domain === 'ticket'
-        ? ticketStatusConfig[props.status]
-        : visibilityConfig[props.visibleToClient ? 'shared' : 'internal'];
+  if (props.domain === 'task') {
+    const config = taskStatusConfig[props.status];
+    return <Badge className={cn(config.className, props.className)}>{config.label}</Badge>;
+  }
 
+  if (props.domain === 'ticket') {
+    const label = ticketStatusLabel[props.audience ?? 'admin'][props.status];
+    return (
+      <Badge className={cn(ticketStatusClassName[props.status], props.className)}>{label}</Badge>
+    );
+  }
+
+  const config = visibilityConfig[props.visibleToClient ? 'shared' : 'internal'];
   return <Badge className={cn(config.className, props.className)}>{config.label}</Badge>;
 }

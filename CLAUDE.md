@@ -89,6 +89,13 @@ documents
 
 ticket_attachments
   ticketId → tickets, fileId → files
+
+ticket_comments
+  id, ticketId → tickets, authorId → users, body, createdAt
+
+activity_log       (system-generated, read-only from the UI)
+  id, projectId → projects, ticketId → tickets (nullable), taskId → tasks (nullable),
+  actorId → users (nullable, null = system-generated), type, description, createdAt
 ```
 
 Conventions: UUID primary keys, `createdAt`/`updatedAt` timestamps with timezone, Postgres enums for status fields, foreign keys with explicit `onDelete` behaviour.
@@ -102,6 +109,8 @@ Security is more important than speed. A client must never see data from another
 - `requireClientUser()` returns the user with `clientId`; all portal queries **must** filter on that `clientId` through the project relation.
 - `assertProjectAccess(user, projectId)` before any read or write on project-related data.
 - Clients never access `tasks`, nor events/documents with `visibleToClient = false`.
+- Client users may read and add `ticket_comments` on their own client's tickets; the same
+  project-scoping rules apply to this write as to any read.
 - Never trust IDs from the client; always verify ownership server-side.
 - File downloads use short-lived presigned URLs, generated only after an access check.
 - Route protection in layouts/middleware is a convenience, not the security boundary. Checks happen in actions and queries.
@@ -237,6 +246,7 @@ Build in vertical slices: one slice = one branch = one session, delivering data 
 - [ ] 5b. Emails: new ticket notification to admin and confirmation to the reporting client user
 - [ ] 5c. Portal: ticket overview and detail with status
 - [ ] 5d. Admin: ticket overview, status changes, tickets section on project detail
+- [ ] 5e. Comment thread on a ticket, visible to and writable by admin and the owning client's users
 
 **6. Documents**
 
@@ -264,7 +274,7 @@ Build in vertical slices: one slice = one branch = one session, delivering data 
 
 ## Out of scope — do not build
 
-Time tracking, email notifications other than those listed under Email (e.g. ticket status updates to clients), comments/chat on tickets, accounting or Google Calendar integrations, invoice generation, realtime updates, reporting, multi-tenancy for other freelancers, task assignees.
+Time tracking, email notifications other than those listed under Email (e.g. ticket status updates to clients), subtasks, project budget/invoiced tracking, accounting or Google Calendar integrations, invoice generation, realtime updates, reporting (including exporting lists), multi-tenancy for other freelancers, task assignees.
 
 If a request touches these, flag it instead of implementing it.
 

@@ -1,5 +1,6 @@
 import { relations } from 'drizzle-orm';
 
+import { activityLog } from '@/db/schema/activity-log';
 import { account, session, user } from '@/db/schema/auth';
 import { clients } from '@/db/schema/clients';
 import { documents } from '@/db/schema/documents';
@@ -8,6 +9,7 @@ import { files } from '@/db/schema/files';
 import { projects } from '@/db/schema/projects';
 import { tasks } from '@/db/schema/tasks';
 import { ticketAttachments } from '@/db/schema/ticket-attachments';
+import { ticketComments } from '@/db/schema/ticket-comments';
 import { tickets } from '@/db/schema/tickets';
 
 export const clientsRelations = relations(clients, ({ many }) => ({
@@ -24,6 +26,8 @@ export const userRelations = relations(user, ({ one, many }) => ({
   accounts: many(account),
   reportedTickets: many(tickets),
   uploadedFiles: many(files),
+  ticketComments: many(ticketComments),
+  activityLogEntries: many(activityLog),
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
@@ -49,9 +53,10 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   tickets: many(tickets),
   events: many(events),
   documents: many(documents),
+  activityLog: many(activityLog),
 }));
 
-export const tasksRelations = relations(tasks, ({ one }) => ({
+export const tasksRelations = relations(tasks, ({ one, many }) => ({
   project: one(projects, {
     fields: [tasks.projectId],
     references: [projects.id],
@@ -60,6 +65,7 @@ export const tasksRelations = relations(tasks, ({ one }) => ({
     fields: [tasks.ticketId],
     references: [tickets.id],
   }),
+  activityLog: many(activityLog),
 }));
 
 export const ticketsRelations = relations(tickets, ({ one, many }) => ({
@@ -73,6 +79,38 @@ export const ticketsRelations = relations(tickets, ({ one, many }) => ({
   }),
   tasks: many(tasks),
   attachments: many(ticketAttachments),
+  comments: many(ticketComments),
+  activityLog: many(activityLog),
+}));
+
+export const ticketCommentsRelations = relations(ticketComments, ({ one }) => ({
+  ticket: one(tickets, {
+    fields: [ticketComments.ticketId],
+    references: [tickets.id],
+  }),
+  author: one(user, {
+    fields: [ticketComments.authorId],
+    references: [user.id],
+  }),
+}));
+
+export const activityLogRelations = relations(activityLog, ({ one }) => ({
+  project: one(projects, {
+    fields: [activityLog.projectId],
+    references: [projects.id],
+  }),
+  ticket: one(tickets, {
+    fields: [activityLog.ticketId],
+    references: [tickets.id],
+  }),
+  task: one(tasks, {
+    fields: [activityLog.taskId],
+    references: [tasks.id],
+  }),
+  actor: one(user, {
+    fields: [activityLog.actorId],
+    references: [user.id],
+  }),
 }));
 
 export const eventsRelations = relations(events, ({ one }) => ({

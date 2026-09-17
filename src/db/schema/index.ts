@@ -1,3 +1,4 @@
+export * from '@/db/schema/activity-log';
 export * from '@/db/schema/auth';
 export * from '@/db/schema/clients';
 export * from '@/db/schema/documents';
@@ -7,5 +8,6 @@ export * from '@/db/schema/files';
 export * from '@/db/schema/projects';
 export * from '@/db/schema/relations';
 export * from '@/db/schema/ticket-attachments';
+export * from '@/db/schema/ticket-comments';
 export * from '@/db/schema/tickets';
 export * from '@/db/schema/tasks';

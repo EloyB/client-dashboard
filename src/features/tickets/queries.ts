@@ -1,7 +1,7 @@
-import { desc, eq } from 'drizzle-orm';
+import { asc, desc, eq } from 'drizzle-orm';
 
 import { db, type Database } from '@/db';
-import { tickets } from '@/db/schema';
+import { ticketComments, tickets } from '@/db/schema';
 import { AccessError, assertProjectAccess, type AuthenticatedUser } from '@/lib/access';
 
 export async function listTicketsForProject(
@@ -32,4 +32,34 @@ export async function getTicketById(
   await assertProjectAccess(user, ticket.projectId, database);
 
   return ticket;
+}
+
+export async function listCommentsForTicket(
+  user: AuthenticatedUser,
+  ticketId: string,
+  database: Database = db,
+) {
+  await getTicketById(user, ticketId, database);
+
+  return database
+    .select()
+    .from(ticketComments)
+    .where(eq(ticketComments.ticketId, ticketId))
+    .orderBy(asc(ticketComments.createdAt));
+}
+
+export async function addCommentToTicket(
+  user: AuthenticatedUser,
+  ticketId: string,
+  body: string,
+  database: Database = db,
+) {
+  await getTicketById(user, ticketId, database);
+
+  const [comment] = await database
+    .insert(ticketComments)
+    .values({ ticketId, authorId: user.id, body })
+    .returning();
+
+  return comment;
 }
