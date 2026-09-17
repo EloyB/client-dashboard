@@ -11,6 +11,7 @@ import {
   isNavItemActive,
   portalSidebarItems,
 } from '@/components/shared/navigation-items';
+import { UserMenu } from '@/components/shared/UserMenu';
 import { cn } from '@/lib/utils';
 
 const COLLAPSED_STORAGE_KEY = 'studio-sidebar-collapsed';
@@ -125,8 +126,14 @@ export function Sidebar({
       </nav>
 
       <div className="border-sidebar-border flex items-center gap-2 border-t px-2 py-2">
-        {footerAvatar}
-        {!collapsed && <div className="min-w-0 flex-1">{footerDetails}</div>}
+        {collapsed ? (
+          footerAvatar
+        ) : (
+          <UserMenu
+            avatar={footerAvatar}
+            details={<div className="min-w-0 flex-1">{footerDetails}</div>}
+          />
+        )}
       </div>
     </aside>
   );

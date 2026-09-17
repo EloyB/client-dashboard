@@ -1,8 +1,9 @@
+import { hashPassword } from 'better-auth/crypto';
 import { eq } from 'drizzle-orm';
 import type { BrowserContext } from '@playwright/test';
 
 import { db } from '@/db';
-import { clients, user as userTable } from '@/db/schema';
+import { account, clients, user as userTable } from '@/db/schema';
 import { auth } from '@/lib/auth';
 
 const SESSION_COOKIE_NAME = 'better-auth.session_token';
@@ -70,8 +71,17 @@ async function ensureClientTestUser() {
   }
 
   if (!existing) {
-    await auth.api.signUpEmail({
-      body: { email: CLIENT_TEST_EMAIL, name: CLIENT_TEST_NAME, password: CLIENT_TEST_PASSWORD },
+    // Direct insert, not signUpEmail: slice 1a disables sign-up everywhere,
+    // in-process calls included (see src/db/seed.ts for the same pattern).
+    const [newUser] = await db
+      .insert(userTable)
+      .values({ name: CLIENT_TEST_NAME, email: CLIENT_TEST_EMAIL, emailVerified: true })
+      .returning();
+    await db.insert(account).values({
+      accountId: newUser.id,
+      providerId: 'credential',
+      userId: newUser.id,
+      password: await hashPassword(CLIENT_TEST_PASSWORD),
     });
   }
 

@@ -1,10 +1,11 @@
 'use client';
 
-import { ChevronLeft, Menu } from 'lucide-react';
+import { ChevronLeft, LogOut, Menu } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import {
   adminOverflowItems,
@@ -13,6 +14,7 @@ import {
   portalTabItems,
   type NavItem,
 } from '@/components/shared/navigation-items';
+import { authClient } from '@/lib/auth-client';
 import { cn } from '@/lib/utils';
 
 function findActiveItem(items: NavItem[], pathname: string): NavItem | undefined {
@@ -30,6 +32,11 @@ export function MobileNav({ area }: { area: 'admin' | 'portal' }) {
   const activeOverflow = overflowItems && findActiveItem(overflowItems, pathname);
   const currentLabel = activeTab?.label ?? activeOverflow?.label ?? '';
   const isOnTabRoute = Boolean(activeTab) && !activeOverflow;
+
+  async function handleSignOut() {
+    await authClient.signOut();
+    router.push('/login');
+  }
 
   return (
     <>
@@ -80,6 +87,19 @@ export function MobileNav({ area }: { area: 'admin' | 'portal' }) {
                     </Link>
                   );
                 })}
+                {area === 'admin' && (
+                  <>
+                    <Separator className="my-1" />
+                    <button
+                      type="button"
+                      onClick={handleSignOut}
+                      className="text-body text-foreground flex h-11 items-center gap-3 rounded-md px-2.5 text-left"
+                    >
+                      <LogOut className="size-4 shrink-0" />
+                      Afmelden
+                    </button>
+                  </>
+                )}
               </nav>
             </SheetContent>
           </Sheet>

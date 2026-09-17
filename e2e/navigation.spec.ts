@@ -3,9 +3,11 @@ import { expect, test } from '@playwright/test';
 import { CLIENT_TEST_CLIENT_NAME, loginAsAdmin, loginAsClient } from './helpers/auth';
 
 test.describe('unauthenticated access', () => {
-  test('visiting /app redirects to /login', async ({ page }) => {
+  test('visiting /app redirects to /login with a next param (slice 1a middleware)', async ({
+    page,
+  }) => {
     await page.goto('/app');
-    await expect(page).toHaveURL(/\/login$/);
+    await expect(page).toHaveURL(/\/login\?next=%2Fapp$/);
   });
 
   test('visiting /portal redirects to /login', async ({ page }) => {

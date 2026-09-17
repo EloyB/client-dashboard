@@ -1,8 +1,10 @@
+import { hashPassword } from 'better-auth/crypto';
 import { and, eq } from 'drizzle-orm';
 import { generateKeyBetween } from 'fractional-indexing';
 
 import { db } from '@/db';
 import {
+  account,
   clients,
   documents,
   events,
@@ -19,23 +21,27 @@ import {
   type TaskStatus,
   type TicketStatus,
 } from '@/db/schema';
-import { auth } from '@/lib/auth';
 
+// Inserts directly instead of going through auth.api.signUpEmail: the admin
+// login (slice 1a) disables public sign-up, and that flag also blocks
+// signUpEmail when called in-process, not just over HTTP.
 async function findOrCreateAdmin(input: { name: string; email: string; password: string }) {
   const [existing] = await db.select().from(user).where(eq(user.email, input.email)).limit(1);
   if (existing) {
     return existing;
   }
 
-  const signUpResult = await auth.api.signUpEmail({
-    body: { name: input.name, email: input.email, password: input.password },
-  });
-
   const [admin] = await db
-    .update(user)
-    .set({ role: 'admin', emailVerified: true })
-    .where(eq(user.id, signUpResult.user.id))
+    .insert(user)
+    .values({ name: input.name, email: input.email, role: 'admin', emailVerified: true })
     .returning();
+
+  await db.insert(account).values({
+    accountId: admin.id,
+    providerId: 'credential',
+    userId: admin.id,
+    password: await hashPassword(input.password),
+  });
 
   return admin;
 }

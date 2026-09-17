@@ -3,11 +3,12 @@
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { CalendarIcon } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { useController, type Control, type FieldPath, type FieldValues } from 'react-hook-form';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -87,6 +88,47 @@ export function TextField<TFieldValues extends FieldValues>({
         {...field}
         {...inputProps}
       />
+    </FieldShell>
+  );
+}
+
+export function PasswordField<TFieldValues extends FieldValues>({
+  control,
+  name,
+  label,
+  hint,
+  required,
+  className,
+  ...inputProps
+}: BaseFieldProps<TFieldValues> & Omit<React.ComponentProps<typeof Input>, 'name' | 'type'>) {
+  const { field, fieldState } = useController({ control, name });
+  const [visible, setVisible] = useState(false);
+
+  return (
+    <FieldShell
+      label={label}
+      htmlFor={name}
+      required={required}
+      hint={hint}
+      error={fieldState.error?.message}
+    >
+      <div className="relative">
+        <Input
+          id={name}
+          type={visible ? 'text' : 'password'}
+          aria-invalid={!!fieldState.error}
+          className={cn('pr-16', className)}
+          {...field}
+          {...inputProps}
+        />
+        <button
+          type="button"
+          onClick={() => setVisible((current) => !current)}
+          className="text-small text-primary absolute top-1/2 right-2.5 -translate-y-1/2 font-semibold"
+        >
+          {visible ? 'Verbergen' : 'Tonen'}
+        </button>
+      </div>
     </FieldShell>
   );
 }
@@ -171,6 +213,22 @@ export function SwitchField<TFieldValues extends FieldValues>({
         {hint && <p className="text-small text-muted-foreground">{hint}</p>}
       </div>
       <Switch id={name} checked={field.value ?? false} onCheckedChange={field.onChange} />
+    </div>
+  );
+}
+
+export function CheckboxField<TFieldValues extends FieldValues>({
+  control,
+  name,
+  label,
+}: Pick<BaseFieldProps<TFieldValues>, 'control' | 'name' | 'label'>) {
+  const { field } = useController({ control, name });
+  return (
+    <div className="flex items-center gap-2">
+      <Checkbox id={name} checked={field.value ?? false} onCheckedChange={field.onChange} />
+      <Label htmlFor={name} className="font-normal">
+        {label}
+      </Label>
     </div>
   );
 }
