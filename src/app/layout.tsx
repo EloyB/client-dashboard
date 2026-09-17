@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Instrument_Sans, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
+import { Toaster } from '@/components/ui/sonner';
 
 const instrumentSans = Instrument_Sans({
   variable: '--font-instrument-sans',
@@ -28,7 +29,10 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
       lang="nl"
       className={`${instrumentSans.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">{children}</body>
+      <body className="flex min-h-full flex-col">
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

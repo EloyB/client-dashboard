@@ -1,4 +1,7 @@
+'use client';
+
 import { Plus } from 'lucide-react';
+import { Suspense } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import {
@@ -28,8 +31,10 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { FileDropzone, FileRow } from '@/components/shared/FileUpload';
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar';
 import { DateBlock, ListRow } from '@/components/shared/ListRow';
-import { PriorityBadge, type Priority } from '@/components/shared/PriorityBadge';
-import { StatusBadge, type TicketStatus } from '@/components/shared/StatusBadge';
+
+import type { Priority, TicketStatus } from '@/db/schema';
+import { StatusBadge } from '@/components/shared/StatusBadge';
+import { DetailPatternDemo, FeedbackDemo, FormPatternDemo } from '@/app/design-check/PatternDemos';
 
 const neutralScale = [
   { name: 'neutral-0', className: 'bg-white', hex: '#FFFFFF', border: true },
@@ -101,30 +106,74 @@ type DemoTicket = {
   client: string;
   status: TicketStatus;
   priority: Priority;
+  reportedAt: string;
 };
 
 const demoTickets: DemoTicket[] = [
+  {
+    id: 'TCK-2021',
+    title: 'Cookiemelding blijft terugkomen',
+    client: 'Praktijk Dewulf',
+    status: 'closed',
+    priority: 'low',
+    reportedAt: '2026-08-24',
+  },
+  {
+    id: 'TCK-2029',
+    title: 'Openingsuren feestdagen aanpassen',
+    client: 'Bakkerij Vermeulen',
+    status: 'resolved',
+    priority: 'medium',
+    reportedAt: '2026-09-01',
+  },
+  {
+    id: 'TCK-2033',
+    title: 'Adres in de footer is verouderd',
+    client: 'Verlinden & Zn',
+    status: 'in_progress',
+    priority: 'low',
+    reportedAt: '2026-09-04',
+  },
+  {
+    id: 'TCK-2038',
+    title: "Foto's van de toonzaal laden traag",
+    client: 'Verlinden & Zn',
+    status: 'in_progress',
+    priority: 'medium',
+    reportedAt: '2026-09-11',
+  },
+  {
+    id: 'TCK-2046',
+    title: 'Nieuwsbriefknop valt weg op tablet',
+    client: 'Praktijk Dewulf',
+    status: 'new',
+    priority: 'low',
+    reportedAt: '2026-09-14',
+  },
   {
     id: 'TCK-2041',
     title: 'Contactformulier verzendt niet',
     client: 'Verlinden & Zn',
     status: 'new',
     priority: 'high',
+    reportedAt: '2026-09-16',
   },
   {
-    id: 'TCK-2039',
-    title: 'Openingsuren kloppen niet',
-    client: 'Bakkerij Vermeulen',
-    status: 'in_progress',
-    priority: 'medium',
-  },
-  {
-    id: 'TCK-2036',
-    title: 'Logo te klein op tablet',
+    id: 'TCK-2044',
+    title: 'Webshop toont verkeerde voorraad',
     client: 'De Groene Kruidenier',
-    status: 'resolved',
-    priority: 'low',
+    status: 'new',
+    priority: 'high',
+    reportedAt: '2026-09-16',
   },
+];
+
+const ticketStatusOptions: { label: string; value: TicketStatus | 'all' }[] = [
+  { label: 'Alle', value: 'all' },
+  { label: 'Nieuw', value: 'new' },
+  { label: 'In behandeling', value: 'in_progress' },
+  { label: 'Opgelost', value: 'resolved' },
+  { label: 'Gesloten', value: 'closed' },
 ];
 
 const ticketColumns: DataTableColumn<DemoTicket>[] = [
@@ -137,12 +186,14 @@ const ticketColumns: DataTableColumn<DemoTicket>[] = [
         <p className="text-small text-muted-foreground font-mono">{row.id}</p>
       </>
     ),
+    sortValue: (row) => row.title,
   },
   {
     key: 'client',
     header: 'Klant',
     cell: (row) => row.client,
     className: 'text-muted-foreground',
+    sortValue: (row) => row.client,
   },
   {
     key: 'status',
@@ -152,11 +203,29 @@ const ticketColumns: DataTableColumn<DemoTicket>[] = [
   {
     key: 'priority',
     header: 'Prioriteit',
-    cell: (row) => <PriorityBadge priority={row.priority} />,
+    cell: (row) => <StatusBadge domain="priority" priority={row.priority} />,
+  },
+  {
+    key: 'reportedAt',
+    header: 'Gemeld',
+    cell: (row) =>
+      new Date(row.reportedAt).toLocaleDateString('nl-BE', { day: 'numeric', month: 'short' }),
+    className: 'text-muted-foreground',
+    sortValue: (row) => row.reportedAt,
   },
 ];
 
 export default function DesignCheckPage() {
+  return (
+    <Suspense>
+      <DesignCheckContent />
+    </Suspense>
+  );
+}
+
+// DataTable reads/writes the URL via useSearchParams, which Next.js requires
+// to sit behind a Suspense boundary.
+function DesignCheckContent() {
   return (
     <main className="mx-auto flex max-w-7xl flex-col gap-12 px-4 py-10 sm:px-6">
       <div className="flex flex-col gap-1">
@@ -273,7 +342,7 @@ export default function DesignCheckPage() {
               className="flex flex-col gap-1 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
             >
               <p className={row.className}>{row.sample}</p>
-              <p className="text-small text-muted-foreground font-mono whitespace-nowrap">
+              <p className="text-small text-muted-foreground font-mono sm:whitespace-nowrap">
                 {row.meta}
               </p>
             </div>
@@ -494,9 +563,9 @@ export default function DesignCheckPage() {
             <CardContent className="flex flex-col gap-2">
               <p className="text-overline text-muted-foreground uppercase">Prioriteit</p>
               <div className="flex flex-wrap gap-2">
-                <PriorityBadge priority="low" />
-                <PriorityBadge priority="medium" />
-                <PriorityBadge priority="high" />
+                <StatusBadge domain="priority" priority="low" />
+                <StatusBadge domain="priority" priority="medium" />
+                <StatusBadge domain="priority" priority="high" />
               </div>
               <p className="text-small text-muted-foreground font-mono">low · medium · high</p>
             </CardContent>
@@ -541,7 +610,7 @@ export default function DesignCheckPage() {
             <CardContent className="flex flex-col gap-3">
               <div className="flex items-center justify-between">
                 <span className="text-small text-muted-foreground font-mono">TSK-318</span>
-                <PriorityBadge priority="high" />
+                <StatusBadge domain="priority" priority="high" />
               </div>
               <CardTitle>Productfoto&apos;s optimaliseren voor mobiel</CardTitle>
               <CardDescription>Webshop De Groene Kruidenier</CardDescription>
@@ -569,8 +638,10 @@ export default function DesignCheckPage() {
         <div>
           <h2 className="text-h2 font-display">8 · Tabel</h2>
           <p className="text-body text-muted-foreground">
-            Vanaf md een echte tabel, daaronder dezelfde rijen als aanraakbare kaarten. Nooit
-            horizontaal scrollen op mobiel.
+            Zoeken links, statusfilters als pillen, sorteren rechts — alles in de URL, zodat een
+            gefilterde lijst deelbaar is. Vanaf md een echte tabel met sorteerbare koppen, daaronder
+            dezelfde rijen als aanraakbare kaarten met &quot;Meer laden&quot;. Nooit horizontaal
+            scrollen op mobiel.
           </p>
         </div>
 
@@ -578,6 +649,17 @@ export default function DesignCheckPage() {
           columns={ticketColumns}
           rows={demoTickets}
           getRowKey={(row) => row.id}
+          searchPlaceholder="Zoek op titel of klant"
+          searchValue={(row) => `${row.title} ${row.client} ${row.id}`}
+          pageSize={5}
+          filters={[
+            {
+              key: 'status',
+              label: 'Status',
+              getValue: (row) => row.status,
+              options: ticketStatusOptions,
+            },
+          ]}
           renderMobileCard={(row) => (
             <Card>
               <CardContent className="flex flex-col gap-1.5">
@@ -587,8 +669,14 @@ export default function DesignCheckPage() {
                 </div>
                 <p className="font-semibold">{row.title}</p>
                 <div className="text-small text-muted-foreground flex items-center justify-between">
-                  <span>{row.client}</span>
-                  <PriorityBadge priority={row.priority} />
+                  <span>
+                    {row.client} ·{' '}
+                    {new Date(row.reportedAt).toLocaleDateString('nl-BE', {
+                      day: 'numeric',
+                      month: 'short',
+                    })}
+                  </span>
+                  <StatusBadge domain="priority" priority={row.priority} />
                 </div>
               </CardContent>
             </Card>
@@ -601,14 +689,38 @@ export default function DesignCheckPage() {
         <div>
           <h2 className="text-h2 font-display">9 · Lege staat</h2>
           <p className="text-body text-muted-foreground">
-            Geen illustraties: een kaderlijn, één zin uitleg en de actie die de lijst vult.
+            Geen illustraties: een kaderlijn, één zin uitleg en, waar zinvol, de actie die de lijst
+            vult. Vier varianten, zie COMPONENTS.md &quot;Lege staten&quot;.
           </p>
         </div>
-        <EmptyState
-          title="Nog geen tickets voor dit project"
-          description="Meldt u een probleem op de website, dan verschijnt het hier met de status en de opvolging."
-          action={<Button>Bug melden</Button>}
-        />
+        <div className="flex flex-col gap-3">
+          <EmptyState
+            variant="invite"
+            title="Nog geen tickets voor dit project"
+            description="Meldt u een probleem op de website, dan verschijnt het hier met de status en de opvolging."
+            action={<Button>Bug melden</Button>}
+          />
+          <EmptyState
+            variant="filtered"
+            title="Geen tickets met deze filters"
+            description="Er zijn geen tickets die aan de huidige filters voldoen."
+            action={
+              <Button variant="outline" size="sm">
+                Filters wissen
+              </Button>
+            }
+          />
+          <EmptyState
+            variant="positive"
+            title="Geen openstaande tickets"
+            description="Positieve lege staat: gebruik deze wanneer leeg goed nieuws is."
+          />
+          <EmptyState
+            variant="neutral"
+            title="Niets gepland deze week"
+            description="Er staan geen agenda-items in deze periode."
+          />
+        </div>
       </section>
 
       {/* 10 · Tabs, kruimelpad & gegevenslijst */}
@@ -795,6 +907,77 @@ export default function DesignCheckPage() {
           Het klantportaal gebruikt dezelfde navigatie met vier bestemmingen: Projecten, Tickets,
           Agenda en Documenten. Interne taken en het takenbord zijn daar niet aanwezig.
         </p>
+      </section>
+
+      {/* 12 · Formulierpatroon */}
+      <section className="flex flex-col gap-4">
+        <div>
+          <h2 className="text-h2 font-display">12 · Formulierpatroon</h2>
+          <p className="text-body text-muted-foreground">
+            Eén kolom, labels boven de velden, verplichte velden met een asterisk. Validatie bij
+            verlaten van het veld en opnieuw bij opslaan; de foutmelding staat onder het veld. Zod +
+            react-hook-form aan de client, dezelfde Zod-check nog eens server-side via{' '}
+            <code className="text-small font-mono">createFormAction</code> — beide tonen fouten op
+            precies dezelfde manier.
+          </p>
+        </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <Card>
+            <CardContent className="flex flex-col gap-2">
+              <p className="font-semibold">Volle pagina gebruiken</p>
+              <p className="text-body text-muted-foreground">
+                Bij aanmaken van een hoofdobject (project, klant), bij meer dan acht velden, of
+                wanneer het formulier eigen secties heeft.
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex flex-col gap-2">
+              <p className="font-semibold">Zijpaneel gebruiken</p>
+              <p className="text-body text-muted-foreground">
+                Bij snel toevoegen of bijwerken vanuit een lijst of bord, met maximaal acht velden,
+                wanneer de context achter het paneel zichtbaar moet blijven. Op mobiel schuift
+                hetzelfde paneel van onder in beeld.
+              </p>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="flex flex-col gap-2">
+              <p className="font-semibold">Dialoog gebruiken</p>
+              <p className="text-body text-muted-foreground">
+                Alleen voor één beslissing of één veld: naam wijzigen, status kiezen, verwijderen
+                bevestigen. Nooit voor een volledig formulier.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+        <FormPatternDemo />
+      </section>
+
+      {/* 13 · Detail */}
+      <section className="flex flex-col gap-4">
+        <div>
+          <h2 className="text-h2 font-display">13 · Detail</h2>
+          <p className="text-body text-muted-foreground">
+            Kruimelpad, titel met statusbadge, één primaire actie plus een overloopmenu voor de rest
+            — <code className="text-small font-mono">DetailHeader</code> bovenop 0a&apos;s{' '}
+            <code className="text-small font-mono">PageHeader</code>. Daaronder secties in vaste
+            orde: de kern van het object, dan gerelateerde lijsten, dan de tijdlijn.
+          </p>
+        </div>
+        <DetailPatternDemo />
+      </section>
+
+      {/* 14 · Feedback */}
+      <section className="flex flex-col gap-4">
+        <div>
+          <h2 className="text-h2 font-display">14 · Feedback</h2>
+          <p className="text-body text-muted-foreground">
+            Toast rechtsonder op desktop (mobiel bovenaan) met een 3px rand in de semantische kleur;
+            succes verdwijnt na 4s, fout blijft met een herhaalactie.
+          </p>
+        </div>
+        <FeedbackDemo />
       </section>
     </main>
   );

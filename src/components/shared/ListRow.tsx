@@ -28,6 +28,26 @@ export function ListRow({
   );
 }
 
+/** Timeline row: dot, text, timestamp (see COMPONENTS.md "Lijstrijvarianten"). */
+export function TimelineItem({
+  children,
+  timestamp,
+  className,
+}: {
+  children: ReactNode;
+  timestamp: string;
+  className?: string;
+}) {
+  return (
+    <div className={cn('flex items-start gap-2.5', className)}>
+      <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-neutral-300" />
+      <p className="text-body flex-1">
+        {children} <span className="text-muted-foreground">· {timestamp}</span>
+      </p>
+    </div>
+  );
+}
+
 /** Month/day block used as the leading visual for agenda list rows. */
 export function DateBlock({
   month,

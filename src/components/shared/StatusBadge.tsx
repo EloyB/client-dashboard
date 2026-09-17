@@ -1,8 +1,6 @@
+import type { Priority, ProjectStatus, TaskStatus, TicketStatus } from '@/db/schema';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-
-export type TaskStatus = 'todo' | 'in_progress' | 'review' | 'done';
-export type TicketStatus = 'new' | 'in_progress' | 'resolved' | 'closed';
 
 const taskStatusConfig: Record<TaskStatus, { label: string; className: string }> = {
   todo: { label: 'Te doen', className: 'bg-muted text-secondary-foreground hover:bg-muted' },
@@ -37,6 +35,39 @@ const ticketStatusLabel: Record<TicketStatusAudience, Record<TicketStatus, strin
   },
 };
 
+const projectStatusConfig: Record<ProjectStatus, { label: string; className: string }> = {
+  planned: { label: 'Gepland', className: 'bg-info-muted text-info hover:bg-info-muted' },
+  active: { label: 'Actief', className: 'bg-accent text-accent-foreground hover:bg-accent' },
+  maintenance: {
+    label: 'Onderhoud',
+    className: 'bg-muted text-secondary-foreground hover:bg-muted',
+  },
+  completed: {
+    label: 'Afgerond',
+    className: 'bg-success-muted text-success hover:bg-success-muted',
+  },
+  archived: { label: 'Gearchiveerd', className: 'bg-muted text-neutral-400 hover:bg-muted' },
+};
+
+const priorityConfig: Record<Priority, { label: string; className: string; dotClassName: string }> =
+  {
+    low: {
+      label: 'Laag',
+      className: 'border-border text-foreground',
+      dotClassName: 'bg-neutral-400',
+    },
+    medium: {
+      label: 'Middel',
+      className: 'border-warning-border text-warning',
+      dotClassName: 'bg-warning-solid',
+    },
+    high: {
+      label: 'Hoog',
+      className: 'border-destructive-border text-destructive',
+      dotClassName: 'bg-destructive',
+    },
+  };
+
 const visibilityConfig = {
   shared: { label: 'Gedeeld', className: 'bg-success-muted text-success hover:bg-success-muted' },
   internal: {
@@ -53,6 +84,8 @@ type StatusBadgeProps =
       audience?: TicketStatusAudience;
       className?: string;
     }
+  | { domain: 'project'; status: ProjectStatus; className?: string }
+  | { domain: 'priority'; priority: Priority; className?: string }
   | { domain: 'document'; visibleToClient: boolean; className?: string };
 
 export function StatusBadge(props: StatusBadgeProps) {
@@ -65,6 +98,21 @@ export function StatusBadge(props: StatusBadgeProps) {
     const label = ticketStatusLabel[props.audience ?? 'admin'][props.status];
     return (
       <Badge className={cn(ticketStatusClassName[props.status], props.className)}>{label}</Badge>
+    );
+  }
+
+  if (props.domain === 'project') {
+    const config = projectStatusConfig[props.status];
+    return <Badge className={cn(config.className, props.className)}>{config.label}</Badge>;
+  }
+
+  if (props.domain === 'priority') {
+    const config = priorityConfig[props.priority];
+    return (
+      <Badge variant="outline" className={cn('gap-1.5', config.className, props.className)}>
+        <span className={cn('size-1.5 rounded-full', config.dotClassName)} />
+        {config.label}
+      </Badge>
     );
   }
 
