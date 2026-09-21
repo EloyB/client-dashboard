@@ -10,11 +10,7 @@ import { AppShell } from '@/components/shared/AppShell';
 import { InitialsAvatar } from '@/components/shared/InitialsAvatar';
 import { Button } from '@/components/ui/button';
 import { getCurrentUser } from '@/lib/access';
-
-function initialsFor(name: string): string {
-  const [first, second] = name.split(' ');
-  return `${first?.charAt(0) ?? ''}${second?.charAt(0) ?? ''}`.toUpperCase();
-}
+import { initialsFromName } from '@/lib/utils';
 
 export default async function PortalLayout({ children }: { children: ReactNode }) {
   const currentUser = await getCurrentUser(await headers());
@@ -55,7 +51,7 @@ export default async function PortalLayout({ children }: { children: ReactNode }
       }
       footerAvatar={
         <InitialsAvatar
-          initials={initialsFor(clientUser.name)}
+          initials={initialsFromName(clientUser.name)}
           shape="circle"
           className="bg-neutral-200 text-neutral-800"
         />

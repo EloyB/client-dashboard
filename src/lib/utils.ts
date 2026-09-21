@@ -12,3 +12,9 @@ export const cn = createCn({
     },
   },
 });
+
+/** First letter of the first two words, e.g. "Verlinden & Zn" -> "VZ". */
+export function initialsFromName(name: string): string {
+  const [first, second] = name.split(' ');
+  return `${first?.charAt(0) ?? ''}${second?.charAt(0) ?? ''}`.toUpperCase();
+}

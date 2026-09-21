@@ -1,6 +1,7 @@
 'use client';
 
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { Fragment, useMemo, type ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -56,23 +57,30 @@ export function DataTable<T>({
   columns,
   rows,
   getRowKey,
+  getRowHref,
   renderMobileCard,
   searchValue,
   searchPlaceholder = 'Zoeken...',
   filters,
   pageSize = 5,
+  emptyState,
   className,
 }: {
   columns: DataTableColumn<T>[];
   rows: T[];
   getRowKey: (row: T) => string;
+  /** Makes each desktop row navigable on click, in addition to whatever links its cells already contain. */
+  getRowHref?: (row: T) => string;
   renderMobileCard: (row: T) => ReactNode;
   searchValue?: (row: T) => string;
   searchPlaceholder?: string;
   filters?: DataTableFilter<T>[];
   pageSize?: number;
+  /** Shown instead of the table/cards when search/filters leave zero rows — the search and sort controls stay visible so the query can still be adjusted. */
+  emptyState?: ReactNode;
   className?: string;
 }) {
+  const router = useRouter();
   const filterKeys = useMemo(() => filters?.map((filter) => filter.key) ?? [], [filters]);
   const state = useDataTableUrlState(filterKeys);
 
@@ -85,6 +93,7 @@ export function DataTable<T>({
 
   const sortColumn = columns.find((column) => column.key === state.sort);
   const sortedRows = sortRows(filteredRows, sortColumn?.sortValue, state.direction);
+  const isEmpty = sortedRows.length === 0;
 
   const pageCount = totalPages(sortedRows.length, pageSize);
   const desktopRows = paginateRowsExact(sortedRows, state.page, pageSize);
@@ -177,51 +186,59 @@ export function DataTable<T>({
         </div>
       )}
 
-      <Card className="hidden overflow-hidden py-0 md:block">
-        <Table>
-          <TableHeader className="bg-neutral-50">
-            <TableRow className="hover:bg-neutral-50">
-              {columns.map((column) => (
-                <TableHead key={column.key} className={column.className}>
-                  {column.sortValue ? (
-                    <button
-                      type="button"
-                      onClick={() => state.setSort(column.key)}
-                      className="inline-flex items-center gap-1 font-semibold"
-                    >
-                      {column.header}
-                      {state.sort === column.key ? (
-                        state.direction === 'asc' ? (
-                          <ArrowUp className="size-3.5" />
-                        ) : (
-                          <ArrowDown className="size-3.5" />
-                        )
-                      ) : (
-                        <ArrowUpDown className="text-muted-foreground size-3.5" />
-                      )}
-                    </button>
-                  ) : (
-                    column.header
-                  )}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {desktopRows.map((row) => (
-              <TableRow key={getRowKey(row)}>
+      {isEmpty && emptyState ? (
+        emptyState
+      ) : (
+        <Card className="hidden overflow-hidden py-0 md:block">
+          <Table>
+            <TableHeader className="bg-neutral-50">
+              <TableRow className="hover:bg-neutral-50">
                 {columns.map((column) => (
-                  <TableCell key={column.key} className={column.className}>
-                    {column.cell(row)}
-                  </TableCell>
+                  <TableHead key={column.key} className={column.className}>
+                    {column.sortValue ? (
+                      <button
+                        type="button"
+                        onClick={() => state.setSort(column.key)}
+                        className="inline-flex items-center gap-1 font-semibold"
+                      >
+                        {column.header}
+                        {state.sort === column.key ? (
+                          state.direction === 'asc' ? (
+                            <ArrowUp className="size-3.5" />
+                          ) : (
+                            <ArrowDown className="size-3.5" />
+                          )
+                        ) : (
+                          <ArrowUpDown className="text-muted-foreground size-3.5" />
+                        )}
+                      </button>
+                    ) : (
+                      column.header
+                    )}
+                  </TableHead>
                 ))}
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </Card>
+            </TableHeader>
+            <TableBody>
+              {desktopRows.map((row) => (
+                <TableRow
+                  key={getRowKey(row)}
+                  onClick={getRowHref ? () => router.push(getRowHref(row)) : undefined}
+                  className={cn(getRowHref && 'cursor-pointer')}
+                >
+                  {columns.map((column) => (
+                    <TableCell key={column.key} className={column.className}>
+                      {column.cell(row)}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </Card>
+      )}
 
-      {pageCount > 1 && (
+      {!isEmpty && pageCount > 1 && (
         <div className="hidden items-center justify-between md:flex">
           <p className="text-small text-muted-foreground">
             Pagina {state.page} van {pageCount}
@@ -260,7 +277,7 @@ export function DataTable<T>({
         </div>
       )}
 
-      <div className="flex flex-col gap-2 md:hidden">
+      <div className={cn('flex flex-col gap-2 md:hidden', isEmpty && emptyState && 'hidden')}>
         {mobileRows.map((row) => (
           <div key={getRowKey(row)}>{renderMobileCard(row)}</div>
         ))}

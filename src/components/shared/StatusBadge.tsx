@@ -76,6 +76,15 @@ const visibilityConfig = {
   },
 } as const;
 
+// Derived from user.emailVerified (see slice 1b) — no separate status column.
+const userStatusConfig = {
+  active: { label: 'Actief', className: 'bg-success-muted text-success hover:bg-success-muted' },
+  invited: {
+    label: 'Uitgenodigd',
+    className: 'bg-warning-muted text-warning hover:bg-warning-muted',
+  },
+} as const;
+
 type StatusBadgeProps =
   | { domain: 'task'; status: TaskStatus; className?: string }
   | {
@@ -86,7 +95,8 @@ type StatusBadgeProps =
     }
   | { domain: 'project'; status: ProjectStatus; className?: string }
   | { domain: 'priority'; priority: Priority; className?: string }
-  | { domain: 'document'; visibleToClient: boolean; className?: string };
+  | { domain: 'document'; visibleToClient: boolean; className?: string }
+  | { domain: 'user'; emailVerified: boolean; className?: string };
 
 export function StatusBadge(props: StatusBadgeProps) {
   if (props.domain === 'task') {
@@ -116,6 +126,11 @@ export function StatusBadge(props: StatusBadgeProps) {
     );
   }
 
-  const config = visibilityConfig[props.visibleToClient ? 'shared' : 'internal'];
+  if (props.domain === 'document') {
+    const config = visibilityConfig[props.visibleToClient ? 'shared' : 'internal'];
+    return <Badge className={cn(config.className, props.className)}>{config.label}</Badge>;
+  }
+
+  const config = userStatusConfig[props.emailVerified ? 'active' : 'invited'];
   return <Badge className={cn(config.className, props.className)}>{config.label}</Badge>;
 }
