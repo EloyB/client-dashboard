@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight, FilterX } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -102,6 +102,7 @@ export function ClientsTable({ clients }: { clients: ClientListRow[] }) {
           description="Er zijn geen klanten die overeenkomen met uw zoekopdracht."
           action={
             <Button variant="outline" size="sm" onClick={() => state.setSearch('')}>
+              <FilterX strokeWidth={1.75} />
               Zoekopdracht wissen
             </Button>
           }

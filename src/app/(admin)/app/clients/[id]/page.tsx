@@ -1,18 +1,19 @@
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
+import { Pencil } from 'lucide-react';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataList, type DataListItem } from '@/components/shared/DataList';
 import { DetailHeader } from '@/components/shared/DetailHeader';
-import { InitialsAvatar } from '@/components/shared/InitialsAvatar';
 import { ListRow } from '@/components/shared/ListRow';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { getClientById } from '@/features/clients/queries';
 import { AccessError } from '@/lib/access';
-import { initialsFromName } from '@/lib/utils';
+import { ClientUsersSection } from './ClientUsersSection';
 
 function formatDueDate(dueDate: string | null): string {
   if (!dueDate) return 'Geen einddatum';
@@ -47,6 +48,14 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
       <DetailHeader
         breadcrumbs={[{ label: 'Klanten', href: '/app/clients' }, { label: client.name }]}
         title={client.name}
+        primaryAction={
+          <Button variant="outline" asChild>
+            <Link href={`/app/clients/${client.id}/edit`}>
+              <Pencil strokeWidth={1.75} />
+              Bewerken
+            </Link>
+          </Button>
+        }
       />
       <div className="flex flex-col gap-4 p-4 sm:p-6 lg:p-8">
         <p className="text-body text-muted-foreground">
@@ -79,43 +88,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader className="border-border-subtle border-b">
-                <CardTitle>Gebruikers</CardTitle>
-              </CardHeader>
-              <CardContent className="flex flex-col">
-                {users.length === 0 ? (
-                  <p className="text-body text-muted-foreground">
-                    Nog geen gebruikers voor deze klant.
-                  </p>
-                ) : (
-                  <>
-                    {users.map((clientUser) => (
-                      <ListRow
-                        key={clientUser.id}
-                        leading={
-                          <InitialsAvatar
-                            initials={initialsFromName(clientUser.name)}
-                            shape="circle"
-                            className="bg-neutral-200 text-neutral-800"
-                          />
-                        }
-                        title={clientUser.name}
-                        subtitle={clientUser.email}
-                        trailing={
-                          <StatusBadge domain="user" emailVerified={clientUser.emailVerified} />
-                        }
-                        className="border-border-subtle border-b py-3 last:border-0"
-                      />
-                    ))}
-                    <p className="text-small text-muted-foreground pt-3">
-                      Gebruikers zien enkel de projecten, tickets, agenda-items en gedeelde
-                      documenten van deze klant. Interne taken blijven verborgen.
-                    </p>
-                  </>
-                )}
-              </CardContent>
-            </Card>
+            <ClientUsersSection clientId={client.id} clientName={client.name} users={users} />
           </div>
 
           <div className="flex flex-col gap-4">

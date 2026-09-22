@@ -1,9 +1,6 @@
-import { hashPassword } from 'better-auth/crypto';
-import { eq } from 'drizzle-orm';
 import { describe, expect, it } from 'vitest';
 
-import { db } from '@/db';
-import { account, clients as clientsTable, tickets, user as userTable } from '@/db/schema';
+import { tickets } from '@/db/schema';
 import { testDb } from '@/db/test-client';
 import {
   cleanupTestClient,
@@ -11,68 +8,8 @@ import {
   createTestClientUser,
   createTestProject,
 } from '@/db/test-fixtures';
+import { adminHeaders, createTempClientSession } from '@/db/test-real-session';
 import { getClientById, listClients } from '@/features/clients/queries';
-import { auth } from '@/lib/auth';
-
-const ADMIN_EMAIL = 'eloy@studioswyft.be';
-const ADMIN_PASSWORD = 'AdminWachtwoord123!';
-
-async function sessionHeadersFor(email: string, password: string): Promise<Headers> {
-  const response = await auth.api.signInEmail({ body: { email, password }, asResponse: true });
-  const [cookiePair] = (response.headers.get('set-cookie') ?? '').split(';');
-  return new Headers({ cookie: cookiePair });
-}
-
-function adminHeaders(): Promise<Headers> {
-  return sessionHeadersFor(ADMIN_EMAIL, ADMIN_PASSWORD);
-}
-
-function unique(prefix: string) {
-  return `${prefix}-${crypto.randomUUID()}@example.test`;
-}
-
-/**
- * A client-role session, backed by the real db (the same one `auth` is bound
- * to) rather than testDb — mirrors src/features/clients/actions.test.ts,
- * since resolving a session always goes through the real database regardless
- * of which `database` a query is later given for its own data.
- */
-async function createTempClientSession(): Promise<{
-  headers: Headers;
-  cleanup: () => Promise<void>;
-}> {
-  const client = await db
-    .insert(clientsTable)
-    .values({ name: unique('Temp Client'), email: unique('temp-client') })
-    .returning()
-    .then(([row]) => row);
-  const password = 'ClientPassword123!';
-  const clientUser = await db
-    .insert(userTable)
-    .values({
-      name: 'Temp Client User',
-      email: unique('temp-client-user'),
-      role: 'client',
-      clientId: client.id,
-      emailVerified: true,
-    })
-    .returning()
-    .then(([row]) => row);
-  await db.insert(account).values({
-    accountId: clientUser.id,
-    providerId: 'credential',
-    userId: clientUser.id,
-    password: await hashPassword(password),
-  });
-
-  const headers = await sessionHeadersFor(clientUser.email, password);
-  const cleanup = async () => {
-    await db.delete(clientsTable).where(eq(clientsTable.id, client.id));
-    await db.delete(userTable).where(eq(userTable.id, clientUser.id));
-  };
-
-  return { headers, cleanup };
-}
 
 describe('listClients', () => {
   it('rejects a non-admin', async () => {
