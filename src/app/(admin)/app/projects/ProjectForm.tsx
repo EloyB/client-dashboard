@@ -1,17 +1,14 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Archive, Loader2, Save, X } from 'lucide-react';
+import { Loader2, Save, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
 import type { z } from 'zod';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
-import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { DetailHeader } from '@/components/shared/DetailHeader';
 import {
   DateField,
@@ -20,11 +17,13 @@ import {
   TextField,
   UrlField,
 } from '@/components/shared/FormFields';
-import { showErrorToast, showSuccessToast } from '@/components/shared/toast';
-import { archiveProject, createProject, updateProject } from '@/features/projects/actions';
+import { showSuccessToast } from '@/components/shared/toast';
+import { createProject, updateProject } from '@/features/projects/actions';
 import { projectFormSchema, statusesRequiringDueDate } from '@/features/projects/schemas';
 import type { SelectableClient } from '@/features/projects/queries';
+import type { ProjectStatus } from '@/db/schema';
 import { applyFormActionErrors } from '@/lib/form-action';
+import { useArchiveProjectAction } from './useArchiveProjectAction';
 
 type ProjectFormInput = z.input<typeof projectFormSchema>;
 
@@ -56,14 +55,12 @@ export function ProjectForm({
   /** Present only when editing an existing project. */
   projectId?: string;
   projectName?: string;
-  currentStatus?: string;
+  currentStatus?: ProjectStatus;
   defaultValues: ProjectFormInput;
   clients: SelectableClient[];
 }) {
   const router = useRouter();
   const isEditing = Boolean(projectId);
-  const [archiveDialogOpen, setArchiveDialogOpen] = useState(false);
-  const [isArchiving, setIsArchiving] = useState(false);
 
   const { control, handleSubmit, formState, setError } = useForm<ProjectFormInput>({
     resolver: zodResolver(projectFormSchema),
@@ -71,6 +68,16 @@ export function ProjectForm({
   });
 
   const status = useWatch({ control, name: 'status' });
+
+  const { menuItem: archiveMenuItem, dialog: archiveDialog } = useArchiveProjectAction({
+    projectId: projectId ?? '',
+    projectName: projectName ?? '',
+    currentStatus: currentStatus ?? 'planned',
+    onArchived: () => {
+      router.push(`/app/projects/${projectId}`);
+      router.refresh();
+    },
+  });
 
   async function onSubmit(data: ProjectFormInput) {
     const result = projectId
@@ -87,22 +94,6 @@ export function ProjectForm({
     }
     router.push(`/app/projects/${result.data.projectId}`);
     router.refresh();
-  }
-
-  async function handleArchiveConfirm() {
-    if (!projectId) return;
-    setIsArchiving(true);
-    try {
-      await archiveProject(projectId);
-      showSuccessToast('Project gearchiveerd');
-      setArchiveDialogOpen(false);
-      router.push(`/app/projects/${projectId}`);
-      router.refresh();
-    } catch (error) {
-      showErrorToast('Archiveren mislukt', error instanceof Error ? error.message : undefined);
-    } finally {
-      setIsArchiving(false);
-    }
   }
 
   return (
@@ -129,15 +120,7 @@ export function ProjectForm({
             {isEditing ? 'Wijzigingen opslaan' : 'Project opslaan'}
           </Button>
         }
-        overflowActions={
-          isEditing &&
-          currentStatus !== 'archived' && (
-            <DropdownMenuItem onSelect={() => setArchiveDialogOpen(true)}>
-              <Archive strokeWidth={1.75} />
-              Archiveren
-            </DropdownMenuItem>
-          )
-        }
+        overflowActions={isEditing && archiveMenuItem}
       />
 
       <form
@@ -222,17 +205,7 @@ export function ProjectForm({
         </fieldset>
       </form>
 
-      {isEditing && (
-        <ConfirmDialog
-          open={archiveDialogOpen}
-          onOpenChange={setArchiveDialogOpen}
-          title="Project archiveren?"
-          description={`${projectName ?? 'Dit project'} verdwijnt uit het standaardoverzicht, maar blijft bewaard.`}
-          confirmLabel={isArchiving ? 'Bezig...' : 'Archiveren'}
-          confirmIcon={Archive}
-          onConfirm={handleArchiveConfirm}
-        />
-      )}
+      {isEditing && archiveDialog}
     </>
   );
 }

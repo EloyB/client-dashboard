@@ -93,7 +93,7 @@ export function ProjectsTable({ projects }: { projects: ProjectListRow[] }) {
       header: 'Project',
       sortValue: (row) => row.name,
       cell: (row) => (
-        <Link href={`/app/projects/${row.id}/edit`} className="font-medium">
+        <Link href={`/app/projects/${row.id}`} className="font-medium">
           {row.name}
         </Link>
       ),
@@ -168,7 +168,7 @@ export function ProjectsTable({ projects }: { projects: ProjectListRow[] }) {
         columns={columns}
         rows={visibleProjects}
         getRowKey={(row) => row.id}
-        getRowHref={(row) => `/app/projects/${row.id}/edit`}
+        getRowHref={(row) => `/app/projects/${row.id}`}
         searchValue={searchValue}
         searchPlaceholder="Zoek op projectnaam"
         filters={filters}
@@ -180,7 +180,7 @@ export function ProjectsTable({ projects }: { projects: ProjectListRow[] }) {
           />
         }
         renderMobileCard={(row) => (
-          <Link href={`/app/projects/${row.id}/edit`} className="block">
+          <Link href={`/app/projects/${row.id}`} className="block">
             <div className="border-border-subtle bg-card flex flex-col gap-2 rounded-xl border p-3">
               <div className="flex items-start justify-between gap-2">
                 <div>
