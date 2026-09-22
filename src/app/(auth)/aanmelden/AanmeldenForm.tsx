@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Send } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -135,7 +135,11 @@ export function AanmeldenForm({ initialError }: { initialError: string | null })
         />
         {formError && <p className="text-small text-destructive">{formError}</p>}
         <Button type="submit" className="w-full" disabled={isBusy}>
-          {formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
+          {formState.isSubmitting ? (
+            <Loader2 className="animate-spin" strokeWidth={1.75} />
+          ) : (
+            <Send strokeWidth={1.75} />
+          )}
           {retryAfter > 0
             ? `Probeer opnieuw over ${retryAfter}s`
             : isExpired

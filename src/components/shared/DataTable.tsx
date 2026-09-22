@@ -1,6 +1,14 @@
 'use client';
 
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  ArrowUpDown,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Search,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { Fragment, useMemo, type ReactNode } from 'react';
 
@@ -283,6 +291,7 @@ export function DataTable<T>({
         ))}
         {hasMore && (
           <Button variant="outline" className="w-full" onClick={state.loadMore}>
+            <ChevronDown strokeWidth={1.75} />
             Meer laden
           </Button>
         )}

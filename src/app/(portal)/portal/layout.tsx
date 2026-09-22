@@ -1,4 +1,5 @@
 import { eq } from 'drizzle-orm';
+import { Bug } from 'lucide-react';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
@@ -45,7 +46,10 @@ export default async function PortalLayout({ children }: { children: ReactNode }
             <p className="text-body truncate font-semibold">{client.name}</p>
           </div>
           <Button asChild>
-            <Link href="/portal/tickets">Bug melden</Link>
+            <Link href="/portal/tickets">
+              <Bug strokeWidth={1.75} />
+              Bug melden
+            </Link>
           </Button>
         </div>
       }

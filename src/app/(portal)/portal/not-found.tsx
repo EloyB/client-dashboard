@@ -1,3 +1,4 @@
+import { Home } from 'lucide-react';
 import Link from 'next/link';
 
 import { BackButton } from '@/components/shared/BackButton';
@@ -16,7 +17,10 @@ export default function PortalNotFound() {
         actions={
           <>
             <Button asChild>
-              <Link href="/portal">Naar start</Link>
+              <Link href="/portal">
+                <Home strokeWidth={1.75} />
+                Naar start
+              </Link>
             </Button>
             <BackButton variant="outline">Vorige pagina</BackButton>
           </>

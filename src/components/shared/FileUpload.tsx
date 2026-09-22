@@ -1,6 +1,6 @@
 'use client';
 
-import { Camera, FileUp, Image as ImageIcon, Upload, X } from 'lucide-react';
+import { Camera, FileUp, Image as ImageIcon, RefreshCw, RotateCcw, Upload, X } from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -217,9 +217,11 @@ export function FileUploadField({
           <p className="text-small text-destructive">{error}</p>
           <div className="flex gap-2">
             <Button size="sm" variant="outline" onClick={() => handleFile(file ?? undefined)}>
+              <RefreshCw strokeWidth={1.75} />
               Opnieuw proberen
             </Button>
             <Button size="sm" variant="ghost" onClick={reset}>
+              <RotateCcw strokeWidth={1.75} />
               Ander bestand kiezen
             </Button>
           </div>

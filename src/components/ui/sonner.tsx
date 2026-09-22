@@ -35,10 +35,16 @@ const Toaster = ({ ...props }: ToasterProps) => {
         } as React.CSSProperties
       }
       toastOptions={{
+        // Sonner injects its own unlayered <style> tag for the base toast
+        // border, which always wins over Tailwind's @layer utilities
+        // classes regardless of specificity — the `!` modifier forces
+        // !important so these actually override it.
         classNames: {
-          toast: 'cn-toast border-l-[3px]',
-          success: 'border-l-success',
-          error: 'border-l-destructive',
+          toast: 'cn-toast border-l-[3px]!',
+          success: 'border-l-success!',
+          error: 'border-l-destructive!',
+          warning: 'border-l-warning!',
+          info: 'border-l-info!',
         },
       }}
       {...props}

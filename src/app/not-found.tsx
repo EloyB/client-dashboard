@@ -1,3 +1,4 @@
+import { LogIn } from 'lucide-react';
 import Link from 'next/link';
 
 import { StatusPage } from '@/components/shared/StatusPage';
@@ -11,7 +12,10 @@ export default function RootNotFound() {
       description="Controleer de link, of meld u aan om verder te gaan."
       actions={
         <Button asChild>
-          <Link href="/login">Naar aanmelden</Link>
+          <Link href="/login">
+            <LogIn strokeWidth={1.75} />
+            Naar aanmelden
+          </Link>
         </Button>
       }
     />

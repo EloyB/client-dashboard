@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -116,7 +116,11 @@ export function AcceptInvitationForm({
         {formError && <p className="text-small text-destructive">{formError}</p>}
 
         <Button type="submit" className="w-full" disabled={formState.isSubmitting}>
-          {formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
+          {formState.isSubmitting ? (
+            <Loader2 className="animate-spin" strokeWidth={1.75} />
+          ) : (
+            <ArrowRight strokeWidth={1.75} />
+          )}
           {formState.isSubmitting ? 'Bezig...' : 'Doorgaan'}
         </Button>
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { X } from 'lucide-react';
 import type { ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -64,6 +65,7 @@ export function FormSheet({
             onClick={onCancel ?? (() => onOpenChange(false))}
             className={cn(!isDesktop && 'w-full')}
           >
+            <X strokeWidth={1.75} />
             {cancelLabel}
           </Button>
           {primaryAction}

@@ -1,3 +1,4 @@
+import { Home } from 'lucide-react';
 import Link from 'next/link';
 
 import { BackButton } from '@/components/shared/BackButton';
@@ -16,7 +17,10 @@ export default function AdminNotFound() {
         actions={
           <>
             <Button asChild>
-              <Link href="/app">Naar dashboard</Link>
+              <Link href="/app">
+                <Home strokeWidth={1.75} />
+                Naar dashboard
+              </Link>
             </Button>
             <BackButton variant="outline">Vorige pagina</BackButton>
           </>

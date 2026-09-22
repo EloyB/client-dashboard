@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { ArrowLeft, Loader2, Send } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -68,7 +68,10 @@ export function ForgotPasswordForm() {
           ongewenste e-mail.
         </AuthNoticeBox>
         <Button asChild className="w-full">
-          <Link href="/login">Terug naar aanmelden</Link>
+          <Link href="/login">
+            <ArrowLeft strokeWidth={1.75} />
+            Terug naar aanmelden
+          </Link>
         </Button>
         <p className="text-small text-muted-foreground text-center">
           Geen e-mail ontvangen?{' '}
@@ -106,7 +109,11 @@ export function ForgotPasswordForm() {
         />
         {formError && <p className="text-small text-destructive">{formError}</p>}
         <Button type="submit" className="w-full" disabled={formState.isSubmitting}>
-          {formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
+          {formState.isSubmitting ? (
+            <Loader2 className="animate-spin" strokeWidth={1.75} />
+          ) : (
+            <Send strokeWidth={1.75} />
+          )}
           {formState.isSubmitting ? 'Bezig...' : 'Stuur de link'}
         </Button>
         <Link href="/login" className="text-small text-primary text-center font-semibold">

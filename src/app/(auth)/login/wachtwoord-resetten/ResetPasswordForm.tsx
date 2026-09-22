@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { KeyRound, Loader2, LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm, useWatch } from 'react-hook-form';
@@ -66,7 +66,10 @@ export function ResetPasswordForm({
           </p>
         </div>
         <Button asChild className="w-full">
-          <Link href="/login/wachtwoord-vergeten">Nieuwe link aanvragen</Link>
+          <Link href="/login/wachtwoord-vergeten">
+            <KeyRound strokeWidth={1.75} />
+            Nieuwe link aanvragen
+          </Link>
         </Button>
       </div>
     );
@@ -83,7 +86,10 @@ export function ResetPasswordForm({
           Uw wachtwoord is aangepast. Andere toestellen zijn afgemeld.
         </AuthNoticeBox>
         <Button asChild className="w-full">
-          <Link href="/login">Aanmelden</Link>
+          <Link href="/login">
+            <LogIn strokeWidth={1.75} />
+            Aanmelden
+          </Link>
         </Button>
       </div>
     );
@@ -119,7 +125,11 @@ export function ResetPasswordForm({
           required
         />
         <Button type="submit" className="w-full" disabled={formState.isSubmitting}>
-          {formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
+          {formState.isSubmitting ? (
+            <Loader2 className="animate-spin" strokeWidth={1.75} />
+          ) : (
+            <KeyRound strokeWidth={1.75} />
+          )}
           {formState.isSubmitting ? 'Bezig...' : 'Wachtwoord instellen'}
         </Button>
       </fieldset>

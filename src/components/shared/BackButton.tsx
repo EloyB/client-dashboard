@@ -1,5 +1,6 @@
 'use client';
 
+import { ArrowLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { ComponentProps } from 'react';
 
@@ -10,6 +11,7 @@ export function BackButton({ children, ...props }: Omit<ComponentProps<typeof Bu
 
   return (
     <Button {...props} onClick={() => router.back()}>
+      <ArrowLeft strokeWidth={1.75} />
       {children}
     </Button>
   );

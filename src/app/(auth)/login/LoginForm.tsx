@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2 } from 'lucide-react';
+import { Loader2, LogIn } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -109,7 +109,11 @@ export function LoginForm() {
         {formError && <p className="text-small text-destructive">{formError}</p>}
 
         <Button type="submit" className="w-full" disabled={isBusy}>
-          {formState.isSubmitting && <Loader2 className="size-4 animate-spin" />}
+          {formState.isSubmitting ? (
+            <Loader2 className="animate-spin" strokeWidth={1.75} />
+          ) : (
+            <LogIn strokeWidth={1.75} />
+          )}
           {isLocked
             ? `Probeer opnieuw over ${retryAfter}s`
             : formState.isSubmitting

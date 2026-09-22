@@ -1,6 +1,6 @@
 'use client';
 
-import { TriangleAlert } from 'lucide-react';
+import { Home, RefreshCw, TriangleAlert } from 'lucide-react';
 import Link from 'next/link';
 
 import { StatusPage } from '@/components/shared/StatusPage';
@@ -31,9 +31,15 @@ export default function AdminError({
       meta={`Foutcode ${error.digest ?? '500'} · ${timestamp}`}
       actions={
         <>
-          <Button onClick={reset}>Opnieuw proberen</Button>
+          <Button onClick={reset}>
+            <RefreshCw strokeWidth={1.75} />
+            Opnieuw proberen
+          </Button>
           <Button variant="outline" asChild>
-            <Link href="/app">Naar dashboard</Link>
+            <Link href="/app">
+              <Home strokeWidth={1.75} />
+              Naar dashboard
+            </Link>
           </Button>
         </>
       }

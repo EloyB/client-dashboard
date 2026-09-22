@@ -1,5 +1,6 @@
 'use client';
 
+import { type LucideIcon, X } from 'lucide-react';
 import { useState } from 'react';
 
 import {
@@ -26,6 +27,7 @@ export function ConfirmDialog({
   title,
   description,
   confirmLabel = 'Bevestigen',
+  confirmIcon: ConfirmIcon,
   cancelLabel = 'Annuleren',
   variant = 'default',
   confirmationText,
@@ -36,6 +38,8 @@ export function ConfirmDialog({
   title: string;
   description: string;
   confirmLabel?: string;
+  /** Icon shown before confirmLabel, matching the action (e.g. Trash2, UserX). */
+  confirmIcon?: LucideIcon;
   cancelLabel?: string;
   variant?: 'default' | 'destructive';
   /** When set, the confirm button stays disabled until this exact text is typed. */
@@ -72,8 +76,12 @@ export function ConfirmDialog({
         )}
 
         <AlertDialogFooter>
-          <AlertDialogCancel>{cancelLabel}</AlertDialogCancel>
+          <AlertDialogCancel>
+            <X strokeWidth={1.75} />
+            {cancelLabel}
+          </AlertDialogCancel>
           <AlertDialogAction variant={variant} disabled={isConfirmDisabled} onClick={onConfirm}>
+            {ConfirmIcon && <ConfirmIcon strokeWidth={1.75} />}
             {confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>

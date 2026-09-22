@@ -1,6 +1,6 @@
 'use client';
 
-import { TriangleAlert } from 'lucide-react';
+import { Home, RefreshCw, TriangleAlert } from 'lucide-react';
 import Link from 'next/link';
 
 import { StatusPage } from '@/components/shared/StatusPage';
@@ -31,9 +31,15 @@ export default function PortalError({
       meta={`Foutcode ${error.digest ?? '500'} · ${timestamp}`}
       actions={
         <>
-          <Button onClick={reset}>Opnieuw proberen</Button>
+          <Button onClick={reset}>
+            <RefreshCw strokeWidth={1.75} />
+            Opnieuw proberen
+          </Button>
           <Button variant="outline" asChild>
-            <Link href="/portal">Naar start</Link>
+            <Link href="/portal">
+              <Home strokeWidth={1.75} />
+              Naar start
+            </Link>
           </Button>
         </>
       }
