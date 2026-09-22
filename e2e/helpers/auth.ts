@@ -3,7 +3,7 @@ import { eq } from 'drizzle-orm';
 import type { BrowserContext } from '@playwright/test';
 
 import { db } from '@/db';
-import { account, clients, user as userTable } from '@/db/schema';
+import { account, clients, files, projects, user as userTable } from '@/db/schema';
 import { auth } from '@/lib/auth';
 
 const SESSION_COOKIE_NAME = 'better-auth.session_token';
@@ -97,4 +97,67 @@ export async function loginAsClient(context: BrowserContext) {
   await ensureClientTestUser();
   const token = await signInAndExtractCookie(CLIENT_TEST_EMAIL, CLIENT_TEST_PASSWORD);
   await addSessionCookie(context, token);
+}
+
+/**
+ * A fresh, disposable client with exactly `projectCount` active projects,
+ * logged in as a new client user — for scenarios the shared
+ * `CLIENT_TEST_CLIENT_NAME` fixture can't cover (it always has multiple
+ * projects), such as the single-selectable-project prefill.
+ */
+export async function loginAsTempClient(
+  context: BrowserContext,
+  projectCount: number,
+): Promise<{ projectNames: string[]; cleanup: () => Promise<void> }> {
+  const unique = Date.now();
+  const password = 'ZzzTempClientWachtwoord123!';
+
+  const [client] = await db
+    .insert(clients)
+    .values({ name: `Zzz Temp Client ${unique}`, email: `zzz-temp-client-${unique}@example.test` })
+    .returning();
+
+  const projectNames = Array.from(
+    { length: projectCount },
+    (_, index) => `Zzz Project ${index + 1}`,
+  );
+  if (projectNames.length > 0) {
+    await db
+      .insert(projects)
+      .values(
+        projectNames.map((name) => ({ clientId: client.id, name, status: 'active' as const })),
+      );
+  }
+
+  const [clientUser] = await db
+    .insert(userTable)
+    .values({
+      name: 'Zzz Temp Client User',
+      email: `zzz-temp-user-${unique}@example.test`,
+      role: 'client',
+      clientId: client.id,
+      emailVerified: true,
+    })
+    .returning();
+  await db.insert(account).values({
+    accountId: clientUser.id,
+    providerId: 'credential',
+    userId: clientUser.id,
+    password: await hashPassword(password),
+  });
+
+  const token = await signInAndExtractCookie(clientUser.email, password);
+  await addSessionCookie(context, token);
+
+  const cleanup = async () => {
+    // Projects first (cascades any tickets/attachments created during the
+    // test), then files uploaded by this user (files.uploadedById
+    // restricts), then the user, then the client.
+    await db.delete(projects).where(eq(projects.clientId, client.id));
+    await db.delete(files).where(eq(files.uploadedById, clientUser.id));
+    await db.delete(userTable).where(eq(userTable.id, clientUser.id));
+    await db.delete(clients).where(eq(clients.id, client.id));
+  };
+
+  return { projectNames, cleanup };
 }

@@ -148,7 +148,7 @@ test.describe('portal area', () => {
     await expect(sidebar.getByText(CLIENT_TEST_CLIENT_NAME).first()).toBeVisible();
     await expect(sidebar.getByRole('link', { name: 'Bug melden' })).toHaveAttribute(
       'href',
-      '/portal/tickets',
+      '/portal/tickets/new',
     );
   });
 

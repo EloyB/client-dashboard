@@ -1,8 +1,22 @@
-import { asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, ne } from 'drizzle-orm';
 
 import { db, type Database } from '@/db';
-import { ticketComments, tickets } from '@/db/schema';
+import { projects, ticketComments, tickets } from '@/db/schema';
 import { AccessError, assertProjectAccess, type AuthenticatedUser } from '@/lib/access';
+
+export type SelectableProject = { id: string; name: string };
+
+/** Used by the "report a bug" form (slice 5a) — a client's own non-archived projects. */
+export async function listSelectableProjectsForClient(
+  user: AuthenticatedUser & { clientId: string },
+  database: Database = db,
+): Promise<SelectableProject[]> {
+  return database
+    .select({ id: projects.id, name: projects.name })
+    .from(projects)
+    .where(and(eq(projects.clientId, user.clientId), ne(projects.status, 'archived')))
+    .orderBy(projects.name);
+}
 
 export async function listTicketsForProject(
   user: AuthenticatedUser,

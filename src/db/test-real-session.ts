@@ -96,3 +96,21 @@ export async function createTempClientSession(): Promise<{
 
   return { headers, cleanup };
 }
+
+// The presigned URL deliberately doesn't sign a Content-Type (see storage.ts),
+// but a real browser upload always sends one matching the file — simulating
+// that here matters, since confirmUpload verifies the type MinIO actually stored.
+export async function uploadRealObject(
+  uploadUrl: string,
+  body: BodyInit,
+  contentType = 'image/png',
+): Promise<void> {
+  const response = await fetch(uploadUrl, {
+    method: 'PUT',
+    body,
+    headers: { 'Content-Type': contentType },
+  });
+  if (!response.ok) {
+    throw new Error(`Test setup: PUT to presigned URL failed with ${response.status}`);
+  }
+}

@@ -46,7 +46,7 @@ export default async function PortalLayout({ children }: { children: ReactNode }
             <p className="text-body truncate font-semibold">{client.name}</p>
           </div>
           <Button asChild>
-            <Link href="/portal/tickets">
+            <Link href="/portal/tickets/new">
               <Bug strokeWidth={1.75} />
               Bug melden
             </Link>
