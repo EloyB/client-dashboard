@@ -35,6 +35,7 @@ import { DateBlock, ListRow } from '@/components/shared/ListRow';
 import type { Priority, TicketStatus } from '@/db/schema';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { DetailPatternDemo, FeedbackDemo, FormPatternDemo } from '@/app/design-check/PatternDemos';
+import { FileUploadDemo } from '@/app/design-check/FileUploadDemo';
 
 const neutralScale = [
   { name: 'neutral-0', className: 'bg-white', hex: '#FFFFFF', border: true },
@@ -973,11 +974,24 @@ function DesignCheckContent() {
         <div>
           <h2 className="text-h2 font-display">14 · Feedback</h2>
           <p className="text-body text-muted-foreground">
-            Toast rechtsonder op desktop (mobiel bovenaan) met een 3px rand in de semantische kleur;
-            succes verdwijnt na 4s, fout blijft met een herhaalactie.
+            Toast rechtsonder op desktop (mobiel bovenaan) met een zachte achtergrondkleur per
+            status; succes verdwijnt na 4s, fout blijft met een herhaalactie.
           </p>
         </div>
         <FeedbackDemo />
+      </section>
+
+      {/* 15 · Bestandsupload */}
+      <section className="flex flex-col gap-4">
+        <div>
+          <h2 className="text-h2 font-display">15 · Bestandsupload</h2>
+          <p className="text-body text-muted-foreground">
+            Werkend voorbeeld tegen de echte objectopslag (slice 4): aanvragen, rechtstreeks
+            uploaden via een presigned URL, bevestigen, downloaden en verwijderen. Enkel voor de
+            admin.
+          </p>
+        </div>
+        <FileUploadDemo />
       </section>
     </main>
   );

@@ -2,7 +2,7 @@ import { hashPassword } from 'better-auth/crypto';
 import { eq } from 'drizzle-orm';
 
 import { db } from '@/db';
-import { account, clients, user as userTable } from '@/db/schema';
+import { account, clients, projects, user as userTable } from '@/db/schema';
 import { auth } from '@/lib/auth';
 
 /**
@@ -30,15 +30,31 @@ export function adminHeaders(): Promise<Headers> {
   return sessionHeadersFor(ADMIN_EMAIL, ADMIN_PASSWORD);
 }
 
-/** A client-role session for a freshly created, disposable client + user. */
-export async function createTempClientSession(): Promise<{
+export async function createTempClient(overrides: Partial<typeof clients.$inferInsert> = {}) {
+  const [client] = await db
+    .insert(clients)
+    .values({ name: unique('Temp Client'), email: unique('temp-client'), ...overrides })
+    .returning();
+  return client;
+}
+
+export async function createTempProject(
+  clientId: string,
+  overrides: Partial<typeof projects.$inferInsert> = {},
+) {
+  const [project] = await db
+    .insert(projects)
+    .values({ clientId, name: unique('Temp Project'), status: 'active', ...overrides })
+    .returning();
+  return project;
+}
+
+/** A client-role session for a fresh, disposable user on an existing client. */
+export async function createTempClientUserSession(clientId: string): Promise<{
+  userId: string;
   headers: Headers;
   cleanup: () => Promise<void>;
 }> {
-  const [client] = await db
-    .insert(clients)
-    .values({ name: unique('Temp Client'), email: unique('temp-client') })
-    .returning();
   const password = 'ClientPassword123!';
   const [clientUser] = await db
     .insert(userTable)
@@ -46,7 +62,7 @@ export async function createTempClientSession(): Promise<{
       name: 'Temp Client User',
       email: unique('temp-client-user'),
       role: 'client',
-      clientId: client.id,
+      clientId,
       emailVerified: true,
     })
     .returning();
@@ -59,8 +75,23 @@ export async function createTempClientSession(): Promise<{
 
   const headers = await sessionHeadersFor(clientUser.email, password);
   const cleanup = async () => {
-    await db.delete(clients).where(eq(clients.id, client.id));
     await db.delete(userTable).where(eq(userTable.id, clientUser.id));
+  };
+
+  return { userId: clientUser.id, headers, cleanup };
+}
+
+/** A client-role session for a freshly created, disposable client + user. */
+export async function createTempClientSession(): Promise<{
+  headers: Headers;
+  cleanup: () => Promise<void>;
+}> {
+  const client = await createTempClient();
+  const { headers, cleanup: cleanupUser } = await createTempClientUserSession(client.id);
+
+  const cleanup = async () => {
+    await db.delete(clients).where(eq(clients.id, client.id));
+    await cleanupUser();
   };
 
   return { headers, cleanup };

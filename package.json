@@ -16,6 +16,7 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx --env-file=.env src/db/seed.ts",
     "db:invite-client": "tsx --env-file=.env src/db/invite-client-user.ts",
+    "storage:cleanup-orphans": "tsx --env-file=.env src/db/cleanup-orphan-files.ts",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -28,6 +29,8 @@
     ]
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1137.0",
+    "@aws-sdk/s3-request-presigner": "^3.1137.0",
     "@hookform/resolvers": "^5.9.1",
     "better-auth": "^1.7.5",
     "class-variance-authority": "^0.7.1",

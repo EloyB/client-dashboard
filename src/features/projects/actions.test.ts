@@ -19,28 +19,10 @@ vi.mock('next/cache', () => ({
 
 const { db } = await import('@/db');
 const { clients, projects } = await import('@/db/schema');
-const { adminHeaders, createTempClientSession, unique } = await import('@/db/test-real-session');
+const { adminHeaders, createTempClient, createTempClientSession, createTempProject } =
+  await import('@/db/test-real-session');
 const { archiveProject, createProject, updateProject } =
   await import('@/features/projects/actions');
-
-async function createTempClient(overrides: Partial<typeof clients.$inferInsert> = {}) {
-  const [client] = await db
-    .insert(clients)
-    .values({ name: unique('Temp Client'), email: unique('temp-client'), ...overrides })
-    .returning();
-  return client;
-}
-
-async function createTempProject(
-  clientId: string,
-  overrides: Partial<typeof projects.$inferInsert> = {},
-) {
-  const [project] = await db
-    .insert(projects)
-    .values({ clientId, name: unique('Temp Project'), status: 'active', ...overrides })
-    .returning();
-  return project;
-}
 
 const validFields = {
   name: 'Test project',

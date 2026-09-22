@@ -104,8 +104,10 @@ function DemoProjectFields({
       />
       <FileUploadField
         label="Schermafbeelding"
-        onUpload={async () => {
+        onUpload={async (_file, onProgress) => {
+          onProgress(50);
           await new Promise((resolve) => setTimeout(resolve, 900));
+          onProgress(100);
         }}
       />
     </>

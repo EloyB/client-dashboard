@@ -19,5 +19,41 @@ services:
       - '1026:1025' # SMTP — the app sends here in development
       - '8026:8025' # Web UI — view caught emails at http://localhost:8026
 
+  # bitnami/minio and Docker Hub's minio/minio were both pulled from Docker Hub
+  # in 2025 (MinIO's AGPLv3 licensing change) — quay.io is MinIO's own
+  # replacement registry, so that's what this points at instead.
+  minio:
+    image: quay.io/minio/minio:latest
+    restart: unless-stopped
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: client_dashboard
+      MINIO_ROOT_PASSWORD: client_dashboard
+      MINIO_API_CORS_ALLOW_ORIGIN: '*' # dev-only: the app runs on a different port than MinIO
+    ports:
+      - '9000:9000' # S3 API — this is what SCALEWAY_ENDPOINT points to locally
+      - '9001:9001' # Web console at http://localhost:9001
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ['CMD', 'mc', 'ready', 'local']
+      interval: 5s
+      retries: 5
+
+  # The official image has no "create this bucket on startup" env var (unlike
+  # the now-unavailable bitnami/minio) — this one-shot container creates the
+  # private dev bucket via the MinIO client, then exits.
+  minio-init:
+    image: quay.io/minio/mc:latest
+    depends_on:
+      minio:
+        condition: service_healthy
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set local http://minio:9000 client_dashboard client_dashboard &&
+      mc mb --ignore-existing local/dev-bucket
+      "
+
 volumes:
   postgres_data:
+  minio_data:

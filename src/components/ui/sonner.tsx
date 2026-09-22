@@ -28,23 +28,27 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       style={
         {
-          '--normal-bg': 'var(--popover)',
-          '--normal-text': 'var(--popover-foreground)',
-          '--normal-border': 'var(--border)',
+          // --popover/--popover-foreground/--border are raw HSL triplets
+          // (e.g. "0 0% 100%"), meant to be wrapped in hsl(...) — Sonner
+          // applies --normal-bg etc. directly as CSS colors, so without the
+          // wrapper here the value is invalid CSS and renders transparent.
+          '--normal-bg': 'hsl(var(--popover))',
+          '--normal-text': 'hsl(var(--popover-foreground))',
+          '--normal-border': 'hsl(var(--border))',
           '--border-radius': 'var(--radius)',
         } as React.CSSProperties
       }
       toastOptions={{
         // Sonner injects its own unlayered <style> tag for the base toast
-        // border, which always wins over Tailwind's @layer utilities
-        // classes regardless of specificity — the `!` modifier forces
-        // !important so these actually override it.
+        // background/border, which always wins over Tailwind's @layer
+        // utilities classes regardless of specificity — the `!` modifier
+        // forces !important so these actually override it.
         classNames: {
-          toast: 'cn-toast border-l-[3px]!',
-          success: 'border-l-success!',
-          error: 'border-l-destructive!',
-          warning: 'border-l-warning!',
-          info: 'border-l-info!',
+          toast: 'cn-toast border-none!',
+          success: 'bg-success-muted!',
+          error: 'bg-destructive-muted!',
+          warning: 'bg-warning-muted!',
+          info: 'bg-info-muted!',
         },
       }}
       {...props}

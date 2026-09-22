@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 
 import { db, type Database } from '@/db';
-import { projects, type UserRole } from '@/db/schema';
+import { documents, files, projects, ticketAttachments, tickets, type UserRole } from '@/db/schema';
 import { auth } from '@/lib/auth';
 
 export type AuthenticatedUser = {
@@ -101,4 +101,56 @@ export async function assertProjectAccess(
   }
 
   return project;
+}
+
+export type StoredFile = typeof files.$inferSelect;
+
+/**
+ * A file is reachable through exactly one of two paths — a document or a
+ * ticket attachment — each scoped to a project/client the same way any other
+ * project-related data is. A file that isn't attached to either yet (the
+ * moment right after confirming an upload, before it's linked to anything)
+ * is admin-only: the uploading client can preview their own pending upload
+ * client-side (a local object URL) without needing to re-fetch it here.
+ */
+export async function assertFileAccess(
+  user: AuthenticatedUser,
+  fileId: string,
+  database: Database = db,
+): Promise<StoredFile> {
+  const [file] = await database.select().from(files).where(eq(files.id, fileId)).limit(1);
+  if (!file) {
+    throw new AccessError('NOT_FOUND', 'File not found.');
+  }
+  if (isAdmin(user)) {
+    return file;
+  }
+
+  const [documentAccess] = await database
+    .select({ clientId: projects.clientId, visibleToClient: documents.visibleToClient })
+    .from(documents)
+    .innerJoin(projects, eq(projects.id, documents.projectId))
+    .where(eq(documents.fileId, fileId))
+    .limit(1);
+
+  if (documentAccess) {
+    if (belongsToClient(user, documentAccess.clientId) && isVisibleToUser(user, documentAccess)) {
+      return file;
+    }
+    throw new AccessError('NOT_FOUND', 'File not found.');
+  }
+
+  const [ticketAccess] = await database
+    .select({ clientId: projects.clientId })
+    .from(ticketAttachments)
+    .innerJoin(tickets, eq(tickets.id, ticketAttachments.ticketId))
+    .innerJoin(projects, eq(projects.id, tickets.projectId))
+    .where(eq(ticketAttachments.fileId, fileId))
+    .limit(1);
+
+  if (ticketAccess && belongsToClient(user, ticketAccess.clientId)) {
+    return file;
+  }
+
+  throw new AccessError('NOT_FOUND', 'File not found.');
 }

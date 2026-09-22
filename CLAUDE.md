@@ -218,17 +218,17 @@ Build in vertical slices: one slice = one branch = one session, delivering data 
 
 **0. App shell**
 
-- [ ] 0a. Admin and portal layouts with navigation (desktop sidebar, mobile menu)
-- [ ] 0b. Shared base components from `COMPONENTS.md`: StatusBadge, EmptyState, DataTable with mobile card layout, form pattern
+- [x] 0a. Admin and portal layouts with navigation (desktop sidebar, mobile menu)
+- [x] 0b. Shared base components from `COMPONENTS.md`: StatusBadge, EmptyState, DataTable with mobile card layout, form pattern
 
 **1. Auth**
 
-- [ ] 1a. Admin login with email + password, logout, route protection
-- [ ] 1b. Email module + client user invite via magic link
+- [x] 1a. Admin login with email + password, logout, route protection
+- [x] 1b. Email module + client user invite via magic link
 
 **2. Clients**
 
-- [ ] 2a. Clients overview and detail
+- [x] 2a. Clients overview and detail
 - [ ] 2b. Create/edit clients, manage and invite client users from the client page
 
 **3. Projects**
