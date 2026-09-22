@@ -5,16 +5,9 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { MoreHorizontal } from 'lucide-react';
-
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenuItem } from '@/components/ui/dropdown-menu';
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { DetailHeader } from '@/components/shared/DetailHeader';
 import {
@@ -342,20 +335,13 @@ export function DetailPatternDemo() {
           }
           primaryAction={<Button size="sm">In behandeling nemen</Button>}
           overflowActions={
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Meer acties">
-                  <MoreHorizontal className="size-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem>Toewijzen</DropdownMenuItem>
-                <DropdownMenuItem>Prioriteit wijzigen</DropdownMenuItem>
-                <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
-                  Ticket verwijderen
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            <>
+              <DropdownMenuItem>Toewijzen</DropdownMenuItem>
+              <DropdownMenuItem>Prioriteit wijzigen</DropdownMenuItem>
+              <DropdownMenuItem variant="destructive" onSelect={() => setDeleteOpen(true)}>
+                Ticket verwijderen
+              </DropdownMenuItem>
+            </>
           }
         />
         <ConfirmDialog

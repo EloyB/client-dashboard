@@ -162,6 +162,54 @@ export function TextareaField<TFieldValues extends FieldValues>({
   );
 }
 
+const URL_PREFIX = 'https://';
+
+/** A URL input with a fixed, non-editable "https://" prefix (see Admin projecten.dc.html). */
+export function UrlField<TFieldValues extends FieldValues>({
+  control,
+  name,
+  label,
+  hint,
+  required,
+  placeholder,
+}: BaseFieldProps<TFieldValues> & { placeholder?: string }) {
+  const { field, fieldState } = useController({ control, name });
+  const value: string = field.value ?? '';
+  const rest = value.startsWith(URL_PREFIX) ? value.slice(URL_PREFIX.length) : value;
+
+  return (
+    <FieldShell
+      label={label}
+      htmlFor={name}
+      required={required}
+      hint={hint}
+      error={fieldState.error?.message}
+    >
+      <div
+        className={cn(
+          'border-input focus-within:border-ring focus-within:ring-ring/50 flex h-10 w-full items-center rounded-lg border focus-within:ring-3',
+          fieldState.error && 'border-destructive',
+        )}
+      >
+        <span className="text-muted-foreground border-border-subtle border-r px-2.5 font-mono text-sm">
+          {URL_PREFIX}
+        </span>
+        <input
+          id={name}
+          value={rest}
+          onChange={(event) =>
+            field.onChange(event.target.value ? URL_PREFIX + event.target.value : '')
+          }
+          onBlur={field.onBlur}
+          placeholder={placeholder}
+          aria-invalid={!!fieldState.error}
+          className="placeholder:text-muted-foreground min-w-0 flex-1 rounded-r-lg bg-transparent px-2.5 py-1 text-base outline-none md:text-sm"
+        />
+      </div>
+    </FieldShell>
+  );
+}
+
 export function SelectField<TFieldValues extends FieldValues>({
   control,
   name,

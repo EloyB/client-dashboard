@@ -54,6 +54,8 @@ export type DataTableFilter<T> = {
   label: string;
   getValue: (row: T) => string;
   options: { label: string; value: string }[];
+  /** 'pills' (default) for a handful of statuses; 'select' for the COMPONENTS.md "filterselect" — a longer list like clients. */
+  variant?: 'pills' | 'select';
 };
 
 /**
@@ -109,24 +111,46 @@ export function DataTable<T>({
   const hasMore = state.page < pageCount;
 
   const sortableColumns = columns.filter((column) => column.sortValue);
+  const pillFilters = (filters ?? []).filter((filter) => (filter.variant ?? 'pills') === 'pills');
+  const selectFilters = (filters ?? []).filter((filter) => filter.variant === 'select');
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
       {(searchValue || filters || sortableColumns.length > 0) && (
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            {searchValue && (
-              <div className="relative sm:max-w-xs">
-                <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
-                <Input
-                  value={state.search}
-                  onChange={(event) => state.setSearch(event.target.value)}
-                  placeholder={searchPlaceholder}
-                  className="pl-9"
-                  aria-label={searchPlaceholder}
-                />
-              </div>
-            )}
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              {searchValue && (
+                <div className="relative sm:max-w-xs">
+                  <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2" />
+                  <Input
+                    value={state.search}
+                    onChange={(event) => state.setSearch(event.target.value)}
+                    placeholder={searchPlaceholder}
+                    className="pl-9"
+                    aria-label={searchPlaceholder}
+                  />
+                </div>
+              )}
+              {selectFilters.map((filter) => (
+                <Select
+                  key={filter.key}
+                  value={state.filters[filter.key] ?? 'all'}
+                  onValueChange={(value) => state.setFilter(filter.key, value)}
+                >
+                  <SelectTrigger className="w-full sm:w-48" aria-label={filter.label}>
+                    <SelectValue placeholder={filter.label} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {filter.options.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              ))}
+            </div>
             {sortableColumns.length > 0 && (
               <div className="flex items-center gap-2">
                 <span className="text-body text-muted-foreground whitespace-nowrap">Sorteren</span>
@@ -157,7 +181,7 @@ export function DataTable<T>({
             )}
           </div>
 
-          {filters?.map((filter) => (
+          {pillFilters.map((filter) => (
             <div key={filter.key} className="flex flex-wrap gap-2">
               {filter.options.map((option) => {
                 const active = (state.filters[filter.key] ?? 'all') === option.value;

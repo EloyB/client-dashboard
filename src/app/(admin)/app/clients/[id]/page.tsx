@@ -1,12 +1,12 @@
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { Pencil } from 'lucide-react';
+import { Pencil, Plus } from 'lucide-react';
 import { headers } from 'next/headers';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataList, type DataListItem } from '@/components/shared/DataList';
 import { DetailHeader } from '@/components/shared/DetailHeader';
 import { ListRow } from '@/components/shared/ListRow';
@@ -67,6 +67,14 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
             <Card>
               <CardHeader className="border-border-subtle border-b">
                 <CardTitle>Projecten</CardTitle>
+                <CardAction>
+                  <Button size="sm" asChild>
+                    <Link href={`/app/projects/new?clientId=${client.id}`}>
+                      <Plus strokeWidth={1.75} />
+                      Nieuw project
+                    </Link>
+                  </Button>
+                </CardAction>
               </CardHeader>
               <CardContent className="flex flex-col">
                 {projects.length === 0 ? (
@@ -75,7 +83,7 @@ export default async function ClientDetailPage({ params }: { params: Promise<{ i
                   </p>
                 ) : (
                   projects.map((project) => (
-                    <Link key={project.id} href="/app/projects" className="block">
+                    <Link key={project.id} href={`/app/projects/${project.id}`} className="block">
                       <ListRow
                         title={project.name}
                         subtitle={formatDueDate(project.dueDate)}

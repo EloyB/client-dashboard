@@ -364,6 +364,16 @@ async function seed() {
     visibleToClient: true,
   });
 
+  await findOrCreateEvent({
+    projectId: herbouwWebsite.id,
+    title: 'Oplevering',
+    description: 'Website gaat live en wordt overgedragen aan de klant.',
+    type: 'deadline',
+    startsAt: new Date('2026-10-21T09:00:00+02:00'),
+    endsAt: new Date('2026-10-21T09:00:00+02:00'),
+    visibleToClient: true,
+  });
+
   const offerteFile = await findOrCreateFile({
     storageKey: 'seed/verlinden/offerte-herbouw-website.pdf',
     filename: 'Offerte herbouw website.pdf',
@@ -460,6 +470,16 @@ async function seed() {
     status: 'completed',
     startDate: '2026-05-01',
     dueDate: '2026-06-01',
+  });
+
+  await findOrCreateEvent({
+    projectId: nieuweWebsite.id,
+    title: 'Kick-off gesprek',
+    description: 'Startgesprek met de klant over scope en planning.',
+    type: 'deadline',
+    startsAt: new Date('2026-10-05T10:00:00+02:00'),
+    endsAt: new Date('2026-10-05T10:00:00+02:00'),
+    visibleToClient: true,
   });
 
   await findOrCreateTask({
@@ -624,6 +644,15 @@ async function seed() {
     pageUrl: 'https://drukkerijnovum.be/bestellen',
     status: 'in_progress',
     priority: 'medium',
+  });
+  await findOrCreateEvent({
+    projectId: novumWebshop.id,
+    title: 'Lancering',
+    description: 'Webshop gaat live voor alle klanten.',
+    type: 'deadline',
+    startsAt: new Date('2026-12-01T09:00:00+01:00'),
+    endsAt: new Date('2026-12-01T09:00:00+01:00'),
+    visibleToClient: true,
   });
 
   const deTrapper = await findOrCreateClient({

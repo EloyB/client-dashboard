@@ -1,7 +1,7 @@
 import { eq, inArray } from 'drizzle-orm';
 
 import { testDb } from '@/db/test-client';
-import { clients, projects, user } from '@/db/schema';
+import { clients, events, projects, tickets, user } from '@/db/schema';
 
 function unique(prefix: string) {
   return `${prefix}-${crypto.randomUUID()}`;
@@ -65,6 +65,43 @@ export async function createTestProject(
       clientId,
       name: unique('Test Project'),
       status: 'active',
+      ...overrides,
+    })
+    .returning();
+
+  return created;
+}
+
+export async function createTestTicket(
+  projectId: string,
+  reportedById: string,
+  overrides: Partial<typeof tickets.$inferInsert> = {},
+) {
+  const [created] = await testDb
+    .insert(tickets)
+    .values({
+      projectId,
+      reportedById,
+      title: unique('Test Ticket'),
+      status: 'new',
+      ...overrides,
+    })
+    .returning();
+
+  return created;
+}
+
+export async function createTestEvent(
+  projectId: string,
+  overrides: Partial<typeof events.$inferInsert> = {},
+) {
+  const [created] = await testDb
+    .insert(events)
+    .values({
+      projectId,
+      title: unique('Test Event'),
+      type: 'other',
+      startsAt: new Date(),
       ...overrides,
     })
     .returning();

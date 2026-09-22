@@ -1,3 +1,4 @@
+import { MoreHorizontal } from 'lucide-react';
 import { Fragment, type ReactNode } from 'react';
 
 import {
@@ -8,27 +9,48 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 export type Breadcrumb = { label: string; href?: string };
 
 /**
  * The page header pattern from COMPONENTS.md: breadcrumb, title, optional
- * badges, one primary action plus an overflow menu for the rest. On mobile
- * the primary action repeats as a full-width button below the header.
+ * badges, one primary action, an always-visible secondary action, and a
+ * "..." overflow menu for anything destructive. All three stay visible on
+ * mobile (stacked below the header), not just the primary action.
  */
 export function PageHeader({
   breadcrumbs,
   title,
   badges,
   primaryAction,
+  secondaryAction,
   overflowActions,
 }: {
   breadcrumbs?: Breadcrumb[];
   title: string;
   badges?: ReactNode;
   primaryAction?: ReactNode;
+  secondaryAction?: ReactNode;
+  /** Menu items (e.g. DropdownMenuItem) shown behind a "..." trigger — for destructive or secondary actions. */
   overflowActions?: ReactNode;
 }) {
+  const overflowTrigger = overflowActions && (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon" aria-label="Meer acties">
+          <MoreHorizontal strokeWidth={1.75} />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end">{overflowActions}</DropdownMenuContent>
+    </DropdownMenu>
+  );
+
   return (
     <div className="border-border-subtle flex flex-col gap-3 border-b px-4 py-4 sm:px-6 lg:px-8">
       {breadcrumbs && breadcrumbs.length > 0 && (
@@ -55,15 +77,22 @@ export function PageHeader({
           <h1 className="text-h1 font-display">{title}</h1>
           {badges}
         </div>
-        {(primaryAction || overflowActions) && (
+        {(primaryAction || secondaryAction || overflowActions) && (
           <div className="hidden items-center gap-2 sm:flex">
+            {secondaryAction}
             {primaryAction}
-            {overflowActions}
+            {overflowTrigger}
           </div>
         )}
       </div>
 
-      {primaryAction && <div className="sm:hidden [&>*]:w-full">{primaryAction}</div>}
+      {(primaryAction || secondaryAction || overflowActions) && (
+        <div className="flex flex-col gap-2 sm:hidden [&>*]:w-full">
+          {primaryAction}
+          {secondaryAction}
+          {overflowTrigger && <div className="w-full [&>button]:w-full">{overflowTrigger}</div>}
+        </div>
+      )}
     </div>
   );
 }
