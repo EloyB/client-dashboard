@@ -2,9 +2,11 @@
 
 import { and, eq, gt } from 'drizzle-orm';
 import { headers } from 'next/headers';
+import { after } from 'next/server';
 
 import { db } from '@/db';
 import { activityLog, documents, files, ticketAttachments, tickets } from '@/db/schema';
+import { notifyNewTicket } from '@/features/tickets/notifications';
 import { createTicketSchema } from '@/features/tickets/schemas';
 import { assertProjectAccess, requireClientUser } from '@/lib/access';
 import { createFormAction } from '@/lib/form-action';
@@ -92,8 +94,8 @@ export const createTicket = createFormAction(createTicketSchema, async (data) =>
     return { ticketId: duplicate.id };
   }
 
-  const ticketId = await db.transaction(async (tx) => {
-    const [ticket] = await tx
+  const ticket = await db.transaction(async (tx) => {
+    const [insertedTicket] = await tx
       .insert(tickets)
       .values({
         projectId: data.projectId,
@@ -108,19 +110,28 @@ export const createTicket = createFormAction(createTicketSchema, async (data) =>
 
     for (const fileId of data.fileIds) {
       await assertUnattachedOwnFile(tx, user.id, fileId);
-      await tx.insert(ticketAttachments).values({ ticketId: ticket.id, fileId });
+      await tx.insert(ticketAttachments).values({ ticketId: insertedTicket.id, fileId });
     }
 
     await tx.insert(activityLog).values({
       projectId: data.projectId,
-      ticketId: ticket.id,
+      ticketId: insertedTicket.id,
       actorId: user.id,
       type: 'ticket_created',
       description: `Nieuwe melding: "${data.title}"`,
     });
 
-    return ticket.id;
+    return insertedTicket;
   });
 
-  return { ticketId };
+  after(() =>
+    notifyNewTicket({
+      ticket,
+      projectName: project.name,
+      clientId: project.clientId,
+      attachmentCount: data.fileIds.length,
+    }),
+  );
+
+  return { ticketId: ticket.id };
 });

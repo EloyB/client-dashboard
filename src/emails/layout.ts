@@ -14,6 +14,22 @@ export function escapeHtml(value: string): string {
 }
 
 /**
+ * Strips line breaks and other control characters from a value before it
+ * goes into a subject line — a bare newline there is how header injection
+ * works. Defense in depth: user-typed free text (a ticket title) never
+ * reaches a subject line in the first place, but this still applies to the
+ * admin-entered values (client/project name) that do.
+ */
+export function sanitizeSubjectPart(value: string): string {
+  return value.replace(/[\r\n\t\x00-\x1f]+/g, ' ').trim();
+}
+
+/** Shortens free text for a preview line, e.g. a ticket description in the admin notification. */
+export function truncate(value: string, maxLength: number): string {
+  return value.length > maxLength ? `${value.slice(0, maxLength).trimEnd()}…` : value;
+}
+
+/**
  * Shared table-based shell for every transactional email — logo row, white
  * card, address footer — copied from the ready-to-send markup in
  * docs/design/handoff/.../emails/*.html (dark-mode media query, MSO

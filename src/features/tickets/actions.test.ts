@@ -9,8 +9,23 @@ vi.mock('next/headers', () => ({
   headers: async () => currentHeaders,
 }));
 
+// after() schedules its callback to run once the response has already been
+// sent — there's nothing to "wait for" in a real request. In tests, mocking
+// it as a plain spy lets each test grab and await the callback itself
+// (runAfterCallbacks below), so notification side effects are deterministic.
+vi.mock('next/server', () => ({ after: vi.fn() }));
+
+vi.mock('@/lib/email', () => ({ sendEmail: vi.fn().mockResolvedValue(undefined) }));
+
 const { db } = await import('@/db');
-const { activityLog, clients, files, ticketAttachments, tickets } = await import('@/db/schema');
+const {
+  activityLog,
+  clients,
+  files,
+  ticketAttachments,
+  tickets,
+  user: userTable,
+} = await import('@/db/schema');
 const {
   adminHeaders,
   createTempClient,
@@ -20,6 +35,25 @@ const {
 } = await import('@/db/test-real-session');
 const { createTicket } = await import('@/features/tickets/actions');
 const { requestUpload, confirmUpload } = await import('@/features/files/actions');
+const { sendEmail } = await import('@/lib/email');
+const { env } = await import('@/lib/env');
+const { after } = await import('next/server');
+
+/** Invokes and awaits every after() callback scheduled since the last clear. */
+async function runAfterCallbacks(): Promise<void> {
+  for (const [task] of vi.mocked(after).mock.calls) {
+    if (typeof task === 'function') await task();
+  }
+  vi.mocked(after).mockClear();
+}
+
+async function emailOf(userId: string): Promise<string> {
+  const [row] = await db
+    .select({ email: userTable.email })
+    .from(userTable)
+    .where(eq(userTable.id, userId));
+  return row.email;
+}
 
 async function deleteTempClient(clientId: string) {
   await db.delete(clients).where(eq(clients.id, clientId));
@@ -323,6 +357,157 @@ describe('createTicket (server action)', () => {
       await db.delete(tickets).where(eq(tickets.projectId, project.id));
       await cleanup();
       await deleteTempClient(client.id);
+    }
+  });
+});
+
+describe('nieuw-ticket-mails (slice 5b)', () => {
+  it('sends exactly two emails, to the reporter and the admin, after a successful transaction', async () => {
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+    const { userId, headers, cleanup } = await createTempClientUserSession(client.id);
+
+    try {
+      currentHeaders = headers;
+      vi.mocked(sendEmail).mockClear();
+      vi.mocked(after).mockClear();
+
+      const result = await createTicket({ ...validInput, projectId: project.id });
+      expect(result.success).toBe(true);
+      await runAfterCallbacks();
+
+      expect(sendEmail).toHaveBeenCalledTimes(2);
+      const reporterEmail = await emailOf(userId);
+      const recipients = vi.mocked(sendEmail).mock.calls.map((call) => call[0].to);
+      expect(recipients.sort()).toEqual([env.ADMIN_NOTIFICATION_EMAIL, reporterEmail].sort());
+    } finally {
+      await deleteTempClient(client.id);
+      await cleanup();
+    }
+  });
+
+  it('never sends to a colleague of the same client', async () => {
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+    const reporter = await createTempClientUserSession(client.id);
+    const colleague = await createTempClientUserSession(client.id);
+
+    try {
+      currentHeaders = reporter.headers;
+      vi.mocked(sendEmail).mockClear();
+      vi.mocked(after).mockClear();
+
+      const result = await createTicket({ ...validInput, projectId: project.id });
+      expect(result.success).toBe(true);
+      await runAfterCallbacks();
+
+      const colleagueEmail = await emailOf(colleague.userId);
+      const recipients = vi.mocked(sendEmail).mock.calls.map((call) => call[0].to);
+      expect(recipients).not.toContain(colleagueEmail);
+    } finally {
+      await deleteTempClient(client.id);
+      await reporter.cleanup();
+      await colleague.cleanup();
+    }
+  });
+
+  it('keeps the ticket and logs the error when sending fails, without failing the action', async () => {
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+    const { headers, cleanup } = await createTempClientUserSession(client.id);
+    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    try {
+      currentHeaders = headers;
+      vi.mocked(sendEmail).mockClear();
+      vi.mocked(after).mockClear();
+      vi.mocked(sendEmail).mockRejectedValueOnce(new Error('SMTP unavailable'));
+
+      const result = await createTicket({ ...validInput, projectId: project.id });
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      await runAfterCallbacks();
+
+      const [ticket] = await db
+        .select()
+        .from(tickets)
+        .where(eq(tickets.id, result.data.ticketId))
+        .limit(1);
+      expect(ticket).toBeDefined();
+
+      expect(consoleError).toHaveBeenCalledWith(
+        'Failed to send new-ticket notification emails',
+        expect.objectContaining({ ticketId: result.data.ticketId }),
+      );
+      const loggedPayload = consoleError.mock.calls.find(
+        (call) => call[0] === 'Failed to send new-ticket notification emails',
+      )?.[1];
+      expect(JSON.stringify(loggedPayload)).not.toContain('<html');
+      expect(JSON.stringify(loggedPayload)).not.toContain('http');
+    } finally {
+      consoleError.mockRestore();
+      await deleteTempClient(client.id);
+      await cleanup();
+    }
+  });
+
+  it('renders a title with newlines and HTML safely in subject and content', async () => {
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+    const { headers, cleanup } = await createTempClientUserSession(client.id);
+    const dangerousTitle = 'Contact <script>alert(1)</script>\nverzendt niet';
+
+    try {
+      currentHeaders = headers;
+      vi.mocked(sendEmail).mockClear();
+      vi.mocked(after).mockClear();
+
+      const result = await createTicket({
+        ...validInput,
+        title: dangerousTitle,
+        projectId: project.id,
+      });
+      expect(result.success).toBe(true);
+      await runAfterCallbacks();
+
+      for (const call of vi.mocked(sendEmail).mock.calls) {
+        const [message] = call;
+        expect(message.subject).not.toMatch(/[\r\n]/);
+        expect(message.html).not.toContain('<script>alert(1)</script>');
+      }
+    } finally {
+      await deleteTempClient(client.id);
+      await cleanup();
+    }
+  });
+
+  it('links to the portal ticket route for the reporter and the admin ticket route for the admin', async () => {
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+    const { headers, cleanup } = await createTempClientUserSession(client.id);
+
+    try {
+      currentHeaders = headers;
+      vi.mocked(sendEmail).mockClear();
+      vi.mocked(after).mockClear();
+
+      const result = await createTicket({ ...validInput, projectId: project.id });
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      await runAfterCallbacks();
+
+      const reporterMail = vi
+        .mocked(sendEmail)
+        .mock.calls.find((call) => call[0].to !== env.ADMIN_NOTIFICATION_EMAIL)?.[0];
+      const adminMail = vi
+        .mocked(sendEmail)
+        .mock.calls.find((call) => call[0].to === env.ADMIN_NOTIFICATION_EMAIL)?.[0];
+
+      expect(reporterMail?.html).toContain(`/portal/tickets/${result.data.ticketId}`);
+      expect(adminMail?.html).toContain(`/app/tickets/${result.data.ticketId}`);
+    } finally {
+      await deleteTempClient(client.id);
+      await cleanup();
     }
   });
 });

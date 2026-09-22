@@ -6,7 +6,10 @@ export type EmailMessage = {
   to: string;
   subject: string;
   html: string;
+  text?: string;
   replyTo?: string;
+  /** Extra fields merged into the failure log only — never the message body or a link. */
+  context?: Record<string, unknown>;
 };
 
 // Local dev/CI: everything lands in Mailpit (docker-compose), never a real
@@ -24,6 +27,7 @@ async function sendViaMailpit(message: EmailMessage): Promise<void> {
     to: message.to,
     subject: message.subject,
     html: message.html,
+    text: message.text,
     replyTo: message.replyTo,
   });
 }
@@ -40,6 +44,7 @@ async function sendViaResend(message: EmailMessage): Promise<void> {
       to: message.to,
       subject: message.subject,
       html: message.html,
+      text: message.text,
       reply_to: message.replyTo,
     }),
   });
@@ -67,6 +72,7 @@ export async function sendEmail(message: EmailMessage): Promise<void> {
     console.error('Failed to send email', {
       to: message.to,
       subject: message.subject,
+      ...message.context,
       error: error instanceof Error ? error.message : error,
     });
   }

@@ -108,13 +108,21 @@ export async function loginAsClient(context: BrowserContext) {
 export async function loginAsTempClient(
   context: BrowserContext,
   projectCount: number,
-): Promise<{ projectNames: string[]; cleanup: () => Promise<void> }> {
-  const unique = Date.now();
+): Promise<{
+  clientName: string;
+  userEmail: string;
+  projectNames: string[];
+  cleanup: () => Promise<void>;
+}> {
+  // Desktop and Mobile projects run this in parallel, so Date.now() alone
+  // can collide between workers started in the same millisecond.
+  const unique = `${Date.now()}-${crypto.randomUUID()}`;
   const password = 'ZzzTempClientWachtwoord123!';
+  const clientName = `Zzz Temp Client ${unique}`;
 
   const [client] = await db
     .insert(clients)
-    .values({ name: `Zzz Temp Client ${unique}`, email: `zzz-temp-client-${unique}@example.test` })
+    .values({ name: clientName, email: `zzz-temp-client-${unique}@example.test` })
     .returning();
 
   const projectNames = Array.from(
@@ -159,5 +167,5 @@ export async function loginAsTempClient(
     await db.delete(clients).where(eq(clients.id, client.id));
   };
 
-  return { projectNames, cleanup };
+  return { clientName, userEmail: clientUser.email, projectNames, cleanup };
 }

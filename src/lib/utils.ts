@@ -36,3 +36,24 @@ export function formatDateOnly(date: Date | undefined): string | null {
   if (!date) return null;
   return format(date, 'yyyy-MM-dd');
 }
+
+/**
+ * "16 september 2026, 08:14" — nl-BE, Europe/Brussels regardless of the
+ * server's own timezone. Built from two Intl calls rather than one combined
+ * formatter so the separator is a plain comma (Intl's own date+time
+ * combination inserts "om" instead).
+ */
+export function formatDateTime(date: Date): string {
+  const datePart = new Intl.DateTimeFormat('nl-BE', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'Europe/Brussels',
+  }).format(date);
+  const timePart = new Intl.DateTimeFormat('nl-BE', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Europe/Brussels',
+  }).format(date);
+  return `${datePart}, ${timePart}`;
+}
