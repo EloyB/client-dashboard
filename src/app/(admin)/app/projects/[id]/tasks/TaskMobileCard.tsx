@@ -107,6 +107,7 @@ export function TaskMobileCard({
           onClick={() =>
             onEditTask({
               id: task.id,
+              projectId: task.projectId,
               title: task.title,
               description: task.description,
               status: task.status,

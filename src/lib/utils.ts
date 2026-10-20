@@ -38,6 +38,17 @@ export function formatDateOnly(date: Date | undefined): string | null {
 }
 
 /**
+ * Today's calendar date ('yyyy-MM-dd') in Europe/Brussels, regardless of the
+ * server's own timezone — matters right around midnight, where a naive
+ * `new Date().toDateString()` on a UTC server can report yesterday's or
+ * tomorrow's date instead (see the "al mijn taken" deadline grouping, 7e).
+ * `en-CA` is a locale that happens to format dates as yyyy-MM-dd.
+ */
+export function todayInBrussels(now: Date = new Date()): string {
+  return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(now);
+}
+
+/**
  * "16 september 2026, 08:14" — nl-BE, Europe/Brussels regardless of the
  * server's own timezone. Built from two Intl calls rather than one combined
  * formatter so the separator is a plain comma (Intl's own date+time

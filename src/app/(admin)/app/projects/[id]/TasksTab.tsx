@@ -9,6 +9,7 @@ import { ListRow } from '@/components/shared/ListRow';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import type { Priority, TaskStatus } from '@/db/schema';
 import { cn, parseDateOnly } from '@/lib/utils';
+import { isOverdue } from './tasks/taskHelpers';
 
 export type OpenTaskRow = {
   id: string;
@@ -17,11 +18,6 @@ export type OpenTaskRow = {
   priority: Priority;
   dueDate: string | null;
 };
-
-function isOverdue(dueDate: string | null): boolean {
-  const date = parseDateOnly(dueDate);
-  return date ? date < new Date(new Date().toDateString()) : false;
-}
 
 /** Compact view of the project's open tasks — the full list lives at /app/projects/[id]/tasks. */
 export function TasksTab({ tasks, projectId }: { tasks: OpenTaskRow[]; projectId: string }) {
@@ -50,7 +46,7 @@ export function TasksTab({ tasks, projectId }: { tasks: OpenTaskRow[]; projectId
               key={task.id}
               title={task.title}
               subtitle={
-                <span className={cn(isOverdue(task.dueDate) && 'text-destructive font-semibold')}>
+                <span className={cn(isOverdue(task) && 'text-destructive font-semibold')}>
                   {task.dueDate
                     ? format(parseDateOnly(task.dueDate)!, 'd MMM yyyy', { locale: nl })
                     : 'Geen vervaldatum'}

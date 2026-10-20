@@ -20,6 +20,7 @@ import { isOverdue } from './taskHelpers';
 
 export type TaskRow = {
   id: string;
+  projectId: string;
   title: string;
   description: string | null;
   status: TaskStatus;
@@ -59,6 +60,7 @@ export function TasksTable({
             onClick={() =>
               onEditTask({
                 id: task.id,
+                projectId: task.projectId,
                 title: task.title,
                 description: task.description,
                 status: task.status,

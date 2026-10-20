@@ -13,7 +13,7 @@ import { getProjectById } from '@/features/projects/queries';
 import { listTicketsForProjectAdmin } from '@/features/tickets/queries.admin';
 import { listTasksForProject } from '@/features/tasks/queries';
 import { AccessError, requireAdmin } from '@/lib/access';
-import { cn, parseDateOnly } from '@/lib/utils';
+import { cn, parseDateOnly, todayInBrussels } from '@/lib/utils';
 import { DocumentsTab } from './DocumentsTab';
 import { OverviewTab } from './OverviewTab';
 import { ProjectDetailHeader } from './ProjectDetailHeader';
@@ -61,7 +61,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
     .filter((task) => task.status !== 'done')
     .slice(0, PROJECT_OPEN_TASKS_LIMIT);
 
-  const today = format(new Date(), 'yyyy-MM-dd');
+  const today = todayInBrussels();
   const isOverdue =
     project.dueDate !== null &&
     project.dueDate < today &&

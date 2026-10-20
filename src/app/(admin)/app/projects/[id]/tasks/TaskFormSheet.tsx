@@ -33,6 +33,7 @@ const priorityOptions: { value: Priority; label: string }[] = [
 
 export type EditableTask = {
   id: string;
+  projectId: string;
   title: string;
   description: string | null;
   status: TaskStatus;
@@ -42,12 +43,16 @@ export type EditableTask = {
 
 export function TaskFormSheet({
   projectId,
+  projects,
   task,
   defaultStatus = 'todo',
   open,
   onOpenChange,
 }: {
-  projectId: string;
+  /** Fixed project (project-detail context, 7a/7b/7c). */
+  projectId?: string;
+  /** Project picker instead, for "al mijn taken" (7e) — required whenever `projectId` is omitted. */
+  projects?: { id: string; name: string }[];
   /** Present when editing an existing task; absent when creating one. */
   task?: EditableTask;
   /** Pre-fills status when creating from a specific kanban column (7b). Ignored when editing. */
@@ -57,9 +62,10 @@ export function TaskFormSheet({
 }) {
   const router = useRouter();
   const isEditing = Boolean(task);
+  const showProjectPicker = !isEditing && !projectId;
 
   const defaultValues: TaskFormInput = {
-    projectId,
+    projectId: task?.projectId ?? projectId ?? '',
     title: task?.title ?? '',
     description: task?.description ?? '',
     status: task?.status ?? defaultStatus,
@@ -107,6 +113,15 @@ export function TaskFormSheet({
         </Button>
       }
     >
+      {showProjectPicker && (
+        <SelectField
+          control={control}
+          name="projectId"
+          label="Project"
+          required
+          options={(projects ?? []).map((project) => ({ value: project.id, label: project.name }))}
+        />
+      )}
       <TextField control={control} name="title" label="Titel" required />
       <TextareaField control={control} name="description" label="Beschrijving" rows={4} />
       <div className="grid grid-cols-2 gap-4">

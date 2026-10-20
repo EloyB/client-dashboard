@@ -5,7 +5,8 @@ const { db } = await import('@/db');
 const { clients, tasks } = await import('@/db/schema');
 const { adminHeaders, createTempClient, createTempClientUserSession, createTempProject } =
   await import('@/db/test-real-session');
-const { getTaskById, listTasksForProject } = await import('@/features/tasks/queries');
+const { getTaskById, listAllTasksForAdmin, listTasksForProject } =
+  await import('@/features/tasks/queries');
 const { taskReference } = await import('@/lib/task-links');
 
 async function deleteTempClient(clientId: string) {
@@ -78,6 +79,45 @@ describe('listTasksForProject', () => {
       expect(result.ticketReference).toBeNull();
     } finally {
       await deleteTempClient(client.id);
+    }
+  });
+});
+
+describe('listAllTasksForAdmin', () => {
+  it('rejects a non-admin', async () => {
+    const client = await createTempClient();
+    const { headers, cleanup } = await createTempClientUserSession(client.id);
+
+    try {
+      await expect(listAllTasksForAdmin(headers)).rejects.toMatchObject({ code: 'FORBIDDEN' });
+    } finally {
+      await cleanup();
+      await deleteTempClient(client.id);
+    }
+  });
+
+  it('includes tasks across every project, with client and project names joined in', async () => {
+    const clientA = await createTempClient();
+    const clientB = await createTempClient();
+    const projectA = await createTempProject(clientA.id);
+    const projectB = await createTempProject(clientB.id);
+    const taskA = await createTempTask(projectA.id, { title: 'Taak A' });
+    const taskB = await createTempTask(projectB.id, { title: 'Taak B' });
+
+    try {
+      const result = await listAllTasksForAdmin(await adminHeaders());
+      const ids = result.map((task) => task.id);
+      expect(ids).toEqual(expect.arrayContaining([taskA.id, taskB.id]));
+
+      const rowA = result.find((task) => task.id === taskA.id);
+      expect(rowA).toMatchObject({
+        projectName: projectA.name,
+        clientId: clientA.id,
+        clientName: clientA.name,
+      });
+    } finally {
+      await deleteTempClient(clientA.id);
+      await deleteTempClient(clientB.id);
     }
   });
 });
