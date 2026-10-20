@@ -25,10 +25,10 @@ export function isOverdueDeadline(event: AgendaEvent, now: Date): boolean {
   return event.type === 'deadline' && isPastEvent(event, now);
 }
 
-export function splitUpcomingAndPast(
-  events: AgendaEvent[],
+export function splitUpcomingAndPast<T extends AgendaEvent>(
+  events: T[],
   now: Date,
-): { upcoming: AgendaEvent[]; past: AgendaEvent[] } {
+): { upcoming: T[]; past: T[] } {
   const upcoming = events
     .filter((event) => !isPastEvent(event, now) || isOverdueDeadline(event, now))
     .sort((a, b) => a.startsAt.getTime() - b.startsAt.getTime());

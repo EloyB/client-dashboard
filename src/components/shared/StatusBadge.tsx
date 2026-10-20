@@ -1,4 +1,11 @@
-import type { DocumentType, Priority, ProjectStatus, TaskStatus, TicketStatus } from '@/db/schema';
+import type {
+  DocumentType,
+  EventType,
+  Priority,
+  ProjectStatus,
+  TaskStatus,
+  TicketStatus,
+} from '@/db/schema';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -73,6 +80,18 @@ const documentTypeConfig: Record<DocumentType, { label: string; className: strin
   other: { label: 'Andere', className: 'bg-muted text-secondary-foreground hover:bg-muted' },
 };
 
+// Used by the portal agenda (8c) to name the event type in plain language,
+// distinguishable without relying on the EventTypeMarker shape alone.
+const eventTypeConfig: Record<EventType, { label: string; className: string }> = {
+  deadline: {
+    label: 'Deadline',
+    className: 'bg-warning-muted text-warning hover:bg-warning-muted',
+  },
+  meeting: { label: 'Overleg', className: 'bg-accent text-accent-foreground hover:bg-accent' },
+  milestone: { label: 'Mijlpaal', className: 'bg-info-muted text-info hover:bg-info-muted' },
+  other: { label: 'Andere', className: 'bg-muted text-secondary-foreground hover:bg-muted' },
+};
+
 const visibilityConfig = {
   shared: { label: 'Gedeeld', className: 'bg-success-muted text-success hover:bg-success-muted' },
   internal: {
@@ -101,6 +120,7 @@ type StatusBadgeProps =
   | { domain: 'project'; status: ProjectStatus; className?: string }
   | { domain: 'priority'; priority: Priority; className?: string }
   | { domain: 'visibility'; visibleToClient: boolean; className?: string }
+  | { domain: 'eventType'; type: EventType; className?: string }
   | { domain: 'documentType'; type: DocumentType; className?: string }
   | { domain: 'user'; emailVerified: boolean; className?: string };
 
@@ -139,6 +159,11 @@ export function StatusBadge(props: StatusBadgeProps) {
 
   if (props.domain === 'documentType') {
     const config = documentTypeConfig[props.type];
+    return <Badge className={cn(config.className, props.className)}>{config.label}</Badge>;
+  }
+
+  if (props.domain === 'eventType') {
+    const config = eventTypeConfig[props.type];
     return <Badge className={cn(config.className, props.className)}>{config.label}</Badge>;
   }
 
