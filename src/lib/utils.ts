@@ -48,6 +48,45 @@ export function todayInBrussels(now: Date = new Date()): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(now);
 }
 
+/** Europe/Brussels' own UTC offset (in minutes) at a given instant — +60 (CET) or +120 (CEST). */
+function brusselsOffsetMinutes(at: Date): number {
+  const offsetPart = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'Europe/Brussels',
+    timeZoneName: 'shortOffset',
+  })
+    .formatToParts(at)
+    .find((part) => part.type === 'timeZoneName')?.value;
+  const hours = Number(offsetPart?.match(/GMT([+-]\d+)/)?.[1] ?? 0);
+  return hours * 60;
+}
+
+/**
+ * A ('yyyy-MM-dd', 'HH:mm') pair — both already unambiguous, timezone-free
+ * strings (see DateTimeField) — combined into the one real instant that
+ * represents that wall-clock moment in Europe/Brussels, regardless of the
+ * server's own timezone. Used for event start/end times (8a): a client never
+ * sends an already-combined Date, precisely to avoid the all-day Dec-31
+ * shifting-to-Dec-30 trap a naive combination is prone to right at the
+ * UTC+1/+2 boundary.
+ */
+export function combineBrusselsDateTime(dateOnly: string, time: string = '00:00'): Date {
+  const naiveUtc = new Date(`${dateOnly}T${time}:00Z`);
+  return new Date(naiveUtc.getTime() - brusselsOffsetMinutes(naiveUtc) * 60 * 1000);
+}
+
+/** The inverse of `combineBrusselsDateTime` — splits a real instant back into Brussels' own date and time strings, for pre-filling an edit form. */
+export function splitBrusselsDateTime(date: Date): { dateOnly: string; time: string } {
+  return {
+    dateOnly: todayInBrussels(date),
+    time: new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Brussels',
+      hour: '2-digit',
+      minute: '2-digit',
+      hourCycle: 'h23',
+    }).format(date),
+  };
+}
+
 /**
  * "16 september 2026, 08:14" — nl-BE, Europe/Brussels regardless of the
  * server's own timezone. Built from two Intl calls rather than one combined
