@@ -21,3 +21,16 @@ export const updateTaskStatusSchema = z.object({
 });
 
 export const deleteTaskSchema = z.object({ taskId: z.uuid() });
+
+/**
+ * For drag-and-drop (7b): the client reports where the card was dropped by
+ * naming its new neighbors, never a computed position — the server looks up
+ * their real positions and computes the key in between, so a stale or
+ * manipulated index from the browser can't corrupt the ordering.
+ */
+export const moveTaskSchema = z.object({
+  taskId: z.uuid(),
+  status: z.enum(taskStatusEnum.enumValues),
+  previousTaskId: z.uuid().nullable(),
+  nextTaskId: z.uuid().nullable(),
+});
