@@ -126,3 +126,19 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
 - **Openstaande twijfels:**
   - Het gedrag rond overdue deadlines (zie Aannames) is een eigen keuze.
   - Geen designcase voor een deadline mét `endsAt` — beide werken, maar het ontwerp toont enkel het geval zonder eind.
+
+---
+
+## Slice 8b — Globale kalender
+
+- **Branch:** `slice/8b-global-calendar` (vertrekt van `slice/8a-project-events`)
+- **PR:** [#10](https://github.com/EloyB/client-dashboard/pull/10) → base `slice/8a-project-events`
+- **Migraties:** geen
+- **Stop-en-wacht toegepast:** de slice-prompt vraagt expliciet om een kalenderaanpak voor te leggen vóór de bouw (nieuwe dependency of zelf bouwen). Voorgelegd via een keuzevraag; gebruiker koos "zelf bouwen, geen library" (aanbevolen optie) — pas daarna gebouwd.
+- **Aannames:**
+  - Events worden enkel onder hun startdag getoond, geen meerdaagse spanning-balk (zelfde vereenvoudiging als 8a's projectdetail-agenda).
+  - Weekraster toont bewust enkel maandag–vrijdag, zoals de designs' `weekHeads`.
+  - Project- en typefilter leven ook in de URL (niet enkel periode/weergave zoals letterlijk gevraagd), voor consistentie met "al mijn taken" (7e) en correcte terugkeer na een herlaad.
+  - Op mobiel bepaalt de actieve weergave (maand/week) wat opgehaald wordt; de Maand/Week-toggle is enkel zichtbaar op desktop, dus in de praktijk blijft dit zo goed als altijd "maand".
+- **Bewuste designafwijkingen (zie PR voor details):** hele-dag-events in een aparte strook boven het weekraster in plaats van overlappend zoals de mockup; weekraster dekt 08:00–17:00 (9 uurvakken) i.p.v. de mockups 10; event-chips met gevulde achtergrondpil i.p.v. witte chip met gekleurde rand; typefilter-pills zonder aantallen.
+- **Openstaande twijfels:** de drie styling-/bereikafwijkingen hierboven — functioneel geen probleem, maar horen bij review opgemerkt te worden.
