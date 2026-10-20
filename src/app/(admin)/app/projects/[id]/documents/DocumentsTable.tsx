@@ -18,13 +18,13 @@ import {
   type DataTableFilter,
 } from '@/components/shared/DataTable';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { fileTypeTile } from '@/components/shared/fileTypeTile';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { showErrorToast, showSuccessToast } from '@/components/shared/toast';
 import { useOpenFile } from '@/components/shared/useOpenFile';
 import { deleteDocument, updateDocumentVisibility } from '@/features/documents/actions';
 import type { DocumentWithFile } from '@/features/documents/queries';
 import { getDocumentColumns } from './documentColumns';
-import { fileTypeTile } from './fileTypeTile';
 
 const typeFilter: DataTableFilter<DocumentWithFile> = {
   key: 'type',

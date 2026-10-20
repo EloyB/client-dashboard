@@ -6,7 +6,10 @@ const labelByMimeType: Record<string, string> = {
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': 'XLS',
 };
 
-/** Small type-tile leading a document row (see COMPONENTS.md "Lijstrijvarianten"). */
+/**
+ * Small type-tile leading a document row (see COMPONENTS.md "Lijstrijvarianten").
+ * Shared between the admin (slice 6a) and portal (slice 6b) document lists.
+ */
 export function fileTypeTile(mimeType: string) {
   return (
     <div className="text-small text-muted-foreground flex size-9 shrink-0 items-center justify-center rounded-md bg-neutral-100 font-medium">

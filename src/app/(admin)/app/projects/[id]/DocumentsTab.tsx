@@ -8,11 +8,11 @@ import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataTable } from '@/components/shared/DataTable';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { fileTypeTile } from '@/components/shared/fileTypeTile';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { useOpenFile } from '@/components/shared/useOpenFile';
 import { DocumentUploadSheet } from './documents/DocumentUploadSheet';
 import { getDocumentColumns } from './documents/documentColumns';
-import { fileTypeTile } from './documents/fileTypeTile';
 import type { DocumentWithFile } from '@/features/documents/queries';
 
 /** Compact view of the project's documents — same Document/Soort/Zichtbaarheid table as /app/projects/[id]/documents, just capped and without filters/sort/actions. */
