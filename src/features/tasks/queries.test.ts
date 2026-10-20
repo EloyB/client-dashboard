@@ -5,7 +5,7 @@ const { db } = await import('@/db');
 const { clients, tasks } = await import('@/db/schema');
 const { adminHeaders, createTempClient, createTempClientUserSession, createTempProject } =
   await import('@/db/test-real-session');
-const { getTaskById, listAllTasksForAdmin, listTasksForProject } =
+const { getTaskById, listAllTasksForAdmin, listTasksForDashboard, listTasksForProject } =
   await import('@/features/tasks/queries');
 const { taskReference } = await import('@/lib/task-links');
 
@@ -118,6 +118,52 @@ describe('listAllTasksForAdmin', () => {
     } finally {
       await deleteTempClient(clientA.id);
       await deleteTempClient(clientB.id);
+    }
+  });
+});
+
+describe('listTasksForDashboard', () => {
+  // 2026-09-16 is a Wednesday, so the week ends Sunday 2026-09-20.
+  const WEDNESDAY = '2026-09-16';
+
+  it('rejects a non-admin', async () => {
+    const client = await createTempClient();
+    const { headers, cleanup } = await createTempClientUserSession(client.id);
+
+    try {
+      await expect(listTasksForDashboard(headers, WEDNESDAY)).rejects.toMatchObject({
+        code: 'FORBIDDEN',
+      });
+    } finally {
+      await cleanup();
+      await deleteTempClient(client.id);
+    }
+  });
+
+  it('includes overdue, in-progress, and this-week tasks, excludes done and later tasks', async () => {
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+
+    const overdue = await createTempTask(project.id, { dueDate: '2026-09-10', status: 'todo' });
+    const inProgressNoDate = await createTempTask(project.id, { status: 'in_progress' });
+    const thisWeek = await createTempTask(project.id, { dueDate: '2026-09-18', status: 'todo' });
+    const doneOverdue = await createTempTask(project.id, {
+      dueDate: '2026-09-10',
+      status: 'done',
+    });
+    const later = await createTempTask(project.id, { dueDate: '2026-10-01', status: 'todo' });
+    const noSignal = await createTempTask(project.id, { status: 'todo' });
+
+    try {
+      const rows = await listTasksForDashboard(await adminHeaders(), WEDNESDAY);
+      const ids = rows.map((row) => row.id);
+
+      expect(ids).toEqual(expect.arrayContaining([overdue.id, inProgressNoDate.id, thisWeek.id]));
+      expect(ids).not.toContain(doneOverdue.id);
+      expect(ids).not.toContain(later.id);
+      expect(ids).not.toContain(noSignal.id);
+    } finally {
+      await deleteTempClient(client.id);
     }
   });
 });

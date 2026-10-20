@@ -98,6 +98,35 @@ describe('listProjects', () => {
       await cleanupTestClient(client.id);
     }
   });
+
+  it('filters by status when given (9a admin home page)', async () => {
+    const client = await createTestClient();
+    const active = await createTestProject(client.id, { status: 'active' });
+    const archived = await createTestProject(client.id, { status: 'archived' });
+
+    try {
+      const rows = await listProjects(await adminHeaders(), testDb, { status: 'active' });
+      const ids = rows.map((row) => row.id);
+      expect(ids).toContain(active.id);
+      expect(ids).not.toContain(archived.id);
+    } finally {
+      await cleanupTestClient(client.id);
+    }
+  });
+
+  it('respects the limit when given (9a admin home page)', async () => {
+    const client = await createTestClient();
+    await createTestProject(client.id);
+    await createTestProject(client.id);
+    await createTestProject(client.id);
+
+    try {
+      const rows = await listProjects(await adminHeaders(), testDb, { limit: 2 });
+      expect(rows).toHaveLength(2);
+    } finally {
+      await cleanupTestClient(client.id);
+    }
+  });
 });
 
 describe('getProjectById', () => {

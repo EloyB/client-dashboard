@@ -17,6 +17,82 @@ import { AccessError, requireAdmin } from '@/lib/access';
 import { taskReference } from '@/lib/task-links';
 import { ticketReference } from '@/lib/ticket-links';
 
+export type AdminDashboardTicketRow = {
+  id: string;
+  reference: string;
+  title: string;
+  clientName: string;
+  projectId: string;
+  projectName: string;
+  priority: Priority;
+  attachmentCount: number;
+  createdAt: Date;
+  linkedTask: { id: string; reference: string; status: TaskStatus } | null;
+};
+
+/**
+ * The newest `limit` tickets still needing triage (status 'new'), for the
+ * admin home page (9a) — a dedicated, LIMIT-ed query rather than slicing
+ * listTicketsForAdmin's full, unlimited result, so a growing ticket history
+ * never slows this section down.
+ */
+export async function listNewTicketsForAdmin(
+  requestHeaders: Headers,
+  limit: number,
+  database: Database = db,
+): Promise<AdminDashboardTicketRow[]> {
+  await requireAdmin(requestHeaders);
+
+  const attachmentCount = database
+    .select({ count: sql<number>`count(*)::int`.as('count') })
+    .from(ticketAttachments)
+    .where(eq(ticketAttachments.ticketId, tickets.id))
+    .as('attachment_count');
+
+  const linkedTask = database
+    .select({ id: tasks.id, status: tasks.status })
+    .from(tasks)
+    .where(eq(tasks.ticketId, tickets.id))
+    .limit(1)
+    .as('linked_task');
+
+  const rows = await database
+    .select({
+      id: tickets.id,
+      title: tickets.title,
+      clientName: clients.name,
+      projectId: projects.id,
+      projectName: projects.name,
+      priority: tickets.priority,
+      createdAt: tickets.createdAt,
+      attachmentCount: attachmentCount.count,
+      linkedTaskId: linkedTask.id,
+      linkedTaskStatus: linkedTask.status,
+    })
+    .from(tickets)
+    .innerJoin(projects, eq(projects.id, tickets.projectId))
+    .innerJoin(clients, eq(clients.id, projects.clientId))
+    .leftJoinLateral(attachmentCount, sql`true`)
+    .leftJoinLateral(linkedTask, sql`true`)
+    .where(eq(tickets.status, 'new'))
+    .orderBy(desc(tickets.createdAt))
+    .limit(limit);
+
+  return rows.map((row) => ({
+    ...row,
+    attachmentCount: row.attachmentCount ?? 0,
+    reference: ticketReference(row.id),
+    linkedTask:
+      row.linkedTaskId && row.linkedTaskStatus
+        ? {
+            id: row.linkedTaskId,
+            reference: taskReference(row.linkedTaskId),
+            status: row.linkedTaskStatus,
+          }
+        : null,
+  }));
+}
+
 /**
  * Admin-only ticket queries — kept entirely separate from
  * features/tickets/queries.ts (the portal queries): each file resolves and

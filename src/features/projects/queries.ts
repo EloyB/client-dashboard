@@ -26,6 +26,7 @@ export type ProjectListRow = {
 export async function listProjects(
   requestHeaders: Headers,
   database: Database = db,
+  options: { status?: ProjectStatus; limit?: number } = {},
 ): Promise<ProjectListRow[]> {
   await requireAdmin(requestHeaders);
 
@@ -49,7 +50,7 @@ export async function listProjects(
     .where(and(eq(tickets.projectId, projects.id), inArray(tickets.status, ['new', 'in_progress'])))
     .as('open_tickets');
 
-  const rows = await database
+  const query = database
     .select({
       id: projects.id,
       name: projects.name,
@@ -66,7 +67,11 @@ export async function listProjects(
     .innerJoin(clients, eq(clients.id, projects.clientId))
     .leftJoinLateral(nextDeadline, sql`true`)
     .leftJoinLateral(openTickets, sql`true`)
-    .orderBy(sql`${nextDeadline.startsAt} asc nulls last`);
+    .where(options.status ? eq(projects.status, options.status) : undefined)
+    .orderBy(sql`${nextDeadline.startsAt} asc nulls last`)
+    .$dynamic();
+
+  const rows = await (options.limit ? query.limit(options.limit) : query);
 
   return rows.map((row) => ({
     id: row.id,
