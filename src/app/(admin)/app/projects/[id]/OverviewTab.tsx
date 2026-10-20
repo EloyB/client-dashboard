@@ -4,8 +4,8 @@ import { nl } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TimelineItem } from '@/components/shared/ListRow';
 import type { activityLog } from '@/db/schema';
+import type { AgendaEvent } from '@/features/events/helpers';
 import { AgendaCard } from './AgendaCard';
-import type { AgendaEvent } from './eventHelpers';
 
 export function OverviewTab({
   activity,
