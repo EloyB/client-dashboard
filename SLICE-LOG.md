@@ -157,3 +157,18 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
 - **Gevonden en gefixt tijdens het testen (niet in het oorspronkelijke plan):**
   - Bug: de "Binnenkort"-badge verscheen ook op het Voorbij-tabblad. Gefixt met een `highlightFirstAsSoon`-prop, enkel actief op de Komende-lijst.
 - **Openstaande twijfels:** geen.
+
+---
+
+## Slice 9a — Admin-homepage
+
+- **Branch:** `slice/9a-admin-home` (vertrekt van `slice/8c-portal-agenda`)
+- **PR:** [#12](https://github.com/EloyB/client-dashboard/pull/12) → base `slice/8c-portal-agenda`
+- **Migraties:** geen
+- **Aannames:**
+  - "Naar taak" verschijnt enkel bij een al gekoppelde taak (zelfde patroon als `ConvertToTaskCard`), geen snelkoppeling naar "omzetten naar taak".
+  - Geen "Sorteren"-schakelaar bij Mijn taken, geen Status-kolom bij Actieve projecten (altijd "Actief", dus overbodig in een al-gefilterde sectie) — beide uit de mockup maar niet uit de letterlijke promptvereisten.
+  - "Nieuwe tickets"-badge toont het aantal getoonde rijen (max. 5), geen aparte COUNT-query voor het werkelijke totaal.
+- **Gevonden en gefixt tijdens het testen (niet in het oorspronkelijke plan):**
+  - Bug: op 375px overschreden "Nieuwe tickets" en "Actieve projecten" de schermbreedte (`ListRow`'s vaste horizontale layout volstond niet voor badge+tekst+knoppen). Gefixt met een eigen, responsieve `flex-col`/wrappende rij voor die twee secties.
+- **Openstaande twijfels:** geen.
