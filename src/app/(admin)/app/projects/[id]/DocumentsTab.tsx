@@ -7,11 +7,11 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { DocumentDownloadButton } from '@/components/shared/DocumentDownloadButton';
+import { fileTypeTile } from '@/components/shared/fileTypeTile';
 import { ListRow } from '@/components/shared/ListRow';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { DocumentUploadSheet } from './documents/DocumentUploadSheet';
-import { OpenDocumentButton } from './documents/OpenDocumentButton';
-import { fileTypeTile } from './documents/fileTypeTile';
 import type { DocumentWithFile } from '@/features/documents/queries';
 
 /** Compact view of the project's documents — the full, filterable list lives at /app/projects/[id]/documents. */
@@ -77,7 +77,7 @@ export function DocumentsTab({
                   <StatusBadge domain="document" visibleToClient={document.visibleToClient} />
                 </span>
               }
-              trailing={<OpenDocumentButton fileId={document.fileId} />}
+              trailing={<DocumentDownloadButton fileId={document.fileId} />}
               className="border-border-subtle border-b py-3 last:border-0"
             />
           ))

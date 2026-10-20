@@ -19,14 +19,14 @@ import {
   type DataTableColumn,
   type DataTableFilter,
 } from '@/components/shared/DataTable';
+import { DocumentDownloadButton } from '@/components/shared/DocumentDownloadButton';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { fileTypeTile } from '@/components/shared/fileTypeTile';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { showErrorToast, showSuccessToast } from '@/components/shared/toast';
 import type { DocumentType } from '@/db/schema';
 import { deleteDocument, updateDocumentVisibility } from '@/features/documents/actions';
 import type { DocumentWithFile } from '@/features/documents/queries';
-import { fileTypeTile } from './fileTypeTile';
-import { OpenDocumentButton } from './OpenDocumentButton';
 
 const typeLabels: Record<DocumentType, string> = {
   invoice: 'Factuur',
@@ -194,7 +194,7 @@ const columns: DataTableColumn<DocumentWithFile>[] = [
     className: 'text-right',
     cell: (document) => (
       <div className="flex items-center justify-end gap-1">
-        <OpenDocumentButton fileId={document.fileId} />
+        <DocumentDownloadButton fileId={document.fileId} />
         <RowActions document={document} />
       </div>
     ),
@@ -219,7 +219,7 @@ function MobileCard({ document }: { document: DocumentWithFile }) {
           <StatusBadge domain="documentType" type={document.type} />
           <VisibilityToggle document={document} />
         </div>
-        <OpenDocumentButton fileId={document.fileId} />
+        <DocumentDownloadButton fileId={document.fileId} />
       </div>
     </div>
   );
