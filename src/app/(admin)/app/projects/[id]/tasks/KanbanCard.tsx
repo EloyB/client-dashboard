@@ -7,13 +7,8 @@ import { nl } from 'date-fns/locale';
 
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { cn, parseDateOnly } from '@/lib/utils';
+import { isOverdue } from './taskHelpers';
 import type { TaskRow } from './TasksTable';
-
-function isOverdue(task: TaskRow): boolean {
-  const date = parseDateOnly(task.dueDate);
-  if (!date || task.status === 'done') return false;
-  return date < new Date(new Date().toDateString());
-}
 
 function dueDateLabel(task: TaskRow): string | null {
   const date = parseDateOnly(task.dueDate);
