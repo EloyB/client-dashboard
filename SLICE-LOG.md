@@ -79,3 +79,20 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
 - **Gevonden tijdens het testen:** geen bugs in productiecode — enkel een verkeerde aanname in de eerste e2e-testopzet (zie PR), gefixt in de test zelf.
 - **Opruiming:** `isOverdue()` (stond drievoudig gekopieerd) samengevoegd in `taskHelpers.ts`; een nieuwe `Pill`-component vervangt dubbele pill-markup in het desktopbord en de mobiele kolomwisselaar; `TaskMobileCard` geëxtraheerd zodat lijst en mobiel bord exact dezelfde kaart gebruiken.
 - **Openstaande twijfels:** geen.
+
+---
+
+## Slice 7d — Ticket omzetten naar taak
+
+- **Branch:** `slice/7d-ticket-to-task` (vertrekt van `slice/7c-kanban-mobile`)
+- **PR:** [#7](https://github.com/EloyB/client-dashboard/pull/7) → base `slice/7c-kanban-mobile`
+- **Migraties:** geen (`tasks.ticketId` bestond al)
+- **Datamodel-/scope-conflicten gevlagd, niet gebouwd (geen schema erbij verzonnen):**
+  - "Schermafbeeldingen meenemen"-checkbox uit het ontwerp — zou een taak-bijlage-relatie vereisen die niet in het datamodel bestaat.
+  - "Taak koppelen" (een bestaande taak aan een ticket koppelen) — stond enkel in de ruwe designmarkup, nergens in de prompttekst of CLAUDE.md se scope.
+- **Aannames:**
+  - Vervaldatum in de omzetten-sheet start leeg (geen vervaldatumconcept op tickets om van te erven).
+  - Ticketreferentie op taakkaarten is nu een link terug naar het ticket in de lijstweergave en mobiele kaarten, maar blijft platte tekst op het bureaubladbord (zit daar in dezelfde knop als de sleepfunctionaliteit; een geneste link zou ongeldige HTML zijn).
+- **Gevonden en gefixt tijdens het testen (niet in het oorspronkelijke plan):**
+  - Bug: de "Gekoppelde taak"-sheet werd enkel gerenderd zolang er nog geen taak gekoppeld was — na een geslaagde conversie verwijderde `router.refresh()` de sheet zelf uit de boom, vóór de gebruiker het bevestigingsscherm kon zien of "Naar de taak" kon aanklikken. Gefixt door de sheet altijd gemonteerd te houden.
+- **Openstaande twijfels:** geen.
