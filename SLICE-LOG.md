@@ -96,3 +96,14 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
 - **Gevonden en gefixt tijdens het testen (niet in het oorspronkelijke plan):**
   - Bug: de "Gekoppelde taak"-sheet werd enkel gerenderd zolang er nog geen taak gekoppeld was — na een geslaagde conversie verwijderde `router.refresh()` de sheet zelf uit de boom, vóór de gebruiker het bevestigingsscherm kon zien of "Naar de taak" kon aanklikken. Gefixt door de sheet altijd gemonteerd te houden.
 - **Openstaande twijfels:** geen.
+
+---
+
+## Slice 7e — Al mijn taken
+
+- **Branch:** `slice/7e-all-tasks` (vertrekt van `slice/7d-ticket-to-task`)
+- **PR:** [#8](https://github.com/EloyB/client-dashboard/pull/8) → base `slice/7d-ticket-to-task`
+- **Migraties:** geen
+- **Aannames:** geen noemenswaardige — prompt en designscreenshot waren hier eenduidig.
+- **Systemische bug gevonden en gefixt (niet enkel deze slice):** `isOverdue()` (7a-7c) en de projectdetailpagina se "project is te laat"-check berekenden "vandaag" via de lokale tijdzone van de server, niet Europe/Brussels — foutgevoelig rond middernacht. Nieuwe `todayInBrussels()`-helper toegevoegd en op alle drie de plaatsen gebruikt.
+- **Openstaande twijfels:** geen.
