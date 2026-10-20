@@ -12,12 +12,7 @@ export const projectStatusEnum = pgEnum('project_status', [
 
 export const taskStatusEnum = pgEnum('task_status', ['todo', 'in_progress', 'review', 'done']);
 
-export const ticketStatusEnum = pgEnum('ticket_status', [
-  'new',
-  'in_progress',
-  'resolved',
-  'closed',
-]);
+export const ticketStatusEnum = pgEnum('ticket_status', ['new', 'in_progress', 'resolved']);
 
 export const priorityEnum = pgEnum('priority', ['low', 'medium', 'high']);
 

@@ -516,7 +516,7 @@ async function seed() {
     title: "Foto's laden traag",
     description: 'De Instagram-feed op de homepage laadt merkbaar traag.',
     pageUrl: 'https://bakkerijvermeulen.be',
-    status: 'closed',
+    status: 'resolved',
     priority: 'medium',
   });
 
@@ -683,7 +683,7 @@ async function seed() {
     title: 'Contactformulier gaf foutmelding (opgelost)',
     description: 'Was tijdelijk stuk door een verkeerde instelling op de server.',
     pageUrl: 'https://detrapper.be/contact',
-    status: 'closed',
+    status: 'resolved',
     priority: 'low',
   });
 

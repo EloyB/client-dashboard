@@ -36,16 +36,10 @@ describe('listClients', () => {
         status: 'in_progress',
       },
       {
-        projectId: activeProject.id,
+        projectId: completedProject.id,
         reportedById: clientUser.id,
         title: 'Resolved',
         status: 'resolved',
-      },
-      {
-        projectId: completedProject.id,
-        reportedById: clientUser.id,
-        title: 'Closed',
-        status: 'closed',
       },
     ]);
 
