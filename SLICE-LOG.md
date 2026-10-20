@@ -65,3 +65,17 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
 - **Gevonden en gefixt tijdens het testen (niet in het oorspronkelijke plan):**
   - Bug: `onDragEnd` herkende een kruis-kolom-verplaatsing niet meer als zodanig omdat `onDragOver` de kolomstatus al live had bijgewerkt — de kaart verplaatste zich visueel maar er gebeurde geen server-call. Gefixt door bij `onDragEnd` te vergelijken met de snapshot van vóór het slepen in plaats van de al-gemuteerde staat.
 - **Openstaande twijfels:** geen.
+
+---
+
+## Slice 7c — Kanban op mobiel
+
+- **Branch:** `slice/7c-kanban-mobile` (vertrekt van `slice/7b-kanban-desktop`)
+- **PR:** [#6](https://github.com/EloyB/client-dashboard/pull/6) → base `slice/7b-kanban-desktop`
+- **Migraties:** geen
+- **Aannames:**
+  - Een gloednieuw project zonder taken toont altijd de algemene lege staat, ongeacht `view=board` — pas na de eerste taak verschijnt de kolomwisselaar.
+  - De "+"-knop staat naast de pillrij in plaats van in de bovenste appbalk zoals de designscreenshot toont — functioneel gelijk, kleine visuele afwijking.
+- **Gevonden tijdens het testen:** geen bugs in productiecode — enkel een verkeerde aanname in de eerste e2e-testopzet (zie PR), gefixt in de test zelf.
+- **Opruiming:** `isOverdue()` (stond drievoudig gekopieerd) samengevoegd in `taskHelpers.ts`; een nieuwe `Pill`-component vervangt dubbele pill-markup in het desktopbord en de mobiele kolomwisselaar; `TaskMobileCard` geëxtraheerd zodat lijst en mobiel bord exact dezelfde kaart gebruiken.
+- **Openstaande twijfels:** geen.
