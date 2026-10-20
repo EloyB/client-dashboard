@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { listProjects } from '@/features/projects/queries';
 import { cn } from '@/lib/utils';
-import { DashboardSectionCard } from './DashboardSectionCard';
+import { DashboardSectionCard } from '@/components/shared/DashboardSectionCard';
 
 const SECTION_LIMIT = 6;
 

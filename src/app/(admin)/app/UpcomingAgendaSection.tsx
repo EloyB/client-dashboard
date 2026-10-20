@@ -15,7 +15,7 @@ import {
   splitBrusselsDateTime,
   todayInBrussels,
 } from '@/lib/utils';
-import { DashboardSectionCard } from './DashboardSectionCard';
+import { DashboardSectionCard } from '@/components/shared/DashboardSectionCard';
 
 /** "Vandaag" / "Te laat" / the weekday name — matches the design's compact per-row status label. */
 function dayLabel(dateOnly: string, today: string): string {

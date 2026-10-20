@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { listNewTicketsForAdmin } from '@/features/tickets/queries.admin';
-import { DashboardSectionCard } from './DashboardSectionCard';
+import { DashboardSectionCard } from '@/components/shared/DashboardSectionCard';
 
 const SECTION_LIMIT = 5;
 

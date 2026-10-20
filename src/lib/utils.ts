@@ -20,6 +20,14 @@ export function initialsFromName(name: string): string {
   return `${first?.charAt(0) ?? ''}${second?.charAt(0) ?? ''}`.toUpperCase();
 }
 
+/** "184 kB" / "1.2 MB" — shared by the admin (6a) and portal (6b/9b) document lists. */
+export function formatFileSize(bytes: number): string {
+  if (bytes < 1024 * 1024) {
+    return `${Math.round(bytes / 1024)} kB`;
+  }
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
+
 /**
  * A `date`-column value ('yyyy-MM-dd') <-> the `Date` object DateField needs.
  * Parsing with an explicit local midnight (rather than a bare date string,

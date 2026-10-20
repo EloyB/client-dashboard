@@ -17,6 +17,8 @@ const buttonVariants = cva(
           'text-neutral-500 hover:bg-muted hover:text-foreground aria-expanded:bg-muted aria-expanded:text-foreground',
         destructive: 'bg-destructive text-destructive-foreground hover:bg-destructive/90',
         link: 'text-primary underline-offset-4 hover:underline',
+        // White button on an accent-colored surface — documented in COMPONENTS.md for the portal home page's action card, not used anywhere else.
+        inverse: 'bg-white text-primary hover:bg-neutral-50',
       },
       size: {
         default: 'h-10 gap-1.5 px-4',

@@ -18,7 +18,7 @@ import { fileTypeTile } from '@/components/shared/fileTypeTile';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import type { DocumentType } from '@/db/schema';
 import type { PortalDocumentRow } from '@/features/documents/queries.portal';
-import { cn } from '@/lib/utils';
+import { cn, formatFileSize } from '@/lib/utils';
 
 const typeOptions: { value: DocumentType | 'all'; label: string }[] = [
   { value: 'all', label: 'Alle' },
@@ -27,13 +27,6 @@ const typeOptions: { value: DocumentType | 'all'; label: string }[] = [
   { value: 'contract', label: 'Contract' },
   { value: 'other', label: 'Andere' },
 ];
-
-function formatSize(bytes: number): string {
-  if (bytes < 1024 * 1024) {
-    return `${Math.round(bytes / 1024)} kB`;
-  }
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
 
 export function PortalDocumentsList({ documents }: { documents: PortalDocumentRow[] }) {
   const router = useRouter();
@@ -160,7 +153,7 @@ export function PortalDocumentsList({ documents }: { documents: PortalDocumentRo
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-medium">{document.title}</p>
                     <p className="text-small text-muted-foreground truncate">
-                      {formatSize(document.size)} ·{' '}
+                      {formatFileSize(document.size)} ·{' '}
                       {format(document.createdAt, 'd MMM yyyy', { locale: nl })}
                     </p>
                   </div>
