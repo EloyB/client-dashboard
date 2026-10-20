@@ -25,9 +25,10 @@ import {
 import { showErrorToast, showSuccessToast } from '@/components/shared/toast';
 import type { Priority, TaskStatus } from '@/db/schema';
 import { moveTask } from '@/features/tasks/actions';
-import { cn, parseDateOnly } from '@/lib/utils';
 import { KanbanCardContent } from './KanbanCard';
 import { KanbanColumn } from './KanbanColumn';
+import { Pill } from './Pill';
+import { isOverdue } from './taskHelpers';
 import type { TaskRow } from './TasksTable';
 
 const STATUS_ORDER: TaskStatus[] = ['todo', 'in_progress', 'review', 'done'];
@@ -38,12 +39,6 @@ const priorityOptions: { value: 'all' | Priority; label: string }[] = [
   { value: 'medium', label: 'Middel' },
   { value: 'low', label: 'Laag' },
 ];
-
-function isOverdue(task: TaskRow): boolean {
-  const date = parseDateOnly(task.dueDate);
-  if (!date || task.status === 'done') return false;
-  return date < new Date(new Date().toDateString());
-}
 
 function groupByStatus(tasks: TaskRow[]): Record<TaskStatus, TaskRow[]> {
   const groups: Record<TaskStatus, TaskRow[]> = { todo: [], in_progress: [], review: [], done: [] };
@@ -208,18 +203,11 @@ export function KanbanBoard({
             ))}
           </SelectContent>
         </Select>
-        <button
-          type="button"
+        <Pill
+          label="Alleen vervallen"
+          active={overdueOnly}
           onClick={() => setOverdueOnly((current) => !current)}
-          className={cn(
-            'text-body flex h-9 items-center gap-1.5 rounded-full border px-3.5 whitespace-nowrap',
-            overdueOnly
-              ? 'border-transparent bg-neutral-900 text-white'
-              : 'border-border-strong bg-card text-foreground',
-          )}
-        >
-          Alleen vervallen
-        </button>
+        />
       </div>
 
       <DndContext

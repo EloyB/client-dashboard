@@ -10,6 +10,7 @@ import { PageHeader } from '@/components/shared/PageHeader';
 import { useIsDesktop } from '@/components/shared/useIsDesktop';
 import type { TaskStatus } from '@/db/schema';
 import { KanbanBoard } from './KanbanBoard';
+import { MobileKanbanBoard } from './MobileKanbanBoard';
 import { TaskFormSheet, type EditableTask } from './TaskFormSheet';
 import { TasksTable, type TaskRow } from './TasksTable';
 
@@ -37,13 +38,11 @@ export function TasksPageContent({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const requestedView: View = isView(searchParams.get('view'))
-    ? (searchParams.get('view') as View)
-    : 'list';
-  // The board isn't usable on mobile yet (7c adds that) — fall back to the
-  // list there regardless of the URL, without losing the saved preference.
+  const view: View = isView(searchParams.get('view')) ? (searchParams.get('view') as View) : 'list';
+  // The board renders differently per breakpoint (side-by-side columns on
+  // desktop, one column at a time with a switcher on mobile — see 7c) —
+  // the `view` choice itself is the same for both.
   const isDesktop = useIsDesktop();
-  const view: View = isDesktop ? requestedView : 'list';
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<EditableTask | undefined>(undefined);
@@ -84,26 +83,24 @@ export function TasksPageContent({
           )
         }
         secondaryAction={
-          isDesktop && (
-            <div className="flex overflow-hidden rounded-lg border">
-              <Button
-                variant={view === 'list' ? 'default' : 'ghost'}
-                className="rounded-none"
-                onClick={() => setView('list')}
-              >
-                <List strokeWidth={1.75} />
-                Lijst
-              </Button>
-              <Button
-                variant={view === 'board' ? 'default' : 'ghost'}
-                className="rounded-none"
-                onClick={() => setView('board')}
-              >
-                <LayoutGrid strokeWidth={1.75} />
-                Bord
-              </Button>
-            </div>
-          )
+          <div className="flex overflow-hidden rounded-lg border">
+            <Button
+              variant={view === 'list' ? 'default' : 'ghost'}
+              className="rounded-none"
+              onClick={() => setView('list')}
+            >
+              <List strokeWidth={1.75} />
+              Lijst
+            </Button>
+            <Button
+              variant={view === 'board' ? 'default' : 'ghost'}
+              className="rounded-none"
+              onClick={() => setView('board')}
+            >
+              <LayoutGrid strokeWidth={1.75} />
+              Bord
+            </Button>
+          </div>
         }
         primaryAction={
           <Button onClick={() => openCreate()}>
@@ -127,7 +124,11 @@ export function TasksPageContent({
             }
           />
         ) : view === 'board' ? (
-          <KanbanBoard tasks={tasks} onEditTask={openEdit} onAddTask={openCreate} />
+          isDesktop ? (
+            <KanbanBoard tasks={tasks} onEditTask={openEdit} onAddTask={openCreate} />
+          ) : (
+            <MobileKanbanBoard tasks={tasks} onEditTask={openEdit} onAddTask={openCreate} />
+          )
         ) : (
           <TasksTable tasks={tasks} onEditTask={openEdit} />
         )}
