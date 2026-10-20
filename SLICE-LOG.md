@@ -142,3 +142,18 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
   - Op mobiel bepaalt de actieve weergave (maand/week) wat opgehaald wordt; de Maand/Week-toggle is enkel zichtbaar op desktop, dus in de praktijk blijft dit zo goed als altijd "maand".
 - **Bewuste designafwijkingen (zie PR voor details):** hele-dag-events in een aparte strook boven het weekraster in plaats van overlappend zoals de mockup; weekraster dekt 08:00–17:00 (9 uurvakken) i.p.v. de mockups 10; event-chips met gevulde achtergrondpil i.p.v. witte chip met gekleurde rand; typefilter-pills zonder aantallen.
 - **Openstaande twijfels:** de drie styling-/bereikafwijkingen hierboven — functioneel geen probleem, maar horen bij review opgemerkt te worden.
+
+---
+
+## Slice 8c — Agenda in het klantportaal
+
+- **Branch:** `slice/8c-portal-agenda` (vertrekt van `slice/8b-global-calendar`)
+- **PR:** [#11](https://github.com/EloyB/client-dashboard/pull/11) → base `slice/8b-global-calendar`
+- **Migraties:** geen
+- **Aannames:**
+  - Type- en projectfilter leven enkel als lokale React-state, niet in de URL (eenvoudige leeslijst, geen navigatie-behoefte zoals bij de admin-kalender).
+  - `Pill` verplaatst van `projects/[id]/tasks/Pill.tsx` naar `components/shared/Pill.tsx`, zodat het portaal er niet voor in de beheerroute hoeft te reiken — nu op 4 plaatsen gebruikt.
+  - `splitUpcomingAndPast` generiek gemaakt (behoudt extra velden zoals `projectId`/`projectName` door de split heen) — geen gedragswijziging voor de bestaande admin-aanroepen.
+- **Gevonden en gefixt tijdens het testen (niet in het oorspronkelijke plan):**
+  - Bug: de "Binnenkort"-badge verscheen ook op het Voorbij-tabblad. Gefixt met een `highlightFirstAsSoon`-prop, enkel actief op de Komende-lijst.
+- **Openstaande twijfels:** geen.
