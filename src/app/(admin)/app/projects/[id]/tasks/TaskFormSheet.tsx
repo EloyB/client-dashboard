@@ -43,12 +43,15 @@ export type EditableTask = {
 export function TaskFormSheet({
   projectId,
   task,
+  defaultStatus = 'todo',
   open,
   onOpenChange,
 }: {
   projectId: string;
   /** Present when editing an existing task; absent when creating one. */
   task?: EditableTask;
+  /** Pre-fills status when creating from a specific kanban column (7b). Ignored when editing. */
+  defaultStatus?: TaskStatus;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
@@ -59,7 +62,7 @@ export function TaskFormSheet({
     projectId,
     title: task?.title ?? '',
     description: task?.description ?? '',
-    status: task?.status ?? 'todo',
+    status: task?.status ?? defaultStatus,
     priority: task?.priority ?? 'medium',
     dueDate: task ? parseDateOnly(task.dueDate) : undefined,
   };
