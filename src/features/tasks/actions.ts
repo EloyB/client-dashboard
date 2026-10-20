@@ -5,8 +5,9 @@ import { generateKeyBetween } from 'fractional-indexing';
 import { headers } from 'next/headers';
 
 import { db, type Database } from '@/db';
-import { activityLog, tasks, type TaskStatus } from '@/db/schema';
+import { activityLog, tasks, tickets, type TaskStatus, type TicketStatus } from '@/db/schema';
 import {
+  convertTicketToTaskSchema,
   createTaskSchema,
   deleteTaskSchema,
   moveTaskSchema,
@@ -22,6 +23,12 @@ const statusLabels: Record<TaskStatus, string> = {
   in_progress: 'Bezig',
   review: 'Review',
   done: 'Klaar',
+};
+
+const ticketStatusLabels: Record<TicketStatus, string> = {
+  new: 'Nieuw',
+  in_progress: 'In behandeling',
+  resolved: 'Opgelost',
 };
 
 /**
@@ -194,6 +201,69 @@ export const moveTask = createFormAction(moveTaskSchema, async (data) => {
     }
 
     return updated;
+  });
+
+  return task;
+});
+
+/**
+ * Ticket detail's "Omzetten naar taak" (7d). One ticket converts to at most
+ * one task — once linked, the UI turns the action into a plain link to the
+ * existing task instead of offering a second conversion; this rejects it
+ * server-side too, rather than silently creating a duplicate.
+ */
+export const convertTicketToTask = createFormAction(convertTicketToTaskSchema, async (data) => {
+  const admin = await requireAdmin(await headers());
+
+  const [ticket] = await db.select().from(tickets).where(eq(tickets.id, data.ticketId)).limit(1);
+  if (!ticket) {
+    throw new AccessError('NOT_FOUND', 'Ticket not found.');
+  }
+
+  const [existingTask] = await db
+    .select({ id: tasks.id })
+    .from(tasks)
+    .where(eq(tasks.ticketId, data.ticketId))
+    .limit(1);
+  if (existingTask) {
+    throw new Error('Dit ticket is al omgezet naar een taak.');
+  }
+
+  const position = await nextPosition(ticket.projectId, data.status, db);
+  const shouldUpdateTicketStatus = data.setTicketInProgress && ticket.status !== 'in_progress';
+
+  const [task] = await db.transaction(async (tx) => {
+    const created = await tx
+      .insert(tasks)
+      .values({
+        projectId: ticket.projectId,
+        title: data.title,
+        description: data.description || null,
+        status: data.status,
+        priority: data.priority,
+        dueDate: formatDateOnly(data.dueDate),
+        position,
+        ticketId: data.ticketId,
+        completedAt: completedAtFor(data.status),
+      })
+      .returning();
+
+    if (shouldUpdateTicketStatus) {
+      await tx
+        .update(tickets)
+        .set({ status: 'in_progress', resolvedAt: null })
+        .where(eq(tickets.id, data.ticketId));
+
+      await tx.insert(activityLog).values({
+        projectId: ticket.projectId,
+        ticketId: ticket.id,
+        actorId: admin.id,
+        type: 'ticket_status_changed',
+        description: `Status gewijzigd naar "${ticketStatusLabels.in_progress}" (ticket omgezet naar taak)`,
+      });
+    }
+
+    return created;
   });
 
   return task;

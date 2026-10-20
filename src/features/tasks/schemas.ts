@@ -34,3 +34,17 @@ export const moveTaskSchema = z.object({
   previousTaskId: z.uuid().nullable(),
   nextTaskId: z.uuid().nullable(),
 });
+
+/** 7d: the ticket-detail "Omzetten naar taak" sheet. */
+export const convertTicketToTaskFormSchema = z.object({
+  title: z.string().trim().min(1, 'Titel is verplicht.'),
+  description: z.string().trim(),
+  status: z.enum(taskStatusEnum.enumValues),
+  priority: z.enum(priorityEnum.enumValues),
+  dueDate: z.date().optional(),
+  setTicketInProgress: z.boolean(),
+});
+
+export const convertTicketToTaskSchema = convertTicketToTaskFormSchema.and(
+  z.object({ ticketId: z.uuid() }),
+);

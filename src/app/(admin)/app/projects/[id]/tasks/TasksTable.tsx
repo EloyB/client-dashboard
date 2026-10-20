@@ -2,6 +2,7 @@
 
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
+import Link from 'next/link';
 
 import {
   DataTable,
@@ -25,6 +26,7 @@ export type TaskRow = {
   priority: Priority;
   dueDate: string | null;
   reference: string;
+  ticketId: string | null;
   ticketReference: string | null;
 };
 
@@ -99,7 +101,18 @@ export function TasksTable({
     {
       key: 'ticket',
       header: 'Ticket',
-      cell: (task) => <span className="text-muted-foreground">{task.ticketReference ?? '—'}</span>,
+      cell: (task) =>
+        task.ticketId ? (
+          <Link
+            href={`/app/tickets/${task.ticketId}`}
+            className="text-primary font-mono underline"
+            onClick={(event) => event.stopPropagation()}
+          >
+            {task.ticketReference}
+          </Link>
+        ) : (
+          <span className="text-muted-foreground">—</span>
+        ),
     },
     {
       key: 'actions',

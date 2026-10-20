@@ -11,6 +11,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { TicketScreenshots } from '@/components/shared/TicketScreenshots';
 import { getTicketByIdForAdmin } from '@/features/tickets/queries.admin';
 import { AccessError } from '@/lib/access';
+import { ConvertToTaskCard } from './ConvertToTaskCard';
 import { TicketOpvolgingCard } from './TicketOpvolgingCard';
 
 function formatDateTime(date: Date): string {
@@ -119,6 +120,20 @@ export default async function AdminTicketDetailPage({
             ticketId={ticket.id}
             status={ticket.status}
             priority={ticket.priority}
+          />
+
+          <ConvertToTaskCard
+            ticket={{
+              id: ticket.id,
+              reference: ticket.reference,
+              title: ticket.title,
+              description: ticket.description,
+              priority: ticket.priority,
+              status: ticket.status,
+              projectId: ticket.projectId,
+              projectName: ticket.projectName,
+              linkedTask: ticket.linkedTask,
+            }}
           />
 
           <Card>

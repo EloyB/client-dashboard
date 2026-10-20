@@ -7,11 +7,14 @@ import {
   projects,
   ticketAttachments,
   tickets,
+  tasks,
   user as userTable,
   type Priority,
+  type TaskStatus,
   type TicketStatus,
 } from '@/db/schema';
 import { AccessError, requireAdmin } from '@/lib/access';
+import { taskReference } from '@/lib/task-links';
 import { ticketReference } from '@/lib/ticket-links';
 
 /**
@@ -128,6 +131,14 @@ export type AdminTicketAttachment = {
   size: number;
 };
 
+export type AdminLinkedTask = {
+  id: string;
+  reference: string;
+  title: string;
+  status: TaskStatus;
+  dueDate: string | null;
+};
+
 export type AdminTicketDetail = {
   id: string;
   reference: string;
@@ -145,6 +156,7 @@ export type AdminTicketDetail = {
   updatedAt: Date;
   resolvedAt: Date | null;
   attachments: AdminTicketAttachment[];
+  linkedTask: AdminLinkedTask | null;
 };
 
 /** NOT_FOUND only for a genuinely non-existent id — an admin can open any ticket, no ownership check. */
@@ -186,6 +198,12 @@ export async function getTicketByIdForAdmin(
     .innerJoin(files, eq(files.id, ticketAttachments.fileId))
     .where(eq(ticketAttachments.ticketId, ticketId));
 
+  const [linkedTask] = await database
+    .select({ id: tasks.id, title: tasks.title, status: tasks.status, dueDate: tasks.dueDate })
+    .from(tasks)
+    .where(eq(tasks.ticketId, ticketId))
+    .limit(1);
+
   return {
     id: row.ticket.id,
     reference: ticketReference(row.ticket.id),
@@ -203,5 +221,14 @@ export async function getTicketByIdForAdmin(
     updatedAt: row.ticket.updatedAt,
     resolvedAt: row.ticket.resolvedAt,
     attachments,
+    linkedTask: linkedTask
+      ? {
+          id: linkedTask.id,
+          reference: taskReference(linkedTask.id),
+          title: linkedTask.title,
+          status: linkedTask.status,
+          dueDate: linkedTask.dueDate,
+        }
+      : null,
   };
 }

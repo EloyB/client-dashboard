@@ -18,7 +18,7 @@ import {
   listTicketsForAdmin,
   listTicketsForProjectAdmin,
 } from '@/features/tickets/queries.admin';
-import { ticketAttachments } from '@/db/schema';
+import { tasks, ticketAttachments } from '@/db/schema';
 import { ticketReference } from '@/lib/ticket-links';
 
 describe('listTicketsForAdmin', () => {
@@ -173,6 +173,40 @@ describe('getTicketByIdForAdmin', () => {
     } finally {
       await testDb.delete(ticketAttachments).where(eq(ticketAttachments.fileId, file.id));
       await cleanupTestFile(file.id);
+      await cleanupTestClient(client.id, [user.id]);
+    }
+  });
+
+  it('includes the linked task once the ticket has been converted (7d)', async () => {
+    const client = await createTestClient();
+    const user = await createTestClientUser(client.id);
+    const project = await createTestProject(client.id);
+    const ticket = await createTestTicket(project.id, user.id);
+
+    try {
+      const withoutTask = await getTicketByIdForAdmin(await adminHeaders(), ticket.id, testDb);
+      expect(withoutTask.linkedTask).toBeNull();
+
+      const [task] = await testDb
+        .insert(tasks)
+        .values({
+          projectId: project.id,
+          title: 'Gekoppelde taak',
+          status: 'in_progress',
+          position: 'a0',
+          ticketId: ticket.id,
+        })
+        .returning();
+
+      const withTask = await getTicketByIdForAdmin(await adminHeaders(), ticket.id, testDb);
+      expect(withTask.linkedTask).toMatchObject({
+        id: task.id,
+        title: 'Gekoppelde taak',
+        status: 'in_progress',
+      });
+
+      await testDb.delete(tasks).where(eq(tasks.id, task.id));
+    } finally {
       await cleanupTestClient(client.id, [user.id]);
     }
   });

@@ -3,6 +3,7 @@
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
 import { MoreHorizontal, Trash2 } from 'lucide-react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -136,8 +137,13 @@ export function TaskMobileCard({
         >
           {dueDateLabel(task.dueDate)}
         </span>
-        {task.ticketReference && (
-          <span className="text-small text-muted-foreground">{task.ticketReference}</span>
+        {task.ticketId && (
+          <Link
+            href={`/app/tickets/${task.ticketId}`}
+            className="text-small text-primary font-mono underline"
+          >
+            {task.ticketReference}
+          </Link>
         )}
       </div>
       <div className="flex items-center gap-2">
