@@ -18,3 +18,20 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
   - Bug: de telling "X bestanden · Y gedeeld" op de projectdetail-sectie toonde de lengte van de al-beperkte (max 4) rijenlijst in plaats van het echte totaal. Gefixt door de volledige lijst op te halen voor de telling en pas daarna te knippen voor weergave.
   - Bug: op 375px overschreden de knoppen "Alle documenten" + "Uploaden" de kaartbreedte in de projectdetail-sectie. Gefixt door ze op mobiel te stapelen.
 - **Openstaande twijfels:** geen.
+
+---
+
+## Slice 6b — Documenten in het portaal
+
+- **Branch:** `slice/6b-documents-portal` (vertrekt van `slice/6a-documents-admin`)
+- **PR:** [#3](https://github.com/EloyB/client-dashboard/pull/3) → base `slice/6a-documents-admin`
+- **Migraties:** geen
+- **Aannames:**
+  - Geen portaal-documentdetailpagina/route — downloaden gaat rechtstreeks via het bestaande `getFileDownloadUrl` (met eigen access-check), geen `getDocumentById` nodig.
+  - Groepering per project via een eigen component (geen `DataTable`, die ondersteunt geen groepering).
+  - `OpenDocumentButton`/`fileTypeTile` uit 6a verplaatst naar `components/shared/` (tweede occurrence-regel uit CLAUDE.md) en hernoemd naar `DocumentDownloadButton`/`fileTypeTile`, met een `label`-prop voor het verschil "Openen" (admin) vs. "Downloaden" (portaal). Geen gedragswijziging voor 6a.
+- **Gevonden en gefixt tijdens het testen (niet in het oorspronkelijke plan):**
+  - Bug: de documentsoort-badge was per ongeluk verborgen op mobiel (`hidden sm:flex`), terwijl het ontwerp die op beide breedtes toont. Gefixt.
+  - Bug (in de Playwright-testhelper zelf, niet in productiecode): `.count()` om tussen twee knoppen te kiezen race't met de DOM en liet de test soms vasthangen. Vervangen door `.or()`.
+  - Opruiming: een paar achtergebleven "Zzz Temp Client"-rijen in de lokale ontwikkel-database van eerder gecrashte testruns (cleanup() liep niet door een test-timeout) zijn verwijderd.
+- **Openstaande twijfels:** geen.
