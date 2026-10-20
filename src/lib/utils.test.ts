@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
-import { cn, combineBrusselsDateTime, splitBrusselsDateTime, todayInBrussels } from '@/lib/utils';
+import {
+  cn,
+  combineBrusselsDateTime,
+  greetingForBrusselsHour,
+  splitBrusselsDateTime,
+  todayInBrussels,
+} from '@/lib/utils';
 
 describe('cn', () => {
   it('merges class names and resolves Tailwind conflicts', () => {
@@ -27,6 +33,23 @@ describe('todayInBrussels', () => {
   it('rolls over to the next date at 00:01 Brussels time (CET, winter)', () => {
     // 2026-01-16 00:01 CET (UTC+1) = 2026-01-15 23:01 UTC.
     expect(todayInBrussels(new Date('2026-01-15T23:01:00Z'))).toBe('2026-01-16');
+  });
+});
+
+describe('greetingForBrusselsHour', () => {
+  it('greets with Goeiemorgen before noon (CEST, summer)', () => {
+    // 09:00 CEST = 07:00 UTC.
+    expect(greetingForBrusselsHour(new Date('2026-09-16T07:00:00Z'))).toBe('Goeiemorgen');
+  });
+
+  it('greets with Goeiemiddag in the afternoon (CEST, summer)', () => {
+    // 14:00 CEST = 12:00 UTC.
+    expect(greetingForBrusselsHour(new Date('2026-09-16T12:00:00Z'))).toBe('Goeiemiddag');
+  });
+
+  it('greets with Goeieavond after 18:00 Brussels time (CET, winter)', () => {
+    // 19:00 CET = 18:00 UTC.
+    expect(greetingForBrusselsHour(new Date('2026-01-15T18:00:00Z'))).toBe('Goeieavond');
   });
 });
 

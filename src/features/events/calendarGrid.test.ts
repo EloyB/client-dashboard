@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest';
 
-import { getMonthGrid, getWeekGrid, groupEventsByDay, shiftMonth, shiftWeek } from './calendarGrid';
+import {
+  getMonthGrid,
+  getUpcomingWeekRange,
+  getWeekGrid,
+  groupEventsByDay,
+  shiftMonth,
+  shiftWeek,
+} from './calendarGrid';
 
 describe('getMonthGrid', () => {
   it('pads the first week with blanks up to the month start weekday', () => {
@@ -74,6 +81,20 @@ describe('shiftWeek', () => {
   it('moves by seven days', () => {
     expect(shiftWeek('2026-09-16', 1)).toBe('2026-09-23');
     expect(shiftWeek('2026-09-16', -1)).toBe('2026-09-09');
+  });
+});
+
+describe('getUpcomingWeekRange', () => {
+  it('spans today through the next 7 days, inclusive', () => {
+    const range = getUpcomingWeekRange('2026-09-16');
+    expect(range.rangeStart).toBe('2026-09-16');
+    expect(range.rangeEndExclusive).toBe('2026-09-24');
+  });
+
+  it('rolls over a month boundary', () => {
+    const range = getUpcomingWeekRange('2026-09-28');
+    expect(range.rangeStart).toBe('2026-09-28');
+    expect(range.rangeEndExclusive).toBe('2026-10-06');
   });
 });
 

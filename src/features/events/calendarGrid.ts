@@ -78,6 +78,18 @@ export function shiftWeek(anchorDateOnly: string, delta: number): string {
   return formatDateOnly(addWeeks(parseDateOnly(anchorDateOnly)!, delta))!;
 }
 
+/** Today through the next 7 days, inclusive — for the admin home page (9a). */
+export function getUpcomingWeekRange(todayDateOnly: string): {
+  rangeStart: string;
+  rangeEndExclusive: string;
+} {
+  const today = parseDateOnly(todayDateOnly)!;
+  return {
+    rangeStart: todayDateOnly,
+    rangeEndExclusive: formatDateOnly(addDays(today, 8))!,
+  };
+}
+
 /** Groups events under their Brussels start day — a multi-day event is shown once, on its start day, with the end communicated in its subtitle text (same simplification as the project-detail agenda, 8a). */
 export function groupEventsByDay<T extends { startsAt: Date }>(events: T[]): Map<string, T[]> {
   const map = new Map<string, T[]>();

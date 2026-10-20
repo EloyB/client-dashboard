@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { deadlineGroupFor, groupTasksByDeadline } from '@/features/tasks/grouping';
+import {
+  deadlineGroupFor,
+  groupTasksByDeadline,
+  groupTasksForDashboard,
+} from '@/features/tasks/grouping';
 
 // 2024-01-01 is a known Monday, so the week ends Sunday 2024-01-07.
 const MONDAY = '2024-01-01';
@@ -50,5 +54,43 @@ describe('groupTasksByDeadline', () => {
     expect(groups.thisWeek.map((t) => t.id)).toEqual(['e']);
     expect(groups.later.map((t) => t.id)).toEqual(['a']);
     expect(groups.noDeadline.map((t) => t.id)).toEqual(['d']);
+  });
+});
+
+describe('groupTasksForDashboard', () => {
+  it('buckets by precedence: overdue beats in_progress beats this week', () => {
+    const tasks = [
+      { id: 'overdue-todo', dueDate: '2023-12-31', status: 'todo' },
+      { id: 'overdue-in-progress', dueDate: '2023-12-31', status: 'in_progress' },
+      { id: 'in-progress-no-date', dueDate: null, status: 'in_progress' },
+      { id: 'in-progress-later', dueDate: '2024-02-01', status: 'in_progress' },
+      { id: 'today-todo', dueDate: MONDAY, status: 'todo' },
+      { id: 'this-week-review', dueDate: '2024-01-05', status: 'review' },
+      { id: 'later-todo', dueDate: '2024-01-08', status: 'todo' },
+      { id: 'no-date-todo', dueDate: null, status: 'todo' },
+      { id: 'done-overdue', dueDate: '2023-12-31', status: 'done' },
+    ];
+
+    const groups = groupTasksForDashboard(tasks, MONDAY);
+
+    expect(groups.overdue.map((t) => t.id).sort()).toEqual(['overdue-in-progress', 'overdue-todo']);
+    expect(groups.inProgress.map((t) => t.id).sort()).toEqual(
+      ['in-progress-later', 'in-progress-no-date'].sort(),
+    );
+    expect(groups.thisWeek.map((t) => t.id).sort()).toEqual(['this-week-review', 'today-todo']);
+  });
+
+  it('excludes done tasks and tasks due later with no other signal', () => {
+    const tasks = [
+      { id: 'done', dueDate: '2023-12-31', status: 'done' },
+      { id: 'later', dueDate: '2024-01-08', status: 'todo' },
+      { id: 'no-date', dueDate: null, status: 'todo' },
+    ];
+
+    const groups = groupTasksForDashboard(tasks, MONDAY);
+
+    expect(groups.overdue).toHaveLength(0);
+    expect(groups.inProgress).toHaveLength(0);
+    expect(groups.thisWeek).toHaveLength(0);
   });
 });
