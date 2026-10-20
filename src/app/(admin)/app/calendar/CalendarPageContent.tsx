@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/select';
 import { PageHeader } from '@/components/shared/PageHeader';
 import { EventFormSheet, type EditableEvent } from '@/app/(admin)/app/projects/[id]/EventFormSheet';
-import { Pill } from '@/app/(admin)/app/projects/[id]/tasks/Pill';
+import { Pill } from '@/components/shared/Pill';
 import type { EventType } from '@/db/schema';
 import {
   shiftMonth,

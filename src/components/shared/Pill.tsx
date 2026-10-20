@@ -1,6 +1,6 @@
 import { cn } from '@/lib/utils';
 
-/** The rounded pill-filter look from COMPONENTS.md/DataTable, reused outside a DataTable (board filters, the mobile column switcher). */
+/** The rounded pill-filter look from COMPONENTS.md/DataTable, reused outside a DataTable (board filters, the mobile column switcher, the admin and portal agenda). */
 export function Pill({
   label,
   count,

@@ -19,7 +19,7 @@ import {
   TaskFormSheet,
   type EditableTask,
 } from '@/app/(admin)/app/projects/[id]/tasks/TaskFormSheet';
-import { Pill } from '@/app/(admin)/app/projects/[id]/tasks/Pill';
+import { Pill } from '@/components/shared/Pill';
 import type { TaskStatus } from '@/db/schema';
 import {
   DEADLINE_GROUPS,
