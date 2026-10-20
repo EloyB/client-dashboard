@@ -113,6 +113,49 @@ describe('requestUpload (server action)', () => {
     }
   });
 
+  it('rejects a disallowed mime type for the document context', async () => {
+    currentHeaders = await adminHeaders();
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+
+    try {
+      const result = await requestUpload({
+        projectId: project.id,
+        context: 'document',
+        filename: 'malware.exe',
+        mimeType: 'application/x-msdownload',
+        size: 1024,
+      });
+      expect(result).toMatchObject({
+        success: false,
+        fieldErrors: { mimeType: [expect.any(String)] },
+      });
+    } finally {
+      await deleteTempClient(client.id);
+    }
+  });
+
+  it('accepts a pdf for the document context, wider than the ticket_attachment allowlist', async () => {
+    currentHeaders = await adminHeaders();
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+
+    try {
+      const result = await requestUpload({
+        projectId: project.id,
+        context: 'document',
+        filename: 'factuur.pdf',
+        mimeType: 'application/pdf',
+        size: 1024,
+      });
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data.storageKey.startsWith(`projects/${project.id}/documents/`)).toBe(true);
+    } finally {
+      await deleteTempClient(client.id);
+    }
+  });
+
   it('returns a storage key scoped to the project and context, plus an upload URL', async () => {
     currentHeaders = await adminHeaders();
     const client = await createTempClient();

@@ -1,4 +1,4 @@
-import type { Priority, ProjectStatus, TaskStatus, TicketStatus } from '@/db/schema';
+import type { DocumentType, Priority, ProjectStatus, TaskStatus, TicketStatus } from '@/db/schema';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
@@ -65,6 +65,13 @@ const priorityConfig: Record<Priority, { label: string; className: string; dotCl
     },
   };
 
+const documentTypeConfig: Record<DocumentType, { label: string; className: string }> = {
+  invoice: { label: 'Factuur', className: 'bg-info-muted text-info hover:bg-info-muted' },
+  quote: { label: 'Offerte', className: 'bg-warning-muted text-warning hover:bg-warning-muted' },
+  contract: { label: 'Contract', className: 'bg-accent text-accent-foreground hover:bg-accent' },
+  other: { label: 'Andere', className: 'bg-muted text-secondary-foreground hover:bg-muted' },
+};
+
 const visibilityConfig = {
   shared: { label: 'Gedeeld', className: 'bg-success-muted text-success hover:bg-success-muted' },
   internal: {
@@ -93,6 +100,7 @@ type StatusBadgeProps =
   | { domain: 'project'; status: ProjectStatus; className?: string }
   | { domain: 'priority'; priority: Priority; className?: string }
   | { domain: 'document'; visibleToClient: boolean; className?: string }
+  | { domain: 'documentType'; type: DocumentType; className?: string }
   | { domain: 'user'; emailVerified: boolean; className?: string };
 
 export function StatusBadge(props: StatusBadgeProps) {
@@ -125,6 +133,11 @@ export function StatusBadge(props: StatusBadgeProps) {
 
   if (props.domain === 'document') {
     const config = visibilityConfig[props.visibleToClient ? 'shared' : 'internal'];
+    return <Badge className={cn(config.className, props.className)}>{config.label}</Badge>;
+  }
+
+  if (props.domain === 'documentType') {
+    const config = documentTypeConfig[props.type];
     return <Badge className={cn(config.className, props.className)}>{config.label}</Badge>;
   }
 
