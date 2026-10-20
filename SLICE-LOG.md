@@ -49,3 +49,19 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
   - Geen expliciete lege-staat-screenshot in de designs gevonden voor taken; `EmptyState variant="invite"` toegepast, consistent met documenten/tickets.
 - **Gevonden tijdens het testen:** geen bugs — screenshots op desktop en 375px kwamen overeen met het verwachte patroon zonder aanpassingen nodig.
 - **Openstaande twijfels:** geen.
+
+---
+
+## Slice 7b — Kanbanbord (desktop)
+
+- **Branch:** `slice/7b-kanban-desktop` (vertrekt van `slice/7a-tasks-list`)
+- **PR:** [#5](https://github.com/EloyB/client-dashboard/pull/5) → base `slice/7a-tasks-list`
+- **Migraties:** geen (`tasks.position` bestond al sinds 7a)
+- **Dependency toegevoegd:** `@dnd-kit/core`, `@dnd-kit/sortable`, `@dnd-kit/utilities` — al vermeld in CLAUDE.md's stack ("Drag & drop: dnd-kit"), dus geen aparte goedkeuring nodig, enkel de installatie zelf ontbrak nog.
+- **Aannames:**
+  - Bord/lijst zijn één route met `?view=` (standaard `list`, `board` opt-in) — conform INDEX.md's expliciete notitie dat dit geen twee navigatie-items zijn.
+  - "Alle prioriteiten"/"Alleen vervallen"-filters op het bord zijn client-side, niet URL-persistent (enkel de bord/lijst-keuze zelf moet dat zijn volgens de prompt).
+  - Taakreferenties (`TSK-XXXXXXXX`) ontbraken in 7a's lijst maar stonden wel in de designscreenshots van zowel lijst als bord — met terugwerkende kracht toegevoegd aan `TasksTable` (7a) binnen deze branch, aangezien beide weergaven dezelfde kolommen moeten tonen.
+- **Gevonden en gefixt tijdens het testen (niet in het oorspronkelijke plan):**
+  - Bug: `onDragEnd` herkende een kruis-kolom-verplaatsing niet meer als zodanig omdat `onDragOver` de kolomstatus al live had bijgewerkt — de kaart verplaatste zich visueel maar er gebeurde geen server-call. Gefixt door bij `onDragEnd` te vergelijken met de snapshot van vóór het slepen in plaats van de al-gemuteerde staat.
+- **Openstaande twijfels:** geen.
