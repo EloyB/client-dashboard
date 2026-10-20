@@ -36,6 +36,7 @@ export type PortalTicketListRow = {
   projectName: string;
   status: TicketStatus;
   priority: Priority;
+  reporterId: string;
   reporterName: string;
   updatedAt: Date;
 };
@@ -53,6 +54,7 @@ export async function listTicketsForClient(
       projectName: projects.name,
       status: tickets.status,
       priority: tickets.priority,
+      reporterId: userTable.id,
       reporterName: userTable.name,
       updatedAt: tickets.updatedAt,
     })

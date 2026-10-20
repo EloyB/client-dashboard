@@ -263,6 +263,7 @@ describe('portal ticket overview and detail (slice 5c)', () => {
           'projectName',
           'status',
           'priority',
+          'reporterId',
           'reporterName',
           'updatedAt',
         ].sort(),
