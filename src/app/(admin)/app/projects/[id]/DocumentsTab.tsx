@@ -74,7 +74,7 @@ export function DocumentsTab({
               subtitle={
                 <span className="flex items-center gap-1.5">
                   <StatusBadge domain="documentType" type={document.type} />
-                  <StatusBadge domain="document" visibleToClient={document.visibleToClient} />
+                  <StatusBadge domain="visibility" visibleToClient={document.visibleToClient} />
                 </span>
               }
               trailing={<DocumentDownloadButton fileId={document.fileId} />}
