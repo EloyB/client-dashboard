@@ -33,6 +33,7 @@ const typeOptions: { value: EventType; label: string }[] = [
 
 export type EditableEvent = {
   id: string;
+  projectId: string;
   title: string;
   description: string | null;
   type: EventType;
@@ -43,15 +44,19 @@ export type EditableEvent = {
   visibleToClient: boolean;
 };
 
-function defaultValuesFor(projectId: string, event?: EditableEvent): EventFormInput {
+function defaultValuesFor(
+  projectId: string | undefined,
+  event?: EditableEvent,
+  defaultDate?: Date,
+): EventFormInput {
   if (!event) {
     return {
-      projectId,
+      projectId: projectId ?? '',
       title: '',
       description: '',
       type: 'meeting',
       allDay: false,
-      startDate: undefined as unknown as Date,
+      startDate: defaultDate ?? (undefined as unknown as Date),
       startTime: '',
       endDate: undefined,
       endTime: undefined,
@@ -64,7 +69,7 @@ function defaultValuesFor(projectId: string, event?: EditableEvent): EventFormIn
   const end = event.endsAt ? splitBrusselsDateTime(event.endsAt) : null;
 
   return {
-    projectId,
+    projectId: event.projectId,
     title: event.title,
     description: event.description ?? '',
     type: event.type,
@@ -80,19 +85,27 @@ function defaultValuesFor(projectId: string, event?: EditableEvent): EventFormIn
 
 export function EventFormSheet({
   projectId,
+  projects,
   event,
+  defaultDate,
   open,
   onOpenChange,
 }: {
-  projectId: string;
+  /** Fixed project (project-detail context, 8a). */
+  projectId?: string;
+  /** Project picker instead, for the global calendar (8b) — required whenever `projectId` is omitted. */
+  projects?: { id: string; name: string }[];
   /** Present when editing an existing event; absent when creating one. */
   event?: EditableEvent;
+  /** Pre-fills the start date when creating from a clicked calendar day (8b). Ignored when editing. */
+  defaultDate?: Date;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }) {
   const router = useRouter();
   const isEditing = Boolean(event);
-  const defaultValues = defaultValuesFor(projectId, event);
+  const showProjectPicker = !isEditing && !projectId;
+  const defaultValues = defaultValuesFor(projectId, event, defaultDate);
 
   const { control, handleSubmit, formState, setError, reset } = useForm<EventFormInput>({
     resolver: zodResolver(eventFormSchema),
@@ -138,6 +151,15 @@ export function EventFormSheet({
         </Button>
       }
     >
+      {showProjectPicker && (
+        <SelectField
+          control={control}
+          name="projectId"
+          label="Project"
+          required
+          options={(projects ?? []).map((project) => ({ value: project.id, label: project.name }))}
+        />
+      )}
       <TextField control={control} name="title" label="Titel" required />
       <TextareaField control={control} name="description" label="Beschrijving" rows={3} />
       <SelectField control={control} name="type" label="Type" required options={typeOptions} />

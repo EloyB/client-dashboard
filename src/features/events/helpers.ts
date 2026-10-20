@@ -51,6 +51,8 @@ export const typeLabels: Record<AgendaEvent['type'], string> = {
   other: 'Andere',
 };
 
+export const typeOrder: AgendaEvent['type'][] = ['deadline', 'meeting', 'milestone', 'other'];
+
 /** "10:00 – 11:00 · videocall" / "Hele dag · intern kantoor" / "Hele dag · t/m 3 okt". */
 export function eventSubtitle(event: AgendaEvent): string {
   const start = splitBrusselsDateTime(event.startsAt);
@@ -71,4 +73,15 @@ export function eventSubtitle(event: AgendaEvent): string {
   }
 
   return event.location ? `${timeLabel} · ${event.location}` : timeLabel;
+}
+
+/** "10:00 – 11:00" / "Hele dag" — just the time portion, for compact calendar chips. */
+export function eventTimeLabel(event: AgendaEvent): string {
+  const start = splitBrusselsDateTime(event.startsAt);
+  const end = event.endsAt ? splitBrusselsDateTime(event.endsAt) : null;
+
+  if (event.allDay) return 'Hele dag';
+  if (!end) return start.time;
+  if (end.dateOnly === start.dateOnly) return `${start.time} – ${end.time}`;
+  return `${start.time} – ${format(parseDateOnly(end.dateOnly)!, 'd MMM', { locale: nl })} ${end.time}`;
 }

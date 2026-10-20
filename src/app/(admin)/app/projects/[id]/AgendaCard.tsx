@@ -15,23 +15,24 @@ import {
 import { ConfirmDialog } from '@/components/shared/ConfirmDialog';
 import { DateBlock, ListRow } from '@/components/shared/ListRow';
 import { EmptyState } from '@/components/shared/EmptyState';
+import { EventTypeMarker } from '@/components/shared/EventTypeMarker';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { showErrorToast, showSuccessToast } from '@/components/shared/toast';
 import { deleteEvent } from '@/features/events/actions';
-import { cn } from '@/lib/utils';
-import { EventFormSheet, type EditableEvent } from './EventFormSheet';
-import { EventTypeMarker } from './EventTypeMarker';
 import {
   dateBlockParts,
   eventSubtitle,
   isOverdueDeadline,
   splitUpcomingAndPast,
   type AgendaEvent,
-} from './eventHelpers';
+} from '@/features/events/helpers';
+import { cn } from '@/lib/utils';
+import { EventFormSheet, type EditableEvent } from './EventFormSheet';
 
-function toEditable(event: AgendaEvent): EditableEvent {
+function toEditable(event: AgendaEvent, projectId: string): EditableEvent {
   return {
     id: event.id,
+    projectId,
     title: event.title,
     description: event.description,
     type: event.type,
@@ -138,7 +139,7 @@ export function AgendaCard({ events, projectId }: { events: AgendaEvent[]; proje
   }
 
   function openEdit(event: AgendaEvent) {
-    setEditingEvent(toEditable(event));
+    setEditingEvent(toEditable(event, projectId));
     setFormOpen(true);
   }
 

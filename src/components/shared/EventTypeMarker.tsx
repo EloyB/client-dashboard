@@ -1,5 +1,5 @@
 import { cn } from '@/lib/utils';
-import type { AgendaEvent } from './eventHelpers';
+import type { AgendaEvent } from '@/features/events/helpers';
 
 /** Shape (not just color) per COMPONENTS.md: deadline = bar, overleg = circle, mijlpaal = diamond, andere = square. */
 export function EventTypeMarker({
