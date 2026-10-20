@@ -7,10 +7,10 @@ vi.mock('next/headers', () => ({
 }));
 
 const { db } = await import('@/db');
-const { activityLog, clients, tasks } = await import('@/db/schema');
+const { activityLog, clients, tasks, tickets } = await import('@/db/schema');
 const { adminHeaders, createTempClient, createTempClientUserSession, createTempProject } =
   await import('@/db/test-real-session');
-const { createTask, deleteTask, moveTask, updateTask, updateTaskStatus } =
+const { convertTicketToTask, createTask, deleteTask, moveTask, updateTask, updateTaskStatus } =
   await import('@/features/tasks/actions');
 
 async function deleteTempClient(clientId: string) {
@@ -26,6 +26,18 @@ async function createTempTask(
     .values({ projectId, title: 'Testtaak', position: 'a0', ...overrides })
     .returning();
   return task;
+}
+
+async function createTempTicket(
+  projectId: string,
+  reportedById: string,
+  overrides: Partial<typeof tickets.$inferInsert> = {},
+) {
+  const [ticket] = await db
+    .insert(tickets)
+    .values({ projectId, reportedById, title: 'Testticket', ...overrides })
+    .returning();
+  return ticket;
 }
 
 describe('createTask (admin server action)', () => {
@@ -401,5 +413,156 @@ describe('deleteTask (admin server action)', () => {
     } finally {
       await deleteTempClient(client.id);
     }
+  });
+});
+
+describe('convertTicketToTask (admin server action)', () => {
+  it('rejects a non-admin', async () => {
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+    const { userId, headers, cleanup } = await createTempClientUserSession(client.id);
+    const ticket = await createTempTicket(project.id, userId);
+
+    try {
+      currentHeaders = headers;
+      const result = await convertTicketToTask({
+        ticketId: ticket.id,
+        title: 'Taak',
+        description: '',
+        status: 'in_progress',
+        priority: 'medium',
+        setTicketInProgress: true,
+      });
+      expect(result).toMatchObject({
+        success: false,
+        formError: 'This action requires an admin account.',
+      });
+    } finally {
+      await deleteTempClient(client.id);
+      await cleanup();
+    }
+  });
+
+  it('creates a linked task in the same project, and sets the ticket to in_progress', async () => {
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+    const { userId, cleanup } = await createTempClientUserSession(client.id);
+    const ticket = await createTempTicket(project.id, userId, {
+      title: 'Contactformulier stuk',
+      status: 'new',
+    });
+
+    try {
+      currentHeaders = await adminHeaders();
+      const result = await convertTicketToTask({
+        ticketId: ticket.id,
+        title: 'Contactformulier opnieuw opbouwen',
+        description: 'Uit melding: formulier stuurt niet door',
+        status: 'in_progress',
+        priority: 'high',
+        setTicketInProgress: true,
+      });
+      expect(result.success).toBe(true);
+      if (!result.success) return;
+      expect(result.data).toMatchObject({
+        projectId: project.id,
+        ticketId: ticket.id,
+        title: 'Contactformulier opnieuw opbouwen',
+        status: 'in_progress',
+      });
+
+      const [updatedTicket] = await db
+        .select()
+        .from(tickets)
+        .where(eq(tickets.id, ticket.id))
+        .limit(1);
+      expect(updatedTicket.status).toBe('in_progress');
+
+      const [logEntry] = await db
+        .select()
+        .from(activityLog)
+        .where(eq(activityLog.ticketId, ticket.id))
+        .limit(1);
+      expect(logEntry).toMatchObject({ type: 'ticket_status_changed' });
+    } finally {
+      await deleteTempClient(client.id);
+      await cleanup();
+    }
+  });
+
+  it('leaves the ticket status untouched when setTicketInProgress is false', async () => {
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+    const { userId, cleanup } = await createTempClientUserSession(client.id);
+    const ticket = await createTempTicket(project.id, userId, { status: 'new' });
+
+    try {
+      currentHeaders = await adminHeaders();
+      const result = await convertTicketToTask({
+        ticketId: ticket.id,
+        title: 'Taak',
+        description: '',
+        status: 'todo',
+        priority: 'medium',
+        setTicketInProgress: false,
+      });
+      expect(result.success).toBe(true);
+
+      const [updatedTicket] = await db
+        .select()
+        .from(tickets)
+        .where(eq(tickets.id, ticket.id))
+        .limit(1);
+      expect(updatedTicket.status).toBe('new');
+    } finally {
+      await deleteTempClient(client.id);
+      await cleanup();
+    }
+  });
+
+  it('rejects converting a ticket that already has a linked task', async () => {
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+    const { userId, cleanup } = await createTempClientUserSession(client.id);
+    const ticket = await createTempTicket(project.id, userId);
+
+    try {
+      currentHeaders = await adminHeaders();
+      const first = await convertTicketToTask({
+        ticketId: ticket.id,
+        title: 'Eerste taak',
+        description: '',
+        status: 'todo',
+        priority: 'medium',
+        setTicketInProgress: false,
+      });
+      expect(first.success).toBe(true);
+
+      const second = await convertTicketToTask({
+        ticketId: ticket.id,
+        title: 'Tweede taak',
+        description: '',
+        status: 'todo',
+        priority: 'medium',
+        setTicketInProgress: false,
+      });
+      expect(second).toMatchObject({ success: false, formError: expect.any(String) });
+    } finally {
+      await deleteTempClient(client.id);
+      await cleanup();
+    }
+  });
+
+  it('rejects a non-existent ticket id', async () => {
+    currentHeaders = await adminHeaders();
+    const result = await convertTicketToTask({
+      ticketId: crypto.randomUUID(),
+      title: 'Taak',
+      description: '',
+      status: 'todo',
+      priority: 'medium',
+      setTicketInProgress: false,
+    });
+    expect(result).toMatchObject({ success: false, formError: expect.any(String) });
   });
 });
