@@ -172,3 +172,23 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
 - **Gevonden en gefixt tijdens het testen (niet in het oorspronkelijke plan):**
   - Bug: op 375px overschreden "Nieuwe tickets" en "Actieve projecten" de schermbreedte (`ListRow`'s vaste horizontale layout volstond niet voor badge+tekst+knoppen). Gefixt met een eigen, responsieve `flex-col`/wrappende rij voor die twee secties.
 - **Openstaande twijfels:** geen.
+
+---
+
+## Slice 9b — Startscherm klantportaal (laatste MVP-slice)
+
+- **Branch:** `slice/9b-portal-home` (vertrekt van `slice/9a-admin-home`)
+- **PR:** [#13](https://github.com/EloyB/client-dashboard/pull/13) → base `slice/9a-admin-home`
+- **Migraties:** geen
+- **Aannames:**
+  - "Volgende stap"-zin afgeleid uit de eerstvolgende zichtbare deadline-of-meeting (titel + weekdag/datum), geen apart veld in het datamodel.
+  - `StatusBadge`'s `project`-domain kreeg een `audience`-parameter (zelfde patroon als `ticket`) voor klantvriendelijke labels ("In uitvoering" i.p.v. "Actief").
+  - Gearchiveerde projecten worden nooit aan de klant getoond.
+  - Projectnaam is platte tekst (geen portaal-projectdetailpagina bestaat nog, enkel het overzicht uit 3a).
+  - "Nieuwe tickets"/"recente documenten" tonen enkel de eerste 5, zonder aparte COUNT-query.
+  - `Button` kreeg een nieuwe `inverse`-variant (wit op accentvlak) — expliciet aangekondigd in COMPONENTS.md voor de actiekaart, geen eigen styling-keuze.
+- **Openstaande twijfels:** geen.
+
+---
+
+**Dit was de laatste slice van de MVP.** Met PR #13 is de volledige "MVP scope and build order"-lijst uit CLAUDE.md inhoudelijk klaar voor review (0a t/m 9b).
