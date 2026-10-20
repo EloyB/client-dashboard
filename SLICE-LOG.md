@@ -107,3 +107,22 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
 - **Aannames:** geen noemenswaardige — prompt en designscreenshot waren hier eenduidig.
 - **Systemische bug gevonden en gefixt (niet enkel deze slice):** `isOverdue()` (7a-7c) en de projectdetailpagina se "project is te laat"-check berekenden "vandaag" via de lokale tijdzone van de server, niet Europe/Brussels — foutgevoelig rond middernacht. Nieuwe `todayInBrussels()`-helper toegevoegd en op alle drie de plaatsen gebruikt.
 - **Openstaande twijfels:** geen.
+
+---
+
+## Slice 8a — Agenda-items per project
+
+- **Branch:** `slice/8a-project-events` (vertrekt van `slice/7e-all-tasks`)
+- **PR:** [#9](https://github.com/EloyB/client-dashboard/pull/9) → base `slice/7e-all-tasks`
+- **Migraties:** geen (schema `events` bestond al sinds de eerste commit)
+- **Aannames:**
+  - `features/events/queries.ts` was al aanwezig vóór deze sessie (generiek, `AuthenticatedUser`-based) — hergebruikt zoals-ie is, zelfde precedent als `documents/queries.ts` in 6a/6b. Per ongeluk eerst overschreven met een admin-only herschrijving, op tijd opgemerkt via `git status`/`git log` en teruggedraaid met `git checkout --`.
+  - `StatusBadge`'s `domain: 'document'` hernoemd naar `domain: 'visibility'`, zodat dezelfde Gedeeld/Intern-badge ook voor events werkt.
+  - Overdue deadlines (type `deadline`, in het verleden, geen `endsAt`) blijven zichtbaar in de "komende" lijst met destructieve styling, in plaats van automatisch naar "voorbije items" te verhuizen. Eigen interpretatie, geen expliciete designeis.
+- **Kernwerk:** `combineBrusselsDateTime`/`splitBrusselsDateTime` toegevoegd aan `lib/utils.ts` zodat een datum+tijd van een event nooit verschuift door de tijdzone van de server (expliciet getest: hele-dag event op 31 december blijft 31 december, unit- en actiontests én end-to-end bevestigd via screenshot).
+- **Gevonden en gefixt tijdens het bouwen (niet in het oorspronkelijke plan):**
+  - Zelf opgemerkt vóór het testen: `.superRefine` gebruikte eerst `.toISOString()` op een lokale-middernacht `Date`, wat de datum had kunnen laten verschuiven afhankelijk van de browsertijdzone. Vervangen door de bestaande `formatDateOnly`-aanpak.
+  - Ongeldige geneste HTML in `AgendaCard`'s rij (delete-menu-knop genest in de rij-klik-knop) — gefixt door enkel de titel in een eigen knop te zetten, net als eerder bij `KanbanCard` in 7b.
+- **Openstaande twijfels:**
+  - Het gedrag rond overdue deadlines (zie Aannames) is een eigen keuze.
+  - Geen designcase voor een deadline mét `endsAt` — beide werken, maar het ontwerp toont enkel het geval zonder eind.
