@@ -79,6 +79,10 @@ export function DocumentsTab({
             // No pagination control needed — `documents` is already capped
             // upstream (PROJECT_DOCUMENTS_LIMIT), so one page always fits.
             pageSize={documents.length}
+            // This table already sits inside the "Documenten" Card, so its
+            // own shadow-card would double up — a border reads as "part of
+            // this card" instead of a second, nested card.
+            tableCardClassName="shadow-none border border-border"
             renderMobileCard={(document) => (
               // A plain clickable div, not a <button> — no nested
               // interactive elements here, so this can safely be the whole

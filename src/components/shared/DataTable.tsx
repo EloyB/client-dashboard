@@ -76,6 +76,7 @@ export function DataTable<T>({
   pageSize = 5,
   emptyState,
   className,
+  tableCardClassName,
 }: {
   columns: DataTableColumn<T>[];
   rows: T[];
@@ -92,6 +93,8 @@ export function DataTable<T>({
   /** Shown instead of the table/cards when search/filters leave zero rows — the search and sort controls stay visible so the query can still be adjusted. */
   emptyState?: ReactNode;
   className?: string;
+  /** Overrides the desktop table's own Card styling — e.g. "shadow-none border border-border" when the table already sits inside another Card (see the compact Documenten tab), where the default shadow-card would double up. */
+  tableCardClassName?: string;
 }) {
   const router = useRouter();
   const filterKeys = useMemo(() => filters?.map((filter) => filter.key) ?? [], [filters]);
@@ -224,7 +227,7 @@ export function DataTable<T>({
       {isEmpty && emptyState ? (
         emptyState
       ) : (
-        <Card className="hidden overflow-hidden py-0 md:block">
+        <Card className={cn('hidden overflow-hidden py-0 md:block', tableCardClassName)}>
           <Table>
             <TableHeader className="bg-neutral-50">
               <TableRow className="hover:bg-neutral-50">
