@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import type { DataTableColumn } from '@/components/shared/DataTable';
 import type { DocumentWithFile } from '@/features/documents/queries';
-import { fileTypeTile } from './fileTypeTile';
+import { fileTypeTile } from '@/components/shared/fileTypeTile';
 
 /**
  * The "Document" / "Soort" / "Zichtbaarheid" columns shared by the full
