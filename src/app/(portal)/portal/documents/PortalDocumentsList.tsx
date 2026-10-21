@@ -165,7 +165,7 @@ export function PortalDocumentsList({ documents }: { documents: PortalDocumentRo
                     </p>
                   </div>
                   <StatusBadge domain="documentType" type={document.type} />
-                  <DocumentDownloadButton fileId={document.fileId} label="Downloaden" />
+                  <DocumentDownloadButton fileId={document.fileId} label="Downloaden" iconOnly />
                 </div>
               ))}
             </div>

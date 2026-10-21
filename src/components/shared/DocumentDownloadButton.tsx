@@ -1,6 +1,6 @@
 'use client';
 
-import { Loader2 } from 'lucide-react';
+import { Download, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
@@ -19,10 +19,13 @@ export function DocumentDownloadButton({
   fileId,
   label = 'Openen',
   variant = 'ghost',
+  iconOnly = false,
 }: {
   fileId: string;
   label?: string;
   variant?: 'ghost' | 'outline';
+  /** Renders just the download icon, with `label` as its accessible name — used by the portal's compact row. */
+  iconOnly?: boolean;
 }) {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,9 +42,20 @@ export function DocumentDownloadButton({
   }
 
   return (
-    <Button type="button" variant={variant} size="sm" onClick={handleClick} disabled={isLoading}>
-      {isLoading ? <Loader2 className="animate-spin" strokeWidth={1.75} /> : null}
-      {label}
+    <Button
+      type="button"
+      variant={variant}
+      size={iconOnly ? 'icon' : 'sm'}
+      onClick={handleClick}
+      disabled={isLoading}
+      aria-label={iconOnly ? label : undefined}
+    >
+      {isLoading ? (
+        <Loader2 className="animate-spin" strokeWidth={1.75} />
+      ) : iconOnly ? (
+        <Download strokeWidth={1.75} />
+      ) : null}
+      {!iconOnly && label}
     </Button>
   );
 }
