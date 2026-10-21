@@ -15,7 +15,6 @@ const ticketStatusClassName: Record<TicketStatus, string> = {
   new: 'bg-info-muted text-info hover:bg-info-muted',
   in_progress: 'bg-accent text-accent-foreground hover:bg-accent',
   resolved: 'bg-success-muted text-success hover:bg-success-muted',
-  closed: 'bg-muted text-neutral-500 hover:bg-muted',
 };
 
 // Same colors in both places; the portal uses friendlier wording for clients
@@ -25,13 +24,11 @@ const ticketStatusLabel: Record<TicketStatusAudience, Record<TicketStatus, strin
     new: 'Nieuw',
     in_progress: 'In behandeling',
     resolved: 'Opgelost',
-    closed: 'Gesloten',
   },
   portal: {
     new: 'Ontvangen',
     in_progress: 'We zijn ermee bezig',
     resolved: 'Opgelost',
-    closed: 'Afgesloten',
   },
 };
 

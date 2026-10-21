@@ -9,11 +9,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DataList, type DataListItem } from '@/components/shared/DataList';
 import { DetailHeader } from '@/components/shared/DetailHeader';
 import { StatusBadge } from '@/components/shared/StatusBadge';
+import { TicketScreenshots } from '@/components/shared/TicketScreenshots';
 import { getTicketDetailForClient } from '@/features/tickets/queries';
 import { AccessError, requireClientUser } from '@/lib/access';
 import { cn } from '@/lib/utils';
 import type { TicketStatus } from '@/db/schema';
-import { TicketScreenshots } from './TicketScreenshots';
 
 function formatDateTime(date: Date): string {
   return format(date, 'd MMM yyyy, HH:mm', { locale: nl });
@@ -24,11 +24,7 @@ const STATUS_GUIDE: { status: TicketStatus; text: string }[] = [
   { status: 'in_progress', text: 'We zijn ermee bezig.' },
   {
     status: 'resolved',
-    text: 'Wij hebben het opgelost. Kijk gerust na of alles werkt zoals u verwacht.',
-  },
-  {
-    status: 'closed',
-    text: 'De melding is afgehandeld en afgesloten. Blijft het probleem terugkomen, maak dan een nieuwe melding.',
+    text: 'Wij hebben het opgelost. Kijk gerust na of alles werkt zoals u verwacht. Blijft het probleem terugkomen, maak dan een nieuwe melding.',
   },
 ];
 

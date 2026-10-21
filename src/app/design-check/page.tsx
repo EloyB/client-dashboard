@@ -115,7 +115,7 @@ const demoTickets: DemoTicket[] = [
     id: 'TCK-2021',
     title: 'Cookiemelding blijft terugkomen',
     client: 'Praktijk Dewulf',
-    status: 'closed',
+    status: 'in_progress',
     priority: 'low',
     reportedAt: '2026-08-24',
   },
@@ -174,7 +174,6 @@ const ticketStatusOptions: { label: string; value: TicketStatus | 'all' }[] = [
   { label: 'Nieuw', value: 'new' },
   { label: 'In behandeling', value: 'in_progress' },
   { label: 'Opgelost', value: 'resolved' },
-  { label: 'Gesloten', value: 'closed' },
 ];
 
 const ticketColumns: DataTableColumn<DemoTicket>[] = [
@@ -553,10 +552,9 @@ function DesignCheckContent() {
                 <StatusBadge domain="ticket" status="new" />
                 <StatusBadge domain="ticket" status="in_progress" />
                 <StatusBadge domain="ticket" status="resolved" />
-                <StatusBadge domain="ticket" status="closed" />
               </div>
               <p className="text-small text-muted-foreground font-mono">
-                new · in_progress · resolved · closed
+                new · in_progress · resolved
               </p>
             </CardContent>
           </Card>

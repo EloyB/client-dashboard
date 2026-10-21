@@ -6,7 +6,12 @@ import { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Lightbox } from '@/components/shared/Lightbox';
 import { getFileDownloadUrl } from '@/features/files/actions';
-import type { PortalTicketAttachment } from '@/features/tickets/queries';
+
+export type TicketScreenshotAttachment = {
+  id: string;
+  filename: string;
+  size: number;
+};
 
 function sizeLabel(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
@@ -17,8 +22,13 @@ function sizeLabel(bytes: number): string {
  * thumbnail and the lightbox (there's no separate thumbnail asset, it's the
  * same image). URLs expire after 5 minutes (see slice 4's storage.ts); a
  * page left open longer than that needs a refresh before opening one.
+ *
+ * Purely presentational — no client/admin distinction, no data access of its
+ * own. Shared between the portal (slice 5c) and admin (slice 5d) ticket
+ * detail pages, each of which has already done its own access check before
+ * handing over this attachment metadata.
  */
-export function TicketScreenshots({ attachments }: { attachments: PortalTicketAttachment[] }) {
+export function TicketScreenshots({ attachments }: { attachments: TicketScreenshotAttachment[] }) {
   const [urls, setUrls] = useState<Record<string, string>>({});
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 

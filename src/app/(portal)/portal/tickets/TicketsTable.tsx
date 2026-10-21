@@ -17,13 +17,12 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import type { PortalTicketListRow } from '@/features/tickets/queries';
 import type { TicketStatus } from '@/db/schema';
 
-const statusOrder: TicketStatus[] = ['new', 'in_progress', 'resolved', 'closed'];
+const statusOrder: TicketStatus[] = ['new', 'in_progress', 'resolved'];
 
 const statusLabels: Record<TicketStatus, string> = {
   new: 'Nieuw',
   in_progress: 'In behandeling',
   resolved: 'Opgelost',
-  closed: 'Gesloten',
 };
 
 const emptyCopyByStatus: Record<TicketStatus, { title: string; description: string }> = {
@@ -38,10 +37,6 @@ const emptyCopyByStatus: Record<TicketStatus, { title: string; description: stri
   resolved: {
     title: 'Nog niets opgelost',
     description: 'Zodra wij een melding oplossen, vindt u ze hier terug.',
-  },
-  closed: {
-    title: 'Geen afgesloten meldingen',
-    description: 'Afgehandelde meldingen komen hier te staan, zodat u ze later kunt terugvinden.',
   },
 };
 

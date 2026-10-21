@@ -9,6 +9,7 @@ import { DataList, type DataListItem } from '@/components/shared/DataList';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { listActivityForProject } from '@/features/activity/queries';
 import { getProjectById } from '@/features/projects/queries';
+import { listTicketsForProjectAdmin } from '@/features/tickets/queries.admin';
 import { AccessError, requireAdmin } from '@/lib/access';
 import { cn, parseDateOnly } from '@/lib/utils';
 import { DocumentsTabPlaceholder } from './DocumentsTabPlaceholder';
@@ -16,7 +17,9 @@ import { OverviewTab } from './OverviewTab';
 import { ProjectDetailHeader } from './ProjectDetailHeader';
 import { ProjectDetailTabs } from './ProjectDetailTabs';
 import { TasksTabPlaceholder } from './TasksTabPlaceholder';
-import { TicketsTabPlaceholder } from './TicketsTabPlaceholder';
+import { TicketsTab } from './TicketsTab';
+
+const PROJECT_TICKETS_LIMIT = 5;
 
 function formatDate(date: Date | undefined): string {
   return date ? format(date, 'd MMMM yyyy', { locale: nl }) : '—';
@@ -39,6 +42,11 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const { project, clientName } = detail;
   const admin = await requireAdmin(requestHeaders);
   const activity = await listActivityForProject(admin, project.id);
+  const projectTickets = await listTicketsForProjectAdmin(
+    requestHeaders,
+    project.id,
+    PROJECT_TICKETS_LIMIT,
+  );
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const isOverdue =
@@ -105,7 +113,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
             <ProjectDetailTabs
               overzicht={<OverviewTab activity={activity} />}
               taken={<TasksTabPlaceholder />}
-              tickets={<TicketsTabPlaceholder />}
+              tickets={<TicketsTab tickets={projectTickets} projectId={project.id} />}
               documenten={<DocumentsTabPlaceholder />}
             />
           </div>
