@@ -108,6 +108,17 @@ describe('documents queries', () => {
     });
   });
 
+  it('orders newest first', async () => {
+    const result = await listDocumentsForProject(admin, projectA.id, testDb);
+    expect(result[0].id).toBe(internalDocument.id);
+  });
+
+  it('includes the underlying file’s metadata', async () => {
+    const result = await listDocumentsForProject(admin, projectA.id, testDb);
+    const row = result.find((document) => document.id === visibleDocument.id);
+    expect(row).toMatchObject({ filename: 'offerte.pdf', mimeType: 'application/pdf', size: 1024 });
+  });
+
   it('never returns another client’s documents, even by a known ID', async () => {
     const asUserA1: AuthenticatedUser = { id: userA1.id, role: 'client', clientId: clientA.id };
 

@@ -71,7 +71,8 @@ export async function getDownloadUrl(
   storageKey: string,
   { filename, mimeType }: { filename: string; mimeType: string },
 ): Promise<string> {
-  const disposition = mimeType.startsWith('image/') ? 'inline' : 'attachment';
+  const disposition =
+    mimeType.startsWith('image/') || mimeType === 'application/pdf' ? 'inline' : 'attachment';
 
   return getSignedUrl(
     client,
