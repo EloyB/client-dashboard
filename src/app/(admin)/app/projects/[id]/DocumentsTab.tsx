@@ -67,41 +67,52 @@ export function DocumentsTab({
             }
           />
         ) : (
-          documents.map((document) => (
-            // A plain clickable div, not a <button> — ListRow has no nested
-            // interactive elements anymore (the old "Openen" button is gone),
-            // so this can safely be the whole row's click target.
-            <div
-              key={document.id}
-              role="button"
-              tabIndex={0}
-              onClick={() => open(document.id, document.fileId)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') open(document.id, document.fileId);
-              }}
-              className="cursor-pointer"
-            >
-              <ListRow
-                leading={
-                  openingId === document.id ? (
-                    <div className="flex size-9 shrink-0 items-center justify-center">
-                      <Loader2 className="text-muted-foreground size-4 animate-spin" />
+          // divide-y (not a per-row border-b/last:border-0) because each row
+          // is now its own wrapper div around ListRow — with the border on
+          // ListRow itself, "last:border-0" would match every row (each is
+          // the lone child of its own wrapper), hiding every divider line.
+          <div className="divide-border-subtle flex flex-col divide-y">
+            {documents.map((document) => (
+              // A plain clickable div, not a <button> — ListRow has no
+              // nested interactive elements anymore (the old "Openen" button
+              // is gone), so this can safely be the whole row's click
+              // target. hover:bg-muted (full opacity, not /50) because the
+              // card's white background makes the real <table>'s subtler
+              // hover:bg-muted/50 nearly invisible here — this needs to read
+              // clearly as "you can click this".
+              <div
+                key={document.id}
+                role="button"
+                tabIndex={0}
+                onClick={() => open(document.id, document.fileId)}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ')
+                    open(document.id, document.fileId);
+                }}
+                className="hover:bg-muted -mx-4 cursor-pointer rounded-lg px-4 transition-colors"
+              >
+                <ListRow
+                  leading={
+                    openingId === document.id ? (
+                      <div className="flex size-9 shrink-0 items-center justify-center">
+                        <Loader2 className="text-muted-foreground size-4 animate-spin" />
+                      </div>
+                    ) : (
+                      fileTypeTile(document.mimeType)
+                    )
+                  }
+                  title={document.title}
+                  trailing={
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      <StatusBadge domain="documentType" type={document.type} />
+                      <StatusBadge domain="document" visibleToClient={document.visibleToClient} />
                     </div>
-                  ) : (
-                    fileTypeTile(document.mimeType)
-                  )
-                }
-                title={document.title}
-                subtitle={
-                  <span className="flex items-center gap-1.5">
-                    <StatusBadge domain="documentType" type={document.type} />
-                    <StatusBadge domain="document" visibleToClient={document.visibleToClient} />
-                  </span>
-                }
-                className="border-border-subtle border-b py-3 last:border-0"
-              />
-            </div>
-          ))
+                  }
+                  className="py-3"
+                />
+              </div>
+            ))}
+          </div>
         )}
       </CardContent>
 
