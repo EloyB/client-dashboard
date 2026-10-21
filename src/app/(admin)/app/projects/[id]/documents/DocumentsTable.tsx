@@ -189,6 +189,10 @@ export function DocumentsTable({ documents }: { documents: DocumentWithFile[] })
       )}
       filters={[typeFilter]}
       pageSize={10}
+      // Border instead of the default shadow-card, same treatment as the
+      // compact Documenten tab on project detail — requested during manual
+      // review.
+      tableCardClassName="shadow-none border border-border"
       emptyState={
         <EmptyState
           variant="filtered"
