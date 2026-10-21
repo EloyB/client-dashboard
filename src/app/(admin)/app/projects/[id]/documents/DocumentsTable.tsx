@@ -23,6 +23,7 @@ import { showErrorToast, showSuccessToast } from '@/components/shared/toast';
 import { useOpenFile } from '@/components/shared/useOpenFile';
 import { deleteDocument, updateDocumentVisibility } from '@/features/documents/actions';
 import type { DocumentWithFile } from '@/features/documents/queries';
+import { getDocumentColumns } from './documentColumns';
 import { fileTypeTile } from './fileTypeTile';
 
 const typeFilter: DataTableFilter<DocumentWithFile> = {
@@ -131,37 +132,13 @@ export function DocumentsTable({ documents }: { documents: DocumentWithFile[] })
   const { open, openingId } = useOpenFile();
   const openDocument = (document: DocumentWithFile) => open(document.id, document.fileId);
 
+  const [titleColumn, ...restColumns] = getDocumentColumns(openingId);
   const columns: DataTableColumn<DocumentWithFile>[] = [
-    {
-      key: 'title',
-      header: 'Document',
-      sortValue: (document) => document.title.toLowerCase(),
-      cell: (document) => (
-        <div className="flex items-center gap-3">
-          {openingId === document.id ? (
-            <div className="flex size-9 shrink-0 items-center justify-center">
-              <Loader2 className="text-muted-foreground size-4 animate-spin" />
-            </div>
-          ) : (
-            fileTypeTile(document.mimeType)
-          )}
-          <div className="min-w-0">
-            <p className="truncate font-medium">{document.title}</p>
-            <p className="text-small text-muted-foreground truncate">{document.filename}</p>
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'badges',
-      header: 'Badges',
-      cell: (document) => (
-        <div className="flex flex-wrap items-center gap-1.5">
-          <StatusBadge domain="documentType" type={document.type} />
-          <StatusBadge domain="document" visibleToClient={document.visibleToClient} />
-        </div>
-      ),
-    },
+    // Sortable here, unlike the compact Documenten tab's copy of these same
+    // columns — the full list has room for a "Sorteren" control, the
+    // 4-row preview doesn't need one.
+    { ...titleColumn, sortValue: (document) => document.title.toLowerCase() },
+    ...restColumns,
     {
       key: 'actions',
       header: '',

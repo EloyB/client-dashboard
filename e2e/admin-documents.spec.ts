@@ -40,8 +40,10 @@ test.describe('admin documents (slice 6a)', () => {
       await expect(page.getByText('Document toegevoegd')).toBeVisible();
       await page.keyboard.press('Escape');
 
-      // 2. It shows up in the compact section.
-      await expect(page.getByText(title)).toBeVisible();
+      // 2. It shows up in the compact section — this is a real DataTable
+      // too now (desktop table + mobile card rendered at once, CSS-toggled
+      // per breakpoint), same as the full list below.
+      await expect(page.locator(`text="${title}" >> visible=true`)).toBeVisible();
 
       // 3. The full list, filtered to this project, shows it too.
       await page.getByRole('link', { name: 'Alle documenten' }).click();
