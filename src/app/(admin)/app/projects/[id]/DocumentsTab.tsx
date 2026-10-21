@@ -1,6 +1,6 @@
 'use client';
 
-import { Upload } from 'lucide-react';
+import { Loader2, Upload } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 
@@ -9,8 +9,8 @@ import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/componen
 import { EmptyState } from '@/components/shared/EmptyState';
 import { ListRow } from '@/components/shared/ListRow';
 import { StatusBadge } from '@/components/shared/StatusBadge';
+import { useOpenFile } from '@/components/shared/useOpenFile';
 import { DocumentUploadSheet } from './documents/DocumentUploadSheet';
-import { OpenDocumentButton } from './documents/OpenDocumentButton';
 import { fileTypeTile } from './documents/fileTypeTile';
 import type { DocumentWithFile } from '@/features/documents/queries';
 
@@ -29,6 +29,7 @@ export function DocumentsTab({
   projectId: string;
 }) {
   const [uploadOpen, setUploadOpen] = useState(false);
+  const { open, openingId } = useOpenFile();
 
   return (
     <Card>
@@ -67,19 +68,39 @@ export function DocumentsTab({
           />
         ) : (
           documents.map((document) => (
-            <ListRow
+            // A plain clickable div, not a <button> — ListRow has no nested
+            // interactive elements anymore (the old "Openen" button is gone),
+            // so this can safely be the whole row's click target.
+            <div
               key={document.id}
-              leading={fileTypeTile(document.mimeType)}
-              title={document.title}
-              subtitle={
-                <span className="flex items-center gap-1.5">
-                  <StatusBadge domain="documentType" type={document.type} />
-                  <StatusBadge domain="document" visibleToClient={document.visibleToClient} />
-                </span>
-              }
-              trailing={<OpenDocumentButton fileId={document.fileId} />}
-              className="border-border-subtle border-b py-3 last:border-0"
-            />
+              role="button"
+              tabIndex={0}
+              onClick={() => open(document.id, document.fileId)}
+              onKeyDown={(event) => {
+                if (event.key === 'Enter' || event.key === ' ') open(document.id, document.fileId);
+              }}
+              className="cursor-pointer"
+            >
+              <ListRow
+                leading={
+                  openingId === document.id ? (
+                    <div className="flex size-9 shrink-0 items-center justify-center">
+                      <Loader2 className="text-muted-foreground size-4 animate-spin" />
+                    </div>
+                  ) : (
+                    fileTypeTile(document.mimeType)
+                  )
+                }
+                title={document.title}
+                subtitle={
+                  <span className="flex items-center gap-1.5">
+                    <StatusBadge domain="documentType" type={document.type} />
+                    <StatusBadge domain="document" visibleToClient={document.visibleToClient} />
+                  </span>
+                }
+                className="border-border-subtle border-b py-3 last:border-0"
+              />
+            </div>
           ))
         )}
       </CardContent>

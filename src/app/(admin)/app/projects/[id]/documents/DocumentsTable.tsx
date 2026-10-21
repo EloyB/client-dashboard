@@ -20,8 +20,8 @@ import {
 import { EmptyState } from '@/components/shared/EmptyState';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { showErrorToast, showSuccessToast } from '@/components/shared/toast';
+import { useOpenFile } from '@/components/shared/useOpenFile';
 import { deleteDocument, updateDocumentVisibility } from '@/features/documents/actions';
-import { getFileDownloadUrl } from '@/features/files/actions';
 import type { DocumentWithFile } from '@/features/documents/queries';
 import { fileTypeTile } from './fileTypeTile';
 
@@ -38,25 +38,6 @@ const typeFilter: DataTableFilter<DocumentWithFile> = {
   ],
   variant: 'pills',
 };
-
-/** Resolves a short-lived presigned URL on click rather than ahead of time — consistent with TicketScreenshots/OpenDocumentButton. */
-function useOpenDocument() {
-  const [openingId, setOpeningId] = useState<string | null>(null);
-
-  async function open(document: DocumentWithFile) {
-    setOpeningId(document.id);
-    try {
-      const url = await getFileDownloadUrl(document.fileId);
-      window.open(url, '_blank', 'noopener,noreferrer');
-    } catch {
-      showErrorToast('Openen mislukt', 'Probeer opnieuw.');
-    } finally {
-      setOpeningId(null);
-    }
-  }
-
-  return { open, openingId };
-}
 
 function RowActions({ document }: { document: DocumentWithFile }) {
   const router = useRouter();
@@ -147,7 +128,8 @@ function RowActions({ document }: { document: DocumentWithFile }) {
 }
 
 export function DocumentsTable({ documents }: { documents: DocumentWithFile[] }) {
-  const { open, openingId } = useOpenDocument();
+  const { open, openingId } = useOpenFile();
+  const openDocument = (document: DocumentWithFile) => open(document.id, document.fileId);
 
   const columns: DataTableColumn<DocumentWithFile>[] = [
     {
@@ -193,7 +175,7 @@ export function DocumentsTable({ documents }: { documents: DocumentWithFile[] })
       columns={columns}
       rows={documents}
       getRowKey={(document) => document.id}
-      onRowClick={open}
+      onRowClick={openDocument}
       renderMobileCard={(document) => (
         // A plain clickable div, not a <button> — RowActions renders its own
         // button (the "..." menu trigger) below, and nesting a button inside
@@ -202,9 +184,9 @@ export function DocumentsTable({ documents }: { documents: DocumentWithFile[] })
         <div
           role="button"
           tabIndex={0}
-          onClick={() => open(document)}
+          onClick={() => openDocument(document)}
           onKeyDown={(event) => {
-            if (event.key === 'Enter' || event.key === ' ') open(document);
+            if (event.key === 'Enter' || event.key === ' ') openDocument(document);
           }}
           className="border-border flex w-full flex-col gap-2 rounded-lg border p-3 text-left"
         >
