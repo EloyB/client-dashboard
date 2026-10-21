@@ -52,22 +52,24 @@ test.describe('admin documents (slice 6a)', () => {
       // getByRole alternative — not available here, these rows don't link anywhere).
       await expect(page.locator(`text="${title}" >> visible=true`)).toBeVisible();
 
-      // 4. Change visibility from the list.
-      const visibilityToggle = page.getByRole('button', { name: 'Gedeeld' }).first();
-      await visibilityToggle.click();
+      // 4. Change visibility from the "…" menu (the table has no standalone
+      // toggle button anymore — visibility lives in the same menu as delete).
+      await page.locator('[aria-label="Meer acties"] >> visible=true').click();
+      await page.getByRole('menuitem', { name: 'Niet langer delen' }).click();
       await expect(page.getByText('Niet langer gedeeld')).toBeVisible();
 
-      // 5. Open the document (new tab with the presigned URL).
+      // 5. Open the document by clicking the row/card itself — the whole row
+      // is clickable now, there's no separate "Openen" button.
       const [newTab] = await Promise.all([
         page.context().waitForEvent('page'),
-        page.getByRole('button', { name: 'Openen' }).first().click(),
+        page.locator(`text="${title}" >> visible=true`).click(),
       ]);
       await newTab.waitForLoadState();
       expect(newTab.url()).toContain('http');
       await newTab.close();
 
       // 6. Delete via the confirmation dialog (typing the title).
-      await page.getByRole('button', { name: 'Meer acties' }).first().click();
+      await page.locator('[aria-label="Meer acties"] >> visible=true').click();
       await page.getByRole('menuitem', { name: 'Verwijderen' }).click();
       const dialog = page.getByRole('alertdialog');
       await expect(dialog).toBeVisible();

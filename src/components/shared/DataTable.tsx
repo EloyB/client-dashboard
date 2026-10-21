@@ -68,6 +68,7 @@ export function DataTable<T>({
   rows,
   getRowKey,
   getRowHref,
+  onRowClick,
   renderMobileCard,
   searchValue,
   searchPlaceholder = 'Zoeken...',
@@ -81,6 +82,8 @@ export function DataTable<T>({
   getRowKey: (row: T) => string;
   /** Makes each desktop row navigable on click, in addition to whatever links its cells already contain. */
   getRowHref?: (row: T) => string;
+  /** Alternative to getRowHref for a click that isn't a page navigation (e.g. resolving a presigned URL first). Ignored when getRowHref is set. */
+  onRowClick?: (row: T) => void;
   renderMobileCard: (row: T) => ReactNode;
   searchValue?: (row: T) => string;
   searchPlaceholder?: string;
@@ -255,8 +258,14 @@ export function DataTable<T>({
               {desktopRows.map((row) => (
                 <TableRow
                   key={getRowKey(row)}
-                  onClick={getRowHref ? () => router.push(getRowHref(row)) : undefined}
-                  className={cn(getRowHref && 'cursor-pointer')}
+                  onClick={
+                    getRowHref
+                      ? () => router.push(getRowHref(row))
+                      : onRowClick
+                        ? () => onRowClick(row)
+                        : undefined
+                  }
+                  className={cn((getRowHref || onRowClick) && 'cursor-pointer')}
                 >
                   {columns.map((column) => (
                     <TableCell key={column.key} className={column.className}>

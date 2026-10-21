@@ -1,8 +1,6 @@
 'use client';
 
-import { format } from 'date-fns';
-import { nl } from 'date-fns/locale';
-import { Loader2, MoreHorizontal, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -22,32 +20,52 @@ import {
 import { EmptyState } from '@/components/shared/EmptyState';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { showErrorToast, showSuccessToast } from '@/components/shared/toast';
-import type { DocumentType } from '@/db/schema';
 import { deleteDocument, updateDocumentVisibility } from '@/features/documents/actions';
+import { getFileDownloadUrl } from '@/features/files/actions';
 import type { DocumentWithFile } from '@/features/documents/queries';
 import { fileTypeTile } from './fileTypeTile';
-import { OpenDocumentButton } from './OpenDocumentButton';
 
-const typeLabels: Record<DocumentType, string> = {
-  invoice: 'Factuur',
-  quote: 'Offerte',
-  contract: 'Contract',
-  other: 'Andere',
+const typeFilter: DataTableFilter<DocumentWithFile> = {
+  key: 'type',
+  label: 'Soort',
+  getValue: (document) => document.type,
+  options: [
+    { label: 'Alle', value: 'all' },
+    { label: 'Factuur', value: 'invoice' },
+    { label: 'Offerte', value: 'quote' },
+    { label: 'Contract', value: 'contract' },
+    { label: 'Andere', value: 'other' },
+  ],
+  variant: 'pills',
 };
 
-function formatSize(bytes: number): string {
-  if (bytes < 1024 * 1024) {
-    return `${Math.round(bytes / 1024)} kB`;
+/** Resolves a short-lived presigned URL on click rather than ahead of time — consistent with TicketScreenshots/OpenDocumentButton. */
+function useOpenDocument() {
+  const [openingId, setOpeningId] = useState<string | null>(null);
+
+  async function open(document: DocumentWithFile) {
+    setOpeningId(document.id);
+    try {
+      const url = await getFileDownloadUrl(document.fileId);
+      window.open(url, '_blank', 'noopener,noreferrer');
+    } catch {
+      showErrorToast('Openen mislukt', 'Probeer opnieuw.');
+    } finally {
+      setOpeningId(null);
+    }
   }
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+
+  return { open, openingId };
 }
 
-function VisibilityToggle({ document }: { document: DocumentWithFile }) {
+function RowActions({ document }: { document: DocumentWithFile }) {
   const router = useRouter();
-  const [isSaving, setIsSaving] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isTogglingVisibility, setIsTogglingVisibility] = useState(false);
 
-  async function toggle() {
-    setIsSaving(true);
+  async function toggleVisibility() {
+    setIsTogglingVisibility(true);
     try {
       const result = await updateDocumentVisibility({
         documentId: document.id,
@@ -62,25 +80,9 @@ function VisibilityToggle({ document }: { document: DocumentWithFile }) {
       );
       router.refresh();
     } finally {
-      setIsSaving(false);
+      setIsTogglingVisibility(false);
     }
   }
-
-  return (
-    <button type="button" onClick={toggle} disabled={isSaving} className="inline-flex items-center">
-      {isSaving ? (
-        <Loader2 className="text-muted-foreground size-4 animate-spin" />
-      ) : (
-        <StatusBadge domain="document" visibleToClient={document.visibleToClient} />
-      )}
-    </button>
-  );
-}
-
-function RowActions({ document }: { document: DocumentWithFile }) {
-  const router = useRouter();
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDelete() {
     setIsDeleting(true);
@@ -99,14 +101,29 @@ function RowActions({ document }: { document: DocumentWithFile }) {
   }
 
   return (
-    <>
+    // Stops the row's own click (which opens the document) from firing when
+    // the user is actually interacting with this menu.
+    <div onClick={(event) => event.stopPropagation()} className="flex justify-end">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="icon" aria-label="Meer acties">
-            <MoreHorizontal strokeWidth={1.75} />
+          <Button
+            variant="ghost"
+            size="icon"
+            aria-label="Meer acties"
+            disabled={isTogglingVisibility}
+          >
+            {isTogglingVisibility ? (
+              <Loader2 className="animate-spin" strokeWidth={1.75} />
+            ) : (
+              <MoreHorizontal strokeWidth={1.75} />
+            )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem onSelect={toggleVisibility}>
+            {document.visibleToClient ? <EyeOff strokeWidth={1.75} /> : <Eye strokeWidth={1.75} />}
+            {document.visibleToClient ? 'Niet langer delen' : 'Delen met klant'}
+          </DropdownMenuItem>
           <DropdownMenuItem variant="destructive" onSelect={() => setConfirmOpen(true)}>
             <Trash2 strokeWidth={1.75} />
             Verwijderen
@@ -125,113 +142,92 @@ function RowActions({ document }: { document: DocumentWithFile }) {
         confirmationText={document.title}
         onConfirm={handleDelete}
       />
-    </>
-  );
-}
-
-const typeFilter: DataTableFilter<DocumentWithFile> = {
-  key: 'type',
-  label: 'Soort',
-  getValue: (document) => document.type,
-  options: [
-    { label: 'Alle', value: 'all' },
-    { label: 'Factuur', value: 'invoice' },
-    { label: 'Offerte', value: 'quote' },
-    { label: 'Contract', value: 'contract' },
-    { label: 'Andere', value: 'other' },
-  ],
-  variant: 'pills',
-};
-
-const columns: DataTableColumn<DocumentWithFile>[] = [
-  {
-    key: 'title',
-    header: 'Titel',
-    sortValue: (document) => document.title.toLowerCase(),
-    cell: (document) => (
-      <div className="flex items-center gap-3">
-        {fileTypeTile(document.mimeType)}
-        <div>
-          <p className="font-medium">{document.title}</p>
-          <p className="text-small text-muted-foreground">{document.filename}</p>
-        </div>
-      </div>
-    ),
-  },
-  {
-    key: 'type',
-    header: 'Soort',
-    sortValue: (document) => typeLabels[document.type],
-    cell: (document) => <StatusBadge domain="documentType" type={document.type} />,
-  },
-  {
-    key: 'size',
-    header: 'Grootte',
-    sortValue: (document) => document.size,
-    cell: (document) => formatSize(document.size),
-  },
-  {
-    key: 'createdAt',
-    header: 'Toegevoegd',
-    sortValue: (document) => document.createdAt.getTime(),
-    cell: (document) => (
-      <div>
-        <p>{format(document.createdAt, 'd MMM yyyy', { locale: nl })}</p>
-        {document.uploadedByName && (
-          <p className="text-small text-muted-foreground">{document.uploadedByName}</p>
-        )}
-      </div>
-    ),
-  },
-  {
-    key: 'visibleToClient',
-    header: 'Zichtbaarheid',
-    cell: (document) => <VisibilityToggle document={document} />,
-  },
-  {
-    key: 'actions',
-    header: '',
-    className: 'text-right',
-    cell: (document) => (
-      <div className="flex items-center justify-end gap-1">
-        <OpenDocumentButton fileId={document.fileId} />
-        <RowActions document={document} />
-      </div>
-    ),
-  },
-];
-
-function MobileCard({ document }: { document: DocumentWithFile }) {
-  return (
-    <div className="border-border flex flex-col gap-2 rounded-lg border p-3">
-      <div className="flex items-start gap-3">
-        {fileTypeTile(document.mimeType)}
-        <div className="flex-1">
-          <p className="font-medium">{document.title}</p>
-          <p className="text-small text-muted-foreground">
-            {document.filename} · {formatSize(document.size)}
-          </p>
-        </div>
-        <RowActions document={document} />
-      </div>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-1.5">
-          <StatusBadge domain="documentType" type={document.type} />
-          <VisibilityToggle document={document} />
-        </div>
-        <OpenDocumentButton fileId={document.fileId} />
-      </div>
     </div>
   );
 }
 
 export function DocumentsTable({ documents }: { documents: DocumentWithFile[] }) {
+  const { open, openingId } = useOpenDocument();
+
+  const columns: DataTableColumn<DocumentWithFile>[] = [
+    {
+      key: 'title',
+      header: 'Document',
+      sortValue: (document) => document.title.toLowerCase(),
+      cell: (document) => (
+        <div className="flex items-center gap-3">
+          {openingId === document.id ? (
+            <div className="flex size-9 shrink-0 items-center justify-center">
+              <Loader2 className="text-muted-foreground size-4 animate-spin" />
+            </div>
+          ) : (
+            fileTypeTile(document.mimeType)
+          )}
+          <div className="min-w-0">
+            <p className="truncate font-medium">{document.title}</p>
+            <p className="text-small text-muted-foreground truncate">{document.filename}</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'badges',
+      header: 'Badges',
+      cell: (document) => (
+        <div className="flex flex-wrap items-center gap-1.5">
+          <StatusBadge domain="documentType" type={document.type} />
+          <StatusBadge domain="document" visibleToClient={document.visibleToClient} />
+        </div>
+      ),
+    },
+    {
+      key: 'actions',
+      header: '',
+      className: 'text-right',
+      cell: (document) => <RowActions document={document} />,
+    },
+  ];
+
   return (
     <DataTable
       columns={columns}
       rows={documents}
       getRowKey={(document) => document.id}
-      renderMobileCard={(document) => <MobileCard document={document} />}
+      onRowClick={open}
+      renderMobileCard={(document) => (
+        // A plain clickable div, not a <button> — RowActions renders its own
+        // button (the "..." menu trigger) below, and nesting a button inside
+        // a button is invalid HTML (see KanbanCard/AgendaCard for the same
+        // pattern elsewhere in this codebase).
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => open(document)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter' || event.key === ' ') open(document);
+          }}
+          className="border-border flex w-full flex-col gap-2 rounded-lg border p-3 text-left"
+        >
+          <div className="flex items-start gap-3">
+            {openingId === document.id ? (
+              <div className="flex size-9 shrink-0 items-center justify-center">
+                <Loader2 className="text-muted-foreground size-4 animate-spin" />
+              </div>
+            ) : (
+              fileTypeTile(document.mimeType)
+            )}
+            <div className="min-w-0 flex-1">
+              <p className="truncate font-medium">{document.title}</p>
+              <p className="text-small text-muted-foreground truncate">{document.filename}</p>
+            </div>
+            <RowActions document={document} />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <StatusBadge domain="documentType" type={document.type} />
+            <StatusBadge domain="document" visibleToClient={document.visibleToClient} />
+          </div>
+        </div>
+      )}
       filters={[typeFilter]}
       pageSize={10}
       emptyState={
