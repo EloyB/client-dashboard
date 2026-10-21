@@ -14,7 +14,6 @@ import { EmptyState } from '@/components/shared/EmptyState';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import type { AdminTicketListRow } from '@/features/tickets/queries.admin';
 import type { Priority, TicketStatus } from '@/db/schema';
-import { cn } from '@/lib/utils';
 
 const statusOrder: TicketStatus[] = ['new', 'in_progress', 'resolved'];
 const statusLabels: Record<TicketStatus, string> = {
@@ -62,13 +61,11 @@ export function TicketsTable({ tickets }: { tickets: AdminTicketListRow[] }) {
       header: 'Ticket',
       sortValue: (row) => row.title,
       cell: (row) => (
-        <div
-          className={cn(
-            'flex flex-col gap-0.5',
-            row.status === 'new' && 'border-info -ml-2.5 border-l-2 pl-2',
-          )}
-        >
-          <Link href={`/app/tickets/${row.id}`} className="font-medium">
+        <div className="flex flex-col gap-0.5">
+          <Link href={`/app/tickets/${row.id}`} className="flex items-center gap-2 font-medium">
+            {row.status === 'new' && (
+              <span className="bg-info size-2 shrink-0 rounded-full" aria-hidden="true" />
+            )}
             {row.title}
           </Link>
           <p className="text-small text-muted-foreground">
@@ -166,17 +163,17 @@ export function TicketsTable({ tickets }: { tickets: AdminTicketListRow[] }) {
       }
       renderMobileCard={(row) => (
         <Link href={`/app/tickets/${row.id}`} className="block">
-          <div
-            className={cn(
-              'border-border-subtle bg-card flex flex-col gap-2 rounded-xl border p-3',
-              row.status === 'new' && 'border-l-info border-l-2',
-            )}
-          >
+          <div className="border-border-subtle bg-card flex flex-col gap-2 rounded-xl border p-3">
             <div className="flex items-center justify-between gap-2">
               <span className="text-small text-muted-foreground font-mono">{row.reference}</span>
               <StatusBadge domain="ticket" status={row.status} />
             </div>
-            <p className="font-medium">{row.title}</p>
+            <p className="flex items-center gap-2 font-medium">
+              {row.status === 'new' && (
+                <span className="bg-info size-2 shrink-0 rounded-full" aria-hidden="true" />
+              )}
+              {row.title}
+            </p>
             <p className="text-small text-muted-foreground">
               {row.clientName} · {row.projectName}
             </p>
