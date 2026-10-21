@@ -77,6 +77,7 @@ export function DataTable<T>({
   emptyState,
   className,
   tableCardClassName,
+  extraControls,
 }: {
   columns: DataTableColumn<T>[];
   rows: T[];
@@ -95,6 +96,8 @@ export function DataTable<T>({
   className?: string;
   /** Overrides the desktop table's own Card styling — e.g. "shadow-none border border-border" when the table already sits inside another Card (see the compact Documenten tab), where the default shadow-card would double up. */
   tableCardClassName?: string;
+  /** Extra content rendered on the same line as the "Sorteren" control (e.g. a switch) — see the documents list's "Alleen gedeeld met de klant" switch. */
+  extraControls?: ReactNode;
 }) {
   const router = useRouter();
   const filterKeys = useMemo(() => filters?.map((filter) => filter.key) ?? [], [filters]);
@@ -122,7 +125,7 @@ export function DataTable<T>({
 
   return (
     <div className={cn('flex flex-col gap-3', className)}>
-      {(searchValue || filters || sortableColumns.length > 0) && (
+      {(searchValue || filters || sortableColumns.length > 0 || extraControls) && (
         <div className="flex flex-col gap-3">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
@@ -157,32 +160,39 @@ export function DataTable<T>({
                 </Select>
               ))}
             </div>
-            {sortableColumns.length > 0 && (
-              <div className="flex items-center gap-2">
-                <span className="text-body text-muted-foreground whitespace-nowrap">Sorteren</span>
-                <Select
-                  value={state.sort ? `${state.sort}:${state.direction}` : undefined}
-                  onValueChange={(value) => {
-                    const [field, direction] = value.split(':') as [string, 'asc' | 'desc'];
-                    state.setSortWithDirection(field, direction);
-                  }}
-                >
-                  <SelectTrigger className="w-full sm:w-56" aria-label="Sorteren">
-                    <SelectValue placeholder="Sorteren op" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sortableColumns.map((column) => (
-                      <Fragment key={column.key}>
-                        <SelectItem value={`${column.key}:asc`}>
-                          {column.header} · oplopend
-                        </SelectItem>
-                        <SelectItem value={`${column.key}:desc`}>
-                          {column.header} · aflopend
-                        </SelectItem>
-                      </Fragment>
-                    ))}
-                  </SelectContent>
-                </Select>
+            {(sortableColumns.length > 0 || extraControls) && (
+              <div className="flex flex-wrap items-center gap-4">
+                {extraControls}
+                {sortableColumns.length > 0 && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-body text-muted-foreground whitespace-nowrap">
+                      Sorteren
+                    </span>
+                    <Select
+                      value={state.sort ? `${state.sort}:${state.direction}` : undefined}
+                      onValueChange={(value) => {
+                        const [field, direction] = value.split(':') as [string, 'asc' | 'desc'];
+                        state.setSortWithDirection(field, direction);
+                      }}
+                    >
+                      <SelectTrigger className="w-full sm:w-56" aria-label="Sorteren">
+                        <SelectValue placeholder="Sorteren op" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {sortableColumns.map((column) => (
+                          <Fragment key={column.key}>
+                            <SelectItem value={`${column.key}:asc`}>
+                              {column.header} · oplopend
+                            </SelectItem>
+                            <SelectItem value={`${column.key}:desc`}>
+                              {column.header} · aflopend
+                            </SelectItem>
+                          </Fragment>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
               </div>
             )}
           </div>

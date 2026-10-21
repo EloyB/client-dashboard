@@ -2,7 +2,7 @@
 
 import { Eye, EyeOff, Loader2, MoreHorizontal, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -128,7 +128,14 @@ function RowActions({ document }: { document: DocumentWithFile }) {
   );
 }
 
-export function DocumentsTable({ documents }: { documents: DocumentWithFile[] }) {
+export function DocumentsTable({
+  documents,
+  extraControls,
+}: {
+  documents: DocumentWithFile[];
+  /** Rendered on the same line as the "Sorteren" control — see DocumentsPageContent's "Alleen gedeeld met de klant" switch. */
+  extraControls?: ReactNode;
+}) {
   const { open, openingId } = useOpenFile();
   const openDocument = (document: DocumentWithFile) => open(document.id, document.fileId);
 
@@ -193,6 +200,7 @@ export function DocumentsTable({ documents }: { documents: DocumentWithFile[] })
       // compact Documenten tab on project detail — requested during manual
       // review.
       tableCardClassName="shadow-none border border-border"
+      extraControls={extraControls}
       emptyState={
         <EmptyState
           variant="filtered"

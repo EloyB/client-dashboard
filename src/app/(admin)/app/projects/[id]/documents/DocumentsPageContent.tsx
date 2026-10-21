@@ -56,14 +56,17 @@ export function DocumentsPageContent({
       />
 
       <div className="flex flex-col gap-4 p-4 sm:p-6 lg:p-8">
-        {documents.length > 0 && (
-          <label className="flex w-fit items-center gap-2">
-            <Switch checked={sharedOnly} onCheckedChange={setSharedOnly} />
-            <span className="text-body">Alleen gedeeld met de klant</span>
-          </label>
-        )}
-
-        <DocumentsTable documents={visibleRows} />
+        <DocumentsTable
+          documents={visibleRows}
+          extraControls={
+            documents.length > 0 && (
+              <label className="flex w-fit items-center gap-2">
+                <Switch checked={sharedOnly} onCheckedChange={setSharedOnly} />
+                <span className="text-body whitespace-nowrap">Alleen gedeeld met de klant</span>
+              </label>
+            )
+          }
+        />
       </div>
 
       <DocumentUploadSheet projectId={projectId} open={uploadOpen} onOpenChange={setUploadOpen} />
