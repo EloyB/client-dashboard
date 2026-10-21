@@ -45,8 +45,9 @@ test.describe('admin taken (slice 7a)', () => {
       await page.getByRole('option', { name: 'Bezig' }).click();
       await expect(page.getByText('Status bijgewerkt')).toBeVisible();
 
-      // 3. Edit the task via its title.
-      await page.getByRole('button', { name: title }).click();
+      // 3. Edit the task via the "..." menu.
+      await page.getByRole('button', { name: 'Meer acties' }).first().click();
+      await page.getByRole('menuitem', { name: 'Bewerken' }).click();
       await expect(page.getByRole('heading', { name: 'Taak bewerken' })).toBeVisible();
       await page.getByLabel('Titel').fill(editedTitle);
       await page.getByRole('button', { name: 'Opslaan' }).click();

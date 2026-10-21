@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns';
 import { nl } from 'date-fns/locale';
-import { MoreHorizontal, Trash2 } from 'lucide-react';
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
@@ -52,7 +52,24 @@ function isOverdue(task: TaskRow): boolean {
   return date < new Date(new Date().toDateString());
 }
 
-function DeleteTaskMenu({ task }: { task: TaskRow }) {
+function toEditableTask(task: TaskRow): EditableTask {
+  return {
+    id: task.id,
+    title: task.title,
+    description: task.description,
+    status: task.status,
+    priority: task.priority,
+    dueDate: task.dueDate,
+  };
+}
+
+function TaskRowActions({
+  task,
+  onEditTask,
+}: {
+  task: TaskRow;
+  onEditTask: (task: EditableTask) => void;
+}) {
   const router = useRouter();
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -82,6 +99,10 @@ function DeleteTaskMenu({ task }: { task: TaskRow }) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
+          <DropdownMenuItem onSelect={() => onEditTask(toEditableTask(task))}>
+            <Pencil strokeWidth={1.75} />
+            Bewerken
+          </DropdownMenuItem>
           <DropdownMenuItem variant="destructive" onSelect={() => setConfirmOpen(true)}>
             <Trash2 strokeWidth={1.75} />
             Verwijderen
@@ -121,16 +142,7 @@ export function TasksTable({
       cell: (task) => (
         <button
           type="button"
-          onClick={() =>
-            onEditTask({
-              id: task.id,
-              title: task.title,
-              description: task.description,
-              status: task.status,
-              priority: task.priority,
-              dueDate: task.dueDate,
-            })
-          }
+          onClick={() => onEditTask(toEditableTask(task))}
           className={cn(
             'text-left font-medium underline-offset-2 hover:underline',
             task.status === 'done' && 'text-muted-foreground line-through',
@@ -170,7 +182,7 @@ export function TasksTable({
       key: 'actions',
       header: '',
       className: 'text-right',
-      cell: (task) => <DeleteTaskMenu task={task} />,
+      cell: (task) => <TaskRowActions task={task} onEditTask={onEditTask} />,
     },
   ];
 
@@ -213,16 +225,7 @@ export function TasksTable({
             <div className="flex items-start justify-between gap-2">
               <button
                 type="button"
-                onClick={() =>
-                  onEditTask({
-                    id: task.id,
-                    title: task.title,
-                    description: task.description,
-                    status: task.status,
-                    priority: task.priority,
-                    dueDate: task.dueDate,
-                  })
-                }
+                onClick={() => onEditTask(toEditableTask(task))}
                 className={cn(
                   'text-left font-medium',
                   task.status === 'done' && 'text-muted-foreground line-through',
@@ -249,7 +252,7 @@ export function TasksTable({
               <div className="flex-1">
                 <TaskStatusSelect taskId={task.id} status={task.status} />
               </div>
-              <DeleteTaskMenu task={task} />
+              <TaskRowActions task={task} onEditTask={onEditTask} />
             </div>
           </div>
         )}
