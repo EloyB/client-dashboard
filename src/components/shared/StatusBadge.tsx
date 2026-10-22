@@ -2,7 +2,8 @@ import type { DocumentType, Priority, ProjectStatus, TaskStatus, TicketStatus } 
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 
-const taskStatusConfig: Record<TaskStatus, { label: string; className: string }> = {
+/** Exported so the takenlijst's inline status-select (slice 7a) can reuse the same colors. */
+export const taskStatusConfig: Record<TaskStatus, { label: string; className: string }> = {
   todo: { label: 'Te doen', className: 'bg-muted text-secondary-foreground hover:bg-muted' },
   in_progress: { label: 'Bezig', className: 'bg-accent text-accent-foreground hover:bg-accent' },
   review: { label: 'Review', className: 'bg-warning-muted text-warning hover:bg-warning-muted' },

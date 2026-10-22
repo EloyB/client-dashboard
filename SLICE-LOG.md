@@ -35,3 +35,17 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
   - Bug (in de Playwright-testhelper zelf, niet in productiecode): `.count()` om tussen twee knoppen te kiezen race't met de DOM en liet de test soms vasthangen. Vervangen door `.or()`.
   - Opruiming: een paar achtergebleven "Zzz Temp Client"-rijen in de lokale ontwikkel-database van eerder gecrashte testruns (cleanup() liep niet door een test-timeout) zijn verwijderd.
 - **Openstaande twijfels:** geen.
+
+---
+
+## Slice 7a — Takenlijst per project
+
+- **Branch:** `slice/7a-tasks-list` (vertrekt van `slice/6b-documents-portal`)
+- **PR:** [#4](https://github.com/EloyB/client-dashboard/pull/4) → base `slice/6b-documents-portal`
+- **Migraties:** geen (`tasks`, inclusief `position`, bestond al)
+- **Aannames:**
+  - Geen `queries.portal.ts`-tegenhanger — taken zijn volledig intern, geen enkele portaalroute of -query raakt ze aan.
+  - Position altijd via `generateKeyBetween` ná de laatste taak in dezelfde (project, status)-kolom, zodat 7b (kanban) er zonder migratie op kan voortbouwen.
+  - Geen expliciete lege-staat-screenshot in de designs gevonden voor taken; `EmptyState variant="invite"` toegepast, consistent met documenten/tickets.
+- **Gevonden tijdens het testen:** geen bugs — screenshots op desktop en 375px kwamen overeen met het verwachte patroon zonder aanpassingen nodig.
+- **Openstaande twijfels:** geen.

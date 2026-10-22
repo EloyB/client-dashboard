@@ -11,17 +11,19 @@ import { listActivityForProject } from '@/features/activity/queries';
 import { listDocumentsForProject } from '@/features/documents/queries';
 import { getProjectById } from '@/features/projects/queries';
 import { listTicketsForProjectAdmin } from '@/features/tickets/queries.admin';
+import { listTasksForProject } from '@/features/tasks/queries';
 import { AccessError, requireAdmin } from '@/lib/access';
 import { cn, parseDateOnly } from '@/lib/utils';
 import { DocumentsTab } from './DocumentsTab';
 import { OverviewTab } from './OverviewTab';
 import { ProjectDetailHeader } from './ProjectDetailHeader';
 import { ProjectDetailTabs } from './ProjectDetailTabs';
-import { TasksTabPlaceholder } from './TasksTabPlaceholder';
+import { TasksTab } from './TasksTab';
 import { TicketsTab } from './TicketsTab';
 
 const PROJECT_TICKETS_LIMIT = 5;
 const PROJECT_DOCUMENTS_LIMIT = 4;
+const PROJECT_OPEN_TASKS_LIMIT = 5;
 
 function formatDate(date: Date | undefined): string {
   return date ? format(date, 'd MMMM yyyy', { locale: nl }) : '—';
@@ -54,6 +56,10 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const sharedDocumentCount = allProjectDocuments.filter(
     (document) => document.visibleToClient,
   ).length;
+  const allProjectTasks = await listTasksForProject(requestHeaders, project.id);
+  const openProjectTasks = allProjectTasks
+    .filter((task) => task.status !== 'done')
+    .slice(0, PROJECT_OPEN_TASKS_LIMIT);
 
   const today = format(new Date(), 'yyyy-MM-dd');
   const isOverdue =
@@ -119,7 +125,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
           <div className="lg:col-span-2">
             <ProjectDetailTabs
               overzicht={<OverviewTab activity={activity} />}
-              taken={<TasksTabPlaceholder />}
+              taken={<TasksTab tasks={openProjectTasks} projectId={project.id} />}
               tickets={<TicketsTab tickets={projectTickets} projectId={project.id} />}
               documenten={
                 <DocumentsTab
