@@ -309,4 +309,21 @@
       min-height: 2.75rem;
     }
   }
+
+  /* Every clickable control shows a pointer by default — browsers don't do
+     this for <button> on their own, and Radix's menu/select/tab items are
+     divs with an ARIA role rather than a real <button>. Components that
+     need something else (e.g. the dropdown/select items below, which ship
+     cursor-default) still override this locally. */
+  button:not(:disabled),
+  [role='button']:not([aria-disabled='true']),
+  [role='tab']:not([aria-disabled='true']),
+  [role='menuitem']:not([data-disabled]),
+  [role='menuitemcheckbox']:not([data-disabled]),
+  [role='menuitemradio']:not([data-disabled]),
+  [role='option']:not([data-disabled]),
+  [role='switch']:not([data-disabled]),
+  [role='checkbox']:not([data-disabled]) {
+    cursor: pointer;
+  }
 }
