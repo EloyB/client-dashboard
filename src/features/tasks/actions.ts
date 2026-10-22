@@ -9,6 +9,7 @@ import { activityLog, tasks, type TaskStatus } from '@/db/schema';
 import {
   createTaskSchema,
   deleteTaskSchema,
+  moveTaskSchema,
   updateTaskSchema,
   updateTaskStatusSchema,
 } from '@/features/tasks/schemas';
@@ -139,6 +140,58 @@ export const updateTaskStatus = createFormAction(updateTaskStatusSchema, async (
       type: 'task_status_changed',
       description: `Taak "${existing.title}" verplaatst naar "${statusLabels[data.status]}"`,
     });
+
+    return updated;
+  });
+
+  return task;
+});
+
+/**
+ * The kanban board's drag-and-drop action (7b). Unlike updateTaskStatus
+ * (which always appends to the end of the target column), this places the
+ * task at a specific spot between two named neighbors — both looked up and
+ * validated server-side (same project, same target column) rather than
+ * trusting a position the browser computed.
+ */
+export const moveTask = createFormAction(moveTaskSchema, async (data) => {
+  const admin = await requireAdmin(await headers());
+  const existing = await getTaskOrNotFound(data.taskId);
+  await assertProjectAccess(admin, existing.projectId);
+
+  const [previous, next] = await Promise.all([
+    data.previousTaskId ? getTaskOrNotFound(data.previousTaskId) : null,
+    data.nextTaskId ? getTaskOrNotFound(data.nextTaskId) : null,
+  ]);
+
+  for (const neighbor of [previous, next]) {
+    if (
+      neighbor &&
+      (neighbor.projectId !== existing.projectId || neighbor.status !== data.status)
+    ) {
+      throw new Error('Ongeldige verplaatsing.');
+    }
+  }
+
+  const position = generateKeyBetween(previous?.position ?? null, next?.position ?? null);
+  const statusChanged = existing.status !== data.status;
+
+  const [task] = await db.transaction(async (tx) => {
+    const updated = await tx
+      .update(tasks)
+      .set({ status: data.status, position, completedAt: completedAtFor(data.status) })
+      .where(eq(tasks.id, data.taskId))
+      .returning();
+
+    if (statusChanged) {
+      await tx.insert(activityLog).values({
+        projectId: existing.projectId,
+        taskId: existing.id,
+        actorId: admin.id,
+        type: 'task_status_changed',
+        description: `Taak "${existing.title}" verplaatst naar "${statusLabels[data.status]}"`,
+      });
+    }
 
     return updated;
   });

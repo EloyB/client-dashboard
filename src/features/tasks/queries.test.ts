@@ -6,6 +6,7 @@ const { clients, tasks } = await import('@/db/schema');
 const { adminHeaders, createTempClient, createTempClientUserSession, createTempProject } =
   await import('@/db/test-real-session');
 const { getTaskById, listTasksForProject } = await import('@/features/tasks/queries');
+const { taskReference } = await import('@/lib/task-links');
 
 async function deleteTempClient(clientId: string) {
   await db.delete(clients).where(eq(clients.id, clientId));
@@ -49,6 +50,19 @@ describe('listTasksForProject', () => {
     try {
       const result = await listTasksForProject(await adminHeaders(), projectA.id);
       expect(result.map((task) => task.id)).toEqual([taskA1.id, taskA2.id]);
+    } finally {
+      await deleteTempClient(client.id);
+    }
+  });
+
+  it('includes the task’s own reference', async () => {
+    const client = await createTempClient();
+    const project = await createTempProject(client.id);
+    const task = await createTempTask(project.id);
+
+    try {
+      const [result] = await listTasksForProject(await adminHeaders(), project.id);
+      expect(result.reference).toBe(taskReference(task.id));
     } finally {
       await deleteTempClient(client.id);
     }

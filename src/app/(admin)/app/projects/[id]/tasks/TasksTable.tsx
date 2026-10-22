@@ -35,6 +35,7 @@ export type TaskRow = {
   status: TaskStatus;
   priority: Priority;
   dueDate: string | null;
+  reference: string;
   ticketReference: string | null;
 };
 
@@ -140,16 +141,19 @@ export function TasksTable({
       header: 'Taak',
       sortValue: (task) => task.title.toLowerCase(),
       cell: (task) => (
-        <button
-          type="button"
-          onClick={() => onEditTask(toEditableTask(task))}
-          className={cn(
-            'text-left font-medium underline-offset-2 hover:underline',
-            task.status === 'done' && 'text-muted-foreground line-through',
-          )}
-        >
-          {task.title}
-        </button>
+        <div className="flex flex-col gap-0.5">
+          <button
+            type="button"
+            onClick={() => onEditTask(toEditableTask(task))}
+            className={cn(
+              'text-left font-medium underline-offset-2 hover:underline',
+              task.status === 'done' && 'text-muted-foreground line-through',
+            )}
+          >
+            {task.title}
+          </button>
+          <p className="text-small text-muted-foreground font-mono">{task.reference}</p>
+        </div>
       ),
     },
     {
@@ -226,12 +230,17 @@ export function TasksTable({
               <button
                 type="button"
                 onClick={() => onEditTask(toEditableTask(task))}
-                className={cn(
-                  'text-left font-medium',
-                  task.status === 'done' && 'text-muted-foreground line-through',
-                )}
+                className="flex flex-col gap-0.5 text-left"
               >
-                {task.title}
+                <span
+                  className={cn(
+                    'font-medium',
+                    task.status === 'done' && 'text-muted-foreground line-through',
+                  )}
+                >
+                  {task.title}
+                </span>
+                <span className="text-small text-muted-foreground font-mono">{task.reference}</span>
               </button>
               <StatusBadge domain="priority" priority={task.priority} />
             </div>

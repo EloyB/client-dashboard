@@ -3,6 +3,7 @@ import { asc, eq } from 'drizzle-orm';
 import { db, type Database } from '@/db';
 import { tasks } from '@/db/schema';
 import { AccessError, assertProjectAccess, requireAdmin } from '@/lib/access';
+import { taskReference } from '@/lib/task-links';
 import { ticketReference } from '@/lib/ticket-links';
 
 /** Tasks are admin-only — never exposed to a portal query or route. */
@@ -22,6 +23,7 @@ export async function listTasksForProject(
 
   return rows.map((task) => ({
     ...task,
+    reference: taskReference(task.id),
     ticketReference: task.ticketId ? ticketReference(task.ticketId) : null,
   }));
 }

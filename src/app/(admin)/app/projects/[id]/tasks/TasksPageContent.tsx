@@ -1,14 +1,30 @@
 'use client';
 
-import { Plus } from 'lucide-react';
+import { LayoutGrid, List, Plus } from 'lucide-react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { PageHeader } from '@/components/shared/PageHeader';
+import { useIsDesktop } from '@/components/shared/useIsDesktop';
+import type { TaskStatus } from '@/db/schema';
+import { KanbanBoard } from './KanbanBoard';
 import { TaskFormSheet, type EditableTask } from './TaskFormSheet';
 import { TasksTable, type TaskRow } from './TasksTable';
 
+const VIEW_VALUES = ['list', 'board'] as const;
+type View = (typeof VIEW_VALUES)[number];
+
+function isView(value: string | null): value is View {
+  return (VIEW_VALUES as readonly string[]).includes(value ?? '');
+}
+
+/**
+ * Lijst and bord are two views of the same route, per INDEX.md's note — not
+ * two nav destinations. `?view=` keeps the choice in the URL; list (7a) stays
+ * the default for a bare URL, board (7b) is opt-in via the toggle.
+ */
 export function TasksPageContent({
   tasks,
   projectId,
@@ -18,11 +34,31 @@ export function TasksPageContent({
   projectId: string;
   projectName: string;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const requestedView: View = isView(searchParams.get('view'))
+    ? (searchParams.get('view') as View)
+    : 'list';
+  // The board isn't usable on mobile yet (7c adds that) — fall back to the
+  // list there regardless of the URL, without losing the saved preference.
+  const isDesktop = useIsDesktop();
+  const view: View = isDesktop ? requestedView : 'list';
+
   const [formOpen, setFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<EditableTask | undefined>(undefined);
+  const [createStatus, setCreateStatus] = useState<TaskStatus>('todo');
 
-  function openCreate() {
+  function setView(next: View) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === 'list') params.delete('view');
+    else params.set('view', next);
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+  }
+
+  function openCreate(status: TaskStatus = 'todo') {
     setEditingTask(undefined);
+    setCreateStatus(status);
     setFormOpen(true);
   }
 
@@ -47,8 +83,34 @@ export function TasksPageContent({
             </span>
           )
         }
+        secondaryAction={
+          isDesktop && (
+            <div className="flex overflow-hidden rounded-lg border">
+              <Button
+                variant={view === 'list' ? 'default' : 'ghost'}
+                size="icon"
+                className="rounded-none"
+                aria-label="Lijst"
+                aria-pressed={view === 'list'}
+                onClick={() => setView('list')}
+              >
+                <List strokeWidth={1.75} />
+              </Button>
+              <Button
+                variant={view === 'board' ? 'default' : 'ghost'}
+                size="icon"
+                className="rounded-none"
+                aria-label="Bord"
+                aria-pressed={view === 'board'}
+                onClick={() => setView('board')}
+              >
+                <LayoutGrid strokeWidth={1.75} />
+              </Button>
+            </div>
+          )
+        }
         primaryAction={
-          <Button onClick={openCreate}>
+          <Button onClick={() => openCreate()}>
             <Plus strokeWidth={1.75} />
             Taak toevoegen
           </Button>
@@ -62,21 +124,24 @@ export function TasksPageContent({
             title="Nog geen taken"
             description="Taken voor dit project komen hier terecht."
             action={
-              <Button onClick={openCreate}>
+              <Button onClick={() => openCreate()}>
                 <Plus strokeWidth={1.75} />
                 Taak toevoegen
               </Button>
             }
           />
+        ) : view === 'board' ? (
+          <KanbanBoard tasks={tasks} onEditTask={openEdit} onAddTask={openCreate} />
         ) : (
           <TasksTable tasks={tasks} onEditTask={openEdit} />
         )}
       </div>
 
       <TaskFormSheet
-        key={editingTask?.id ?? 'new'}
+        key={editingTask?.id ?? `new-${createStatus}`}
         projectId={projectId}
         task={editingTask}
+        defaultStatus={createStatus}
         open={formOpen}
         onOpenChange={setFormOpen}
       />
