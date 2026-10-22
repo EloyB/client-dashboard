@@ -88,19 +88,23 @@ export function TasksPageContent({
             <div className="flex overflow-hidden rounded-lg border">
               <Button
                 variant={view === 'list' ? 'default' : 'ghost'}
+                size="icon"
                 className="rounded-none"
+                aria-label="Lijst"
+                aria-pressed={view === 'list'}
                 onClick={() => setView('list')}
               >
                 <List strokeWidth={1.75} />
-                Lijst
               </Button>
               <Button
                 variant={view === 'board' ? 'default' : 'ghost'}
+                size="icon"
                 className="rounded-none"
+                aria-label="Bord"
+                aria-pressed={view === 'board'}
                 onClick={() => setView('board')}
               >
                 <LayoutGrid strokeWidth={1.75} />
-                Bord
               </Button>
             </div>
           )
