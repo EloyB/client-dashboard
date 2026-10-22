@@ -10,7 +10,6 @@ import { PageHeader } from '@/components/shared/PageHeader';
 import { useIsDesktop } from '@/components/shared/useIsDesktop';
 import type { TaskStatus } from '@/db/schema';
 import { KanbanBoard } from './KanbanBoard';
-import { MobileKanbanBoard } from './MobileKanbanBoard';
 import { TaskFormSheet, type EditableTask } from './TaskFormSheet';
 import { TasksTable, type TaskRow } from './TasksTable';
 
@@ -24,7 +23,11 @@ function isView(value: string | null): value is View {
 /**
  * Lijst and bord are two views of the same route, per INDEX.md's note — not
  * two nav destinations. `?view=` keeps the choice in the URL; list (7a) stays
- * the default for a bare URL, board (7b) is opt-in via the toggle.
+ * the default for a bare URL, board (7b) is opt-in via the toggle. The board
+ * isn't usable on mobile (no mobile layout for it — see CLAUDE.md), so the
+ * toggle is desktop-only and mobile always falls back to the list regardless
+ * of the URL, without losing the saved preference for when the viewport
+ * grows.
  */
 export function TasksPageContent({
   tasks,
@@ -38,11 +41,11 @@ export function TasksPageContent({
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const view: View = isView(searchParams.get('view')) ? (searchParams.get('view') as View) : 'list';
-  // The board renders differently per breakpoint (side-by-side columns on
-  // desktop, one column at a time with a switcher on mobile — see 7c) —
-  // the `view` choice itself is the same for both.
+  const requestedView: View = isView(searchParams.get('view'))
+    ? (searchParams.get('view') as View)
+    : 'list';
   const isDesktop = useIsDesktop();
+  const view: View = isDesktop ? requestedView : 'list';
 
   const [formOpen, setFormOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<EditableTask | undefined>(undefined);
@@ -83,28 +86,30 @@ export function TasksPageContent({
           )
         }
         secondaryAction={
-          <div className="flex overflow-hidden rounded-lg border">
-            <Button
-              variant={view === 'list' ? 'default' : 'ghost'}
-              size="icon"
-              className="rounded-none"
-              aria-label="Lijst"
-              aria-pressed={view === 'list'}
-              onClick={() => setView('list')}
-            >
-              <List strokeWidth={1.75} />
-            </Button>
-            <Button
-              variant={view === 'board' ? 'default' : 'ghost'}
-              size="icon"
-              className="rounded-none"
-              aria-label="Bord"
-              aria-pressed={view === 'board'}
-              onClick={() => setView('board')}
-            >
-              <LayoutGrid strokeWidth={1.75} />
-            </Button>
-          </div>
+          isDesktop && (
+            <div className="flex overflow-hidden rounded-lg border">
+              <Button
+                variant={view === 'list' ? 'default' : 'ghost'}
+                size="icon"
+                className="rounded-none"
+                aria-label="Lijst"
+                aria-pressed={view === 'list'}
+                onClick={() => setView('list')}
+              >
+                <List strokeWidth={1.75} />
+              </Button>
+              <Button
+                variant={view === 'board' ? 'default' : 'ghost'}
+                size="icon"
+                className="rounded-none"
+                aria-label="Bord"
+                aria-pressed={view === 'board'}
+                onClick={() => setView('board')}
+              >
+                <LayoutGrid strokeWidth={1.75} />
+              </Button>
+            </div>
+          )
         }
         primaryAction={
           <Button onClick={() => openCreate()}>
@@ -128,11 +133,7 @@ export function TasksPageContent({
             }
           />
         ) : view === 'board' ? (
-          isDesktop ? (
-            <KanbanBoard tasks={tasks} onEditTask={openEdit} onAddTask={openCreate} />
-          ) : (
-            <MobileKanbanBoard tasks={tasks} onEditTask={openEdit} onAddTask={openCreate} />
-          )
+          <KanbanBoard tasks={tasks} onEditTask={openEdit} onAddTask={openCreate} />
         ) : (
           <TasksTable tasks={tasks} onEditTask={openEdit} />
         )}

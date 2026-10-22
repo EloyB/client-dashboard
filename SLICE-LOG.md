@@ -73,9 +73,6 @@ Kort logboek voor de autonome doorloop van de resterende MVP-slices (zie SLICE-P
 - **Branch:** `slice/7c-kanban-mobile` (vertrekt van `slice/7b-kanban-desktop`)
 - **PR:** [#6](https://github.com/EloyB/client-dashboard/pull/6) → base `slice/7b-kanban-desktop`
 - **Migraties:** geen
-- **Aannames:**
-  - Een gloednieuw project zonder taken toont altijd de algemene lege staat, ongeacht `view=board` — pas na de eerste taak verschijnt de kolomwisselaar.
-  - De "+"-knop staat naast de pillrij in plaats van in de bovenste appbalk zoals de designscreenshot toont — functioneel gelijk, kleine visuele afwijking.
-- **Gevonden tijdens het testen:** geen bugs in productiecode — enkel een verkeerde aanname in de eerste e2e-testopzet (zie PR), gefixt in de test zelf.
-- **Opruiming:** `isOverdue()` (stond drievoudig gekopieerd) samengevoegd in `taskHelpers.ts`; een nieuwe `Pill`-component vervangt dubbele pill-markup in het desktopbord en de mobiele kolomwisselaar; `TaskMobileCard` geëxtraheerd zodat lijst en mobiel bord exact dezelfde kaart gebruiken.
+- **Scope aangepast tijdens review:** het mobiele kanbanbord zelf (`MobileKanbanBoard`, kolomwisselaar) is tijdens de PR-review geschrapt — op mobiel volstaat enkel de lijstweergave, net als vóór deze slice. De bord/lijst-toggle blijft dus desktop-only (`isDesktop &&`), `view` valt op mobiel altijd terug op `list`, ongeacht `?view=`. `MobileKanbanBoard.tsx` en `e2e/admin-kanban-mobile.spec.ts` zijn verwijderd.
+- **Wat wél overblijft uit deze slice:** de opruiming die ook het desktopbord en de lijst ten goede komt — `isOverdue()` (stond drievoudig gekopieerd) samengevoegd in `taskHelpers.ts`; een nieuwe `Pill`-component vervangt dubbele pill-markup in het desktopbord se "Alleen vervallen"; `TaskMobileCard`/`TaskRowActions` geëxtraheerd naar een eigen bestand zodat de lijst se mobiele kaart (375px) herbruikbaar is.
 - **Openstaande twijfels:** geen.

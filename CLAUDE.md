@@ -257,7 +257,7 @@ Build in vertical slices: one slice = one branch = one session, delivering data 
 
 - [ ] 7a. Task list per project with create/edit (no board yet)
 - [ ] 7b. Kanban board on desktop with drag-and-drop and fractional indexing
-- [ ] 7c. Mobile kanban: one column at a time with status select
+- [ ] 7c. Mobile: list view only, no board — decided during review, the toggle and board stay desktop-only
 - [ ] 7d. Convert ticket to task
 - [ ] 7e. "All my tasks" overview across projects
 
