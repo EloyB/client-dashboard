@@ -40,18 +40,30 @@ const ticketStatusLabel: Record<TicketStatusAudience, Record<TicketStatus, strin
   },
 };
 
-const projectStatusConfig: Record<ProjectStatus, { label: string; className: string }> = {
-  planned: { label: 'Gepland', className: 'bg-info-muted text-info hover:bg-info-muted' },
-  active: { label: 'Actief', className: 'bg-accent text-accent-foreground hover:bg-accent' },
-  maintenance: {
-    label: 'Onderhoud',
-    className: 'bg-muted text-secondary-foreground hover:bg-muted',
+const projectStatusClassName: Record<ProjectStatus, string> = {
+  planned: 'bg-info-muted text-info hover:bg-info-muted',
+  active: 'bg-accent text-accent-foreground hover:bg-accent',
+  maintenance: 'bg-muted text-secondary-foreground hover:bg-muted',
+  completed: 'bg-success-muted text-success hover:bg-success-muted',
+  archived: 'bg-muted text-neutral-400 hover:bg-muted',
+};
+
+// Same colors in both places; the portal uses friendlier wording, same idea as ticketStatusLabel (slice 9b).
+const projectStatusLabel: Record<TicketStatusAudience, Record<ProjectStatus, string>> = {
+  admin: {
+    planned: 'Gepland',
+    active: 'Actief',
+    maintenance: 'Onderhoud',
+    completed: 'Afgerond',
+    archived: 'Gearchiveerd',
   },
-  completed: {
-    label: 'Afgerond',
-    className: 'bg-success-muted text-success hover:bg-success-muted',
+  portal: {
+    planned: 'Binnenkort van start',
+    active: 'In uitvoering',
+    maintenance: 'In onderhoud',
+    completed: 'Afgerond',
+    archived: 'Gearchiveerd',
   },
-  archived: { label: 'Gearchiveerd', className: 'bg-muted text-neutral-400 hover:bg-muted' },
 };
 
 const priorityConfig: Record<Priority, { label: string; className: string; dotClassName: string }> =
@@ -117,7 +129,12 @@ type StatusBadgeProps =
       audience?: TicketStatusAudience;
       className?: string;
     }
-  | { domain: 'project'; status: ProjectStatus; className?: string }
+  | {
+      domain: 'project';
+      status: ProjectStatus;
+      audience?: TicketStatusAudience;
+      className?: string;
+    }
   | { domain: 'priority'; priority: Priority; className?: string }
   | { domain: 'visibility'; visibleToClient: boolean; className?: string }
   | { domain: 'eventType'; type: EventType; className?: string }
@@ -138,8 +155,10 @@ export function StatusBadge(props: StatusBadgeProps) {
   }
 
   if (props.domain === 'project') {
-    const config = projectStatusConfig[props.status];
-    return <Badge className={cn(config.className, props.className)}>{config.label}</Badge>;
+    const label = projectStatusLabel[props.audience ?? 'admin'][props.status];
+    return (
+      <Badge className={cn(projectStatusClassName[props.status], props.className)}>{label}</Badge>
+    );
   }
 
   if (props.domain === 'priority') {

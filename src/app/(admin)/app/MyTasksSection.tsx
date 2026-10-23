@@ -13,7 +13,7 @@ import {
 } from '@/features/tasks/grouping';
 import { listTasksForDashboard, type DashboardTaskRow } from '@/features/tasks/queries';
 import { cn, formatDateOnly, parseDateOnly, todayInBrussels } from '@/lib/utils';
-import { DashboardSectionCard } from './DashboardSectionCard';
+import { DashboardSectionCard } from '@/components/shared/DashboardSectionCard';
 
 function dueDateLabel(dueDate: string | null, today: string): string | null {
   if (!dueDate) return null;

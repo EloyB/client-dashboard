@@ -4,16 +4,18 @@ import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
-/** The "sectiekaart" shape from COMPONENTS.md: title (+ optional count), a text action to the full overview, then rows. Shared by all four admin home page sections (9a). */
+/** The "sectiekaart" shape from COMPONENTS.md: title (+ optional count/subtitle), a text action to the full overview, then rows. Shared by the admin (9a) and portal (9b) home page sections. */
 export function DashboardSectionCard({
   title,
   count,
+  subtitle,
   actionLabel,
   actionHref,
   children,
 }: {
   title: string;
   count?: number;
+  subtitle?: string;
   actionLabel: string;
   actionHref: string;
   children: ReactNode;
@@ -21,14 +23,17 @@ export function DashboardSectionCard({
   return (
     <Card>
       <CardHeader className="border-border-subtle border-b">
-        <CardTitle className="flex items-center gap-2">
-          {title}
-          {count !== undefined && (
-            <span className="bg-muted text-muted-foreground rounded-full px-1.5 text-xs font-semibold">
-              {count}
-            </span>
-          )}
-        </CardTitle>
+        <div className="flex flex-col gap-0.5">
+          <CardTitle className="flex items-center gap-2">
+            {title}
+            {count !== undefined && (
+              <span className="bg-muted text-muted-foreground rounded-full px-1.5 text-xs font-semibold">
+                {count}
+              </span>
+            )}
+          </CardTitle>
+          {subtitle && <p className="text-small text-muted-foreground">{subtitle}</p>}
+        </div>
         <CardAction>
           <Button size="sm" variant="outline" asChild>
             <Link href={actionHref}>{actionLabel}</Link>

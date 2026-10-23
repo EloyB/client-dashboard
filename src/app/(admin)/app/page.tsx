@@ -10,7 +10,7 @@ import { getCurrentUser } from '@/lib/access';
 import { greetingForBrusselsHour, parseDateOnly, todayInBrussels } from '@/lib/utils';
 import { listProjects } from '@/features/projects/queries';
 import { ActiveProjectsSection } from './ActiveProjectsSection';
-import { DashboardSectionSkeleton } from './DashboardSectionCard';
+import { DashboardSectionSkeleton } from '@/components/shared/DashboardSectionCard';
 import { MyTasksSection } from './MyTasksSection';
 import { NewTicketsSection } from './NewTicketsSection';
 import { QuickActions } from './QuickActions';
