@@ -27,7 +27,7 @@ import type { Priority, TaskStatus } from '@/db/schema';
 import { moveTask } from '@/features/tasks/actions';
 import { KanbanCardContent } from './KanbanCard';
 import { KanbanColumn } from './KanbanColumn';
-import { Pill } from './Pill';
+import { Pill } from '@/components/shared/Pill';
 import { isOverdue } from './taskHelpers';
 import type { TaskRow } from './TasksTable';
 

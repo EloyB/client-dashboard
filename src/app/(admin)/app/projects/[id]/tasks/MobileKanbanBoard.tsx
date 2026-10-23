@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/shared/EmptyState';
 import { taskStatusConfig } from '@/components/shared/StatusBadge';
 import type { TaskStatus } from '@/db/schema';
-import { Pill } from './Pill';
+import { Pill } from '@/components/shared/Pill';
 import { TaskMobileCard } from './TaskMobileCard';
 import type { EditableTask } from './TaskFormSheet';
 import type { TaskRow } from './TasksTable';
