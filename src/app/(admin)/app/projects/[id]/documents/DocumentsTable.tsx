@@ -71,7 +71,7 @@ function VisibilityToggle({ document }: { document: DocumentWithFile }) {
       {isSaving ? (
         <Loader2 className="text-muted-foreground size-4 animate-spin" />
       ) : (
-        <StatusBadge domain="document" visibleToClient={document.visibleToClient} />
+        <StatusBadge domain="visibility" visibleToClient={document.visibleToClient} />
       )}
     </button>
   );

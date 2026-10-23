@@ -2,25 +2,23 @@ import { formatDistanceToNow } from 'date-fns';
 import { nl } from 'date-fns/locale';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { EmptyState } from '@/components/shared/EmptyState';
 import { TimelineItem } from '@/components/shared/ListRow';
 import type { activityLog } from '@/db/schema';
+import { AgendaCard } from './AgendaCard';
+import type { AgendaEvent } from './eventHelpers';
 
-export function OverviewTab({ activity }: { activity: (typeof activityLog.$inferSelect)[] }) {
+export function OverviewTab({
+  activity,
+  events,
+  projectId,
+}: {
+  activity: (typeof activityLog.$inferSelect)[];
+  events: AgendaEvent[];
+  projectId: string;
+}) {
   return (
     <div className="flex flex-col gap-4">
-      <Card>
-        <CardHeader className="border-border-subtle border-b">
-          <CardTitle>Komende agenda</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <EmptyState
-            variant="neutral"
-            title="Niets gepland"
-            description="Agenda-items voor dit project komen hier terecht."
-          />
-        </CardContent>
-      </Card>
+      <AgendaCard events={events} projectId={projectId} />
 
       <Card>
         <CardHeader className="border-border-subtle border-b">

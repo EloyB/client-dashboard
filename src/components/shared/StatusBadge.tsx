@@ -100,7 +100,7 @@ type StatusBadgeProps =
     }
   | { domain: 'project'; status: ProjectStatus; className?: string }
   | { domain: 'priority'; priority: Priority; className?: string }
-  | { domain: 'document'; visibleToClient: boolean; className?: string }
+  | { domain: 'visibility'; visibleToClient: boolean; className?: string }
   | { domain: 'documentType'; type: DocumentType; className?: string }
   | { domain: 'user'; emailVerified: boolean; className?: string };
 
@@ -132,7 +132,7 @@ export function StatusBadge(props: StatusBadgeProps) {
     );
   }
 
-  if (props.domain === 'document') {
+  if (props.domain === 'visibility') {
     const config = visibilityConfig[props.visibleToClient ? 'shared' : 'internal'];
     return <Badge className={cn(config.className, props.className)}>{config.label}</Badge>;
   }

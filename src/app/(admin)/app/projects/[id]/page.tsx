@@ -9,6 +9,7 @@ import { DataList, type DataListItem } from '@/components/shared/DataList';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { listActivityForProject } from '@/features/activity/queries';
 import { listDocumentsForProject } from '@/features/documents/queries';
+import { listEventsForProject } from '@/features/events/queries';
 import { getProjectById } from '@/features/projects/queries';
 import { listTicketsForProjectAdmin } from '@/features/tickets/queries.admin';
 import { listTasksForProject } from '@/features/tasks/queries';
@@ -60,6 +61,7 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
   const openProjectTasks = allProjectTasks
     .filter((task) => task.status !== 'done')
     .slice(0, PROJECT_OPEN_TASKS_LIMIT);
+  const projectEvents = await listEventsForProject(admin, project.id);
 
   const today = todayInBrussels();
   const isOverdue =
@@ -124,7 +126,9 @@ export default async function ProjectDetailPage({ params }: { params: Promise<{ 
         <div className="grid gap-4 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <ProjectDetailTabs
-              overzicht={<OverviewTab activity={activity} />}
+              overzicht={
+                <OverviewTab activity={activity} events={projectEvents} projectId={project.id} />
+              }
               taken={<TasksTab tasks={openProjectTasks} projectId={project.id} />}
               tickets={<TicketsTab tickets={projectTickets} projectId={project.id} />}
               documenten={
