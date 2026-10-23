@@ -23,7 +23,11 @@ function isView(value: string | null): value is View {
 /**
  * Lijst and bord are two views of the same route, per INDEX.md's note — not
  * two nav destinations. `?view=` keeps the choice in the URL; list (7a) stays
- * the default for a bare URL, board (7b) is opt-in via the toggle.
+ * the default for a bare URL, board (7b) is opt-in via the toggle. The board
+ * isn't usable on mobile (no mobile layout for it — see CLAUDE.md), so the
+ * toggle is desktop-only and mobile always falls back to the list regardless
+ * of the URL, without losing the saved preference for when the viewport
+ * grows.
  */
 export function TasksPageContent({
   tasks,
@@ -40,8 +44,6 @@ export function TasksPageContent({
   const requestedView: View = isView(searchParams.get('view'))
     ? (searchParams.get('view') as View)
     : 'list';
-  // The board isn't usable on mobile yet (7c adds that) — fall back to the
-  // list there regardless of the URL, without losing the saved preference.
   const isDesktop = useIsDesktop();
   const view: View = isDesktop ? requestedView : 'list';
 
