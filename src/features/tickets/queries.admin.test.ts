@@ -15,6 +15,7 @@ import {
 import { adminHeaders, createTempClientSession } from '@/db/test-real-session';
 import {
   getTicketByIdForAdmin,
+  listNewTicketsForAdmin,
   listTicketsForAdmin,
   listTicketsForProjectAdmin,
 } from '@/features/tickets/queries.admin';
@@ -80,6 +81,85 @@ describe('listTicketsForAdmin', () => {
       // restricts), so it must go before cleanupTestClient's user cleanup.
       await testDb.delete(ticketAttachments).where(eq(ticketAttachments.fileId, file.id));
       await cleanupTestFile(file.id);
+      await cleanupTestClient(client.id, [user.id]);
+    }
+  });
+});
+
+describe('listNewTicketsForAdmin', () => {
+  it('rejects a non-admin', async () => {
+    const { headers, cleanup } = await createTempClientSession();
+    try {
+      await expect(listNewTicketsForAdmin(headers, 5, testDb)).rejects.toMatchObject({
+        code: 'FORBIDDEN',
+      });
+    } finally {
+      await cleanup();
+    }
+  });
+
+  it('only returns tickets with status new, newest first', async () => {
+    const client = await createTestClient();
+    const user = await createTestClientUser(client.id);
+    const project = await createTestProject(client.id);
+    const resolved = await createTestTicket(project.id, user.id, { status: 'resolved' });
+    const older = await createTestTicket(project.id, user.id, {
+      status: 'new',
+      createdAt: new Date('2026-01-01'),
+    });
+    const newer = await createTestTicket(project.id, user.id, {
+      status: 'new',
+      createdAt: new Date('2026-06-01'),
+    });
+
+    try {
+      const rows = await listNewTicketsForAdmin(await adminHeaders(), 5, testDb);
+      const ids = rows.map((row) => row.id);
+      expect(ids).not.toContain(resolved.id);
+      expect(ids.indexOf(newer.id)).toBeLessThan(ids.indexOf(older.id));
+    } finally {
+      await cleanupTestClient(client.id, [user.id]);
+    }
+  });
+
+  it('respects the limit', async () => {
+    const client = await createTestClient();
+    const user = await createTestClientUser(client.id);
+    const project = await createTestProject(client.id);
+    await createTestTicket(project.id, user.id, { status: 'new' });
+    await createTestTicket(project.id, user.id, { status: 'new' });
+    await createTestTicket(project.id, user.id, { status: 'new' });
+
+    try {
+      const rows = await listNewTicketsForAdmin(await adminHeaders(), 2, testDb);
+      expect(rows).toHaveLength(2);
+    } finally {
+      await cleanupTestClient(client.id, [user.id]);
+    }
+  });
+
+  it('includes the linked task once the ticket has been converted', async () => {
+    const client = await createTestClient();
+    const user = await createTestClientUser(client.id);
+    const project = await createTestProject(client.id);
+    const ticket = await createTestTicket(project.id, user.id, { status: 'new' });
+    const [task] = await testDb
+      .insert(tasks)
+      .values({
+        projectId: project.id,
+        title: 'Gekoppelde taak',
+        status: 'todo',
+        position: 'a0',
+        ticketId: ticket.id,
+      })
+      .returning();
+
+    try {
+      const rows = await listNewTicketsForAdmin(await adminHeaders(), 5, testDb);
+      const row = rows.find((candidate) => candidate.id === ticket.id);
+      expect(row?.linkedTask).toMatchObject({ id: task.id });
+    } finally {
+      await testDb.delete(tasks).where(eq(tasks.id, task.id));
       await cleanupTestClient(client.id, [user.id]);
     }
   });

@@ -1,8 +1,9 @@
-import { asc, desc, eq } from 'drizzle-orm';
+import { and, asc, desc, eq, lte, ne, or } from 'drizzle-orm';
 
 import { db, type Database } from '@/db';
 import { clients, projects, tasks } from '@/db/schema';
 import { AccessError, assertProjectAccess, requireAdmin } from '@/lib/access';
+import { endOfWeek } from '@/features/tasks/grouping';
 import { taskReference } from '@/lib/task-links';
 import { ticketReference } from '@/lib/ticket-links';
 
@@ -75,3 +76,43 @@ export async function listAllTasksForAdmin(requestHeaders: Headers, database: Da
 }
 
 export type AllTasksRow = Awaited<ReturnType<typeof listAllTasksForAdmin>>[number];
+
+/**
+ * For the admin home page (9a) — not-done tasks that are either overdue,
+ * due by the end of this week, or already in progress. Filtered in SQL
+ * (not fetched-then-filtered from listAllTasksForAdmin) so a studio with a
+ * long task history never slows this section down.
+ */
+export async function listTasksForDashboard(
+  requestHeaders: Headers,
+  today: string,
+  database: Database = db,
+) {
+  await requireAdmin(requestHeaders);
+
+  const rows = await database
+    .select({
+      task: tasks,
+      projectName: projects.name,
+      clientName: clients.name,
+    })
+    .from(tasks)
+    .innerJoin(projects, eq(projects.id, tasks.projectId))
+    .innerJoin(clients, eq(clients.id, projects.clientId))
+    .where(
+      and(
+        ne(tasks.status, 'done'),
+        or(lte(tasks.dueDate, endOfWeek(today)), eq(tasks.status, 'in_progress')),
+      ),
+    )
+    .orderBy(asc(tasks.dueDate));
+
+  return rows.map((row) => ({
+    ...row.task,
+    reference: taskReference(row.task.id),
+    projectName: row.projectName,
+    clientName: row.clientName,
+  }));
+}
+
+export type DashboardTaskRow = Awaited<ReturnType<typeof listTasksForDashboard>>[number];

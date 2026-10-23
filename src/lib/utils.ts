@@ -48,6 +48,20 @@ export function todayInBrussels(now: Date = new Date()): string {
   return new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Brussels' }).format(now);
 }
 
+/** Goeiemorgen/Goeiemiddag/Goeieavond for the admin home page (9a), by Europe/Brussels wall-clock hour. */
+export function greetingForBrusselsHour(now: Date = new Date()): string {
+  const hour = Number(
+    new Intl.DateTimeFormat('en-GB', {
+      timeZone: 'Europe/Brussels',
+      hour: '2-digit',
+      hourCycle: 'h23',
+    }).format(now),
+  );
+  if (hour < 12) return 'Goeiemorgen';
+  if (hour < 18) return 'Goeiemiddag';
+  return 'Goeieavond';
+}
+
 /** Europe/Brussels' own UTC offset (in minutes) at a given instant — +60 (CET) or +120 (CEST). */
 function brusselsOffsetMinutes(at: Date): number {
   const offsetPart = new Intl.DateTimeFormat('en-US', {
